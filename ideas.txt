@@ -1,0 +1,183 @@
+Airbnb-clone — Next.js + NestJS + MongoDB
+
+Tài liệu này là một scaffold + hướng dẫn chi tiết để xây dựng một web ứng dụng tương tự Airbnb bằng Next.js (frontend), NestJS (backend) và MongoDB. Bao gồm: kiến trúc, mô hình dữ liệu, API contract, ví dụ schema, snippet code, Docker Compose, CI/CD, bảo mật và bước tiếp theo.
+
+1. Mục tiêu
+
+Ứng dụng cho phép: đăng/duyệt listing (nhà/phòng), đặt phòng (booking), quản lý lịch, review, chat cơ bản và thanh toán.
+
+Triển khai được lên Docker / Vercel (frontend) + VPS/Cloud (backend).
+
+2. Tech stack
+
+Frontend: Next.js (React, SSR/ISR), TypeScript, Tailwind CSS
+
+Backend: NestJS, TypeScript, Mongoose
+
+Database: MongoDB (Atlas hoặc self-hosted)
+
+Authentication: JWT (access + refresh) hoặc NextAuth (giao tiếp với Nest)
+
+File storage: AWS S3 / DigitalOcean Spaces
+
+Thanh toán: Stripe (checkout + webhooks)
+
+Devops: Docker Compose, GitHub Actions, Terraform (option)
+
+3. Kiến trúc tổng quan
+
+Next.js (client + server-side rendering) gọi REST/GraphQL API của NestJS.
+
+NestJS cung cấp API (Auth, Listings, Bookings, Reviews, Messages, Admin).
+
+MongoDB lưu dữ liệu, S3 lưu ảnh.
+
+4. Tính năng chính
+
+User: register/login, profile, role (guest/host)
+
+Listings: CRUD cho host, ảnh, location (lat/lng), tiện nghi, rules
+
+Search: tìm theo thành phố, ngày checkin/checkout, số khách, price range, filters
+
+Booking: availability check, create/cancel, host approval hoặc auto
+
+Payments: xử lý đặt cọc và thanh toán (Stripe)
+
+Reviews
+
+Messages (inbox giữa host - guest)
+
+Dashboard cho host: calendar, earnings
+
+Admin: quản lý users/listings/bookings
+
+5. Cấu trúc database (mẫu)
+
+User
+
+_id, name, email (unique), passwordHash, role, avatarUrl, createdAt
+
+Listing
+
+_id, hostId (ref User), title, description, address, location {lat, lng}, images[], pricePerNight, guests, amenities[], rules[], calendar (booked ranges), createdAt, updatedAt
+
+Booking
+
+_id, listingId, guestId, hostId, startDate, endDate, nights, totalPrice, status (pending/confirmed/cancelled), paymentInfo, createdAt
+
+Review
+
+_id, listingId, authorId, rating, comment, createdAt
+
+Message / Conversation
+
+_id, participants [userId], messages [{from, text, createdAt}]
+
+6. Indexes quan trọng
+
+Users: email (unique)
+
+Listings: location 2dsphere (nếu làm geo queries), hostId
+
+Bookings: listingId, startDate, endDate, guestId
+
+7. API contract (REST - ví dụ)
+
+POST /auth/register — body: {name,email,password}
+
+POST /auth/login — body: {email,password} => {accessToken,refreshToken}
+
+POST /auth/refresh — body: {refreshToken}
+
+GET /listings — query: ?q=Hanoi&minPrice=&maxPrice=&guests=&lat=&lng=&radius=
+
+GET /listings/:id
+
+POST /listings — Auth(Host)
+
+PUT /listings/:id — Auth(Host)
+
+POST /listings/:id/book — body: {startDate,endDate,guests,paymentMethod}
+
+GET /bookings — Auth (user's bookings or host bookings)
+
+POST /webhooks/stripe — webhook xử lý event
+
+8. Bảo mật & Authentication
+
+Password: bcrypt (salt rounds 12+)
+
+JWT: access token (short, e.g. 15m) + refresh token (httpOnly cookie)
+
+CSRF: nếu dùng cookies, bảo vệ CSRF (SameSite, CSRF token)
+
+Rate limiting: Nest middleware cho endpoints auth
+
+Validation: class-validator + DTOs
+
+Sanitization: chống NoSQL injection (validate objectId, use Mongoose params)
+
+9. Lưu ảnh
+
+Frontend upload trực tiếp lên S3 bằng pre-signed URL (Nest cấp presigned URL)
+
+Lưu URL file vào Listing.images
+4. Transaction / Availability logic
+
+Khi đặt: check availability (range overlap) bằng query trên bookings collection hoặc calendar trong listing.
+
+Sử dụng transaction nếu cần nhiều step (create payment, create booking) — MongoDB transaction trong replica set.
+
+15. Thanh toán (Stripe)
+
+Flow: khách thanh toán (Checkout session) -> Stripe trả về success -> webhook backend xử lý và tạo booking chính thức.
+
+Ghi chú: verify webhook signature kĩ.
+
+16. CI / CD (GitHub Actions) — ý tưởng
+
+Test + Lint → build docker images → push to registry → deploy (k8s, VPS hoặc Heroku)
+
+Frontend deploy lên Vercel/Netlify (recommended)
+
+17. Tối ưu hoá hiệu năng
+
+Cache: CDN cho assets; Redis cache cho search results
+
+Pagination: cursor-based
+
+Rate limiting / queue: hàng đợi cho email/webhook xử lý (Bull + Redis)
+
+18. Checklist bảo mật & vận hành
+
+HTTPS everywhere, helmet, CORS whitelist
+
+Backups MongoDB, monitoring (Prometheus/Grafana hoặc Atlas built-in)
+
+Logging structured (winston/pino)
+
+Sentry cho error tracking
+
+19. Roadmap phát triển (gợi ý)
+
+MVP: Auth, create/listing, search basic, booking (no payment)
+
+Add images upload, profile, host dashboard
+
+Integrate payments + webhooks
+
+Reviews, messages
+
+Optimize search (geo / filters), add calendar sync
+
+Production hardening + scaling
+
+20. Next steps mình đã chuẩn bị sẵn (nếu bạn muốn tiếp tục)
+
+Boilerplate backend (NestJS) với modules: auth, users, listings, bookings, reviews, messages
+
+Boilerplate frontend (Next.js + Tailwind) với pages: home, search, listing detail, host dashboard, auth pages
+
+A
+Docker Compose, .env.example, script seed data

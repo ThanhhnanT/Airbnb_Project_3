@@ -1,0 +1,93 @@
+Airbnb Clone RESTful API Specification
+======================================
+
+Base URL: http://localhost:4000/api
+
+--------------------------------------
+AUTH
+--------------------------------------
+POST   /auth/register
+  body: { name, email, password, role }   // role: guest|host
+  resp: { user, accessToken }
+
+POST   /auth/login
+  body: { email, password }
+  resp: { user, accessToken }
+
+POST   /auth/refresh
+  body: { refreshToken }
+  resp: { accessToken }
+
+POST   /auth/logout
+  body: { refreshToken }
+  resp: { success: true }
+
+--------------------------------------
+USERS
+--------------------------------------
+GET    /users/me                (Auth) - thông tin user hiện tại
+PUT    /users/me                (Auth) - cập nhật profile
+GET    /users/:id               - xem thông tin user công khai
+
+--------------------------------------
+LISTINGS
+--------------------------------------
+GET    /listings
+  query: q, minPrice, maxPrice, guests, lat, lng, radius
+  resp: [ {id,title,pricePerNight,...} ]
+
+GET    /listings/:id
+  resp: { id, host, title, description, images, pricePerNight, amenities, ... }
+
+POST   /listings                 (Auth: host)
+  body: { title, description, address, location, images[], pricePerNight, guests, amenities[] }
+  resp: { id, ... }
+
+PUT    /listings/:id             (Auth: host-owner)
+DELETE /listings/:id             (Auth: host-owner)
+
+--------------------------------------
+BOOKINGS
+--------------------------------------
+POST   /listings/:id/book        (Auth: guest)
+  body: { startDate, endDate, guests, paymentMethod }
+  resp: { bookingId, status }
+
+GET    /bookings                 (Auth: user)
+  query: role=guest|host
+  resp: danh sách booking của user hoặc host
+
+GET    /bookings/:id             (Auth: related user)
+PUT    /bookings/:id/cancel      (Auth: guest|host)
+
+--------------------------------------
+REVIEWS
+--------------------------------------
+POST   /listings/:id/reviews     (Auth: guest đã ở)
+  body: { rating, comment }
+GET    /listings/:id/reviews
+  resp: [ {author, rating, comment, createdAt} ]
+
+--------------------------------------
+MESSAGES
+--------------------------------------
+POST   /conversations            (Auth)
+  body: { toUserId, text }
+GET    /conversations            (Auth)
+GET    /conversations/:id        (Auth)
+POST   /conversations/:id        (Auth) - gửi message
+
+--------------------------------------
+ADMIN (role=admin)
+--------------------------------------
+GET    /admin/users
+GET    /admin/listings
+GET    /admin/bookings
+PUT    /admin/users/:id/ban
+
+--------------------------------------
+NOTES
+--------------------------------------
+- Authentication: Bearer token (JWT)
+- Dates: ISO8601 strings
+- Status codes: 200 success, 201 created, 400 bad request, 401 unauthorized, 403 forbidden, 404 not found, 500 server error
