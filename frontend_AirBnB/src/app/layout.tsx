@@ -1,7 +1,10 @@
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import RegisterModal from './components/modals/RegisterModal';
+import Navbar from "./components/navbar/Navbar";
 import "./globals.css";
-import { AntdRegistry } from '@ant-design/nextjs-registry';
+import ToasterProvider from './providers/ToasterProvider';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +32,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AntdRegistry>
+          <ToasterProvider />
+          <RegisterModal />
+          <Navbar/>
           {children}
         </AntdRegistry>
         
