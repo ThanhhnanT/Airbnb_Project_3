@@ -12,24 +12,30 @@ import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { Public } from './decorate/customize';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
+import {MailerService} from '@nestjs-modules/mailer'
+import { VerifyDto } from './dto/verify-email.dto';
+import { LoginAuthDto } from './dto/login-auth.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mailerService: MailerService
+  ) {}
 
   @ApiOperation({summary: 'Người dùng đăng nhập'})
   @UseGuards(LocalAuthGuard)
   @Public()
-  @ApiBody({ type: CreateAuthDto })
+  @ApiBody({ type: LoginAuthDto })
   @Post('login')
-  async login(@Request() req) {
+  async login(@Request() req: any) {
     const user = req.user as any; 
     console.log(user)
-    const { id, email } = user;
-    return this.authService.signIn( id, email);
+    const { _id, email } = user;
+    return this.authService.signIn( _id, email);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiBearerAuth()
   getProfile(@Request() req) {
@@ -40,6 +46,13 @@ export class AuthController {
   @Post('register')
   @Public()
   async register(@Body() createUser: CreateAuthDto ){
-    return this.authService.register(createUser)
+    return await this.authService.register(createUser)
+  }
+
+  @Public()
+  @ApiOperation({summary: 'Xác thực email'})
+  @Post('verify_email')
+  verifyEmail(@Body() verifyDto: VerifyDto){
+    return this.authService.verifyEmail(verifyDto)
   }
 }

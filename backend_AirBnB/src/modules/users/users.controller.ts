@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Public } from '@/auth/decorate/customize';
 import { ApiTags } from '@nestjs/swagger';
+import { VerifyDto } from '../../auth/dto/verify-email.dto';
 
 @ApiTags('Admin')
 @Controller('users')
@@ -35,4 +36,5 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
+
 }

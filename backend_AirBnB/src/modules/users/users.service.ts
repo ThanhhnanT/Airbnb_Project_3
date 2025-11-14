@@ -9,11 +9,16 @@ import aqp from 'api-query-params';
 import { CreateAuthDto } from '@/auth/dto/create-auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
+import {MailerService} from '@nestjs-modules/mailer'
+import { VerifyDto } from '../../auth/dto/verify-email.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) 
-  private userModel: Model<User>) {}
+  private userModel: Model<User>,
+  private readonly mailerService: MailerService
+  
+) {}
   
  isEmailExist = async (email:string) => {
   const user = await this.userModel.exists({email:email})
@@ -23,7 +28,7 @@ export class UsersService {
 
  async create(createUserDto: CreateUserDto) {
     
-    const {email, password, phone} = createUserDto
+    const {name, email, password, phone} = createUserDto
     const isExist = await this.isEmailExist(email)
 
     if(isExist){
@@ -34,6 +39,7 @@ export class UsersService {
     // console.log(hashPass)
     
     const newUser = await this.userModel.create({
+      name: name,
       email: email,
       password: hashPass,
       phone: phone
@@ -67,7 +73,7 @@ export class UsersService {
   }
 
   async getUserByEmail(email: string) {
-    return await this.userModel.findOne({email: email})
+    return await this.userModel.findOne({email: email}).select('-password')
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
@@ -80,7 +86,7 @@ export class UsersService {
 
 
   hanldeRegister = async (createUser : CreateAuthDto) => {
-     const {email, password} = createUser
+    const {name, email, password, phone} = createUser
     const isExist = await this.isEmailExist(email)
 
     if(isExist){
@@ -89,17 +95,73 @@ export class UsersService {
 
     const hashPass = await hashPassword(password)
     // console.log(hashPass)
-    
+    const codeId = uuidv4()
     const newUser = await this.userModel.create({
+      name: name,
       email: email,
       password: hashPass,
       isActive: false,
-      codeId: uuidv4(),
+      codeId: codeId,
       codeExpired: dayjs().add(1, 'day')
     })
 
+    await this.mailerService.sendMail({
+      to: email,
+      subject: 'Active your account',
+      text: 'welcome',
+      template: 'register',
+      context: {
+        name: name,
+        activationCode: codeId 
+      }
+
+    })
+
     return {
-      newUser
+      statusCode: 201,
     }
   }
+  
+verifyEmail = async (verifyDto: VerifyDto) => {
+  const { email, codeId } = verifyDto;
+
+  try {
+    const user = await this.userModel.findOne({ email });
+
+    if (!user) {
+      return {
+        statusCode: 404,
+        message: 'User not found',
+      };
+    }
+
+    if (user.codeId !== codeId) {
+      return {
+        statusCode: 400,
+        message: 'Mã xác nhận không đúng',
+      };
+    }
+
+    await this.userModel.updateOne(
+      { email },
+      { email_verified: true, codeId: null }
+    );
+
+    return {
+      statusCode: 200,
+      id: user.id,
+      email: user.email,
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      message: 'Internal server error',
+      error: error.message,
+    };
+  }
+};
+
+
+
+  
 }
