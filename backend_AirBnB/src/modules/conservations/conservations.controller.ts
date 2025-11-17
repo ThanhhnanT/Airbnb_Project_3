@@ -19,16 +19,16 @@ export class ConservationsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.conservationsService.findOne(+id);
+    return this.conservationsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateConservationDto: UpdateConservationDto) {
-    return this.conservationsService.update(+id, updateConservationDto);
+    return this.conservationsService.update(id, updateConservationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.conservationsService.remove(+id);
+    return this.conservationsService.remove(id);
   }
 }

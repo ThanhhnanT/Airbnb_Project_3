@@ -31,11 +31,40 @@ export const post = async (path: string, data: object) => {
     return res.data; 
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
-      console.log('API Error:', error.response?.data || error.message);
-      return error.response?.data; 
+      // Network error
+      if (!error.response) {
+        console.error('Network Error:', error.message);
+        return {
+          statusCode: 0,
+          message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng của bạn.',
+          error: 'Network Error'
+        };
+      }
+      
+      // Server responded with error
+      const errorData = error.response?.data || {};
+      const statusCode = error.response?.status || 500;
+      const message = errorData.message || errorData.error || 'Đã xảy ra lỗi không xác định';
+      
+      console.error('API Error:', {
+        status: statusCode,
+        message: message,
+        data: errorData
+      });
+      
+      return {
+        statusCode: statusCode,
+        message: message,
+        error: errorData.error || error.message,
+        ...errorData
+      };
     } else {
       console.error('Unknown error:', error);
-      throw error;
+      return {
+        statusCode: 500,
+        message: 'Đã xảy ra lỗi không xác định',
+        error: error.message || 'Unknown error'
+      };
     }
   }
 };

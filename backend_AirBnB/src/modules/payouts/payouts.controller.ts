@@ -19,16 +19,16 @@ export class PayoutsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.payoutsService.findOne(+id);
+    return this.payoutsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePayoutDto: UpdatePayoutDto) {
-    return this.payoutsService.update(+id, updatePayoutDto);
+    return this.payoutsService.update(id, updatePayoutDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.payoutsService.remove(+id);
+    return this.payoutsService.remove(id);
   }
 }

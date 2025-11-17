@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AntdProvider from "@/components/providers/AntProvider";
+import "@/styles/globals.css";
 
 
 export const metadata: Metadata = {

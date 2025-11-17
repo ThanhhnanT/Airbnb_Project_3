@@ -19,16 +19,16 @@ export class CalendarsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.calendarsService.findOne(+id);
+    return this.calendarsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCalendarDto: UpdateCalendarDto) {
-    return this.calendarsService.update(+id, updateCalendarDto);
+    return this.calendarsService.update(id, updateCalendarDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.calendarsService.remove(+id);
+    return this.calendarsService.remove(id);
   }
 }

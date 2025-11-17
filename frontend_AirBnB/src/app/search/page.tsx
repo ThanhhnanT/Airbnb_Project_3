@@ -1,0 +1,293 @@
+"use client";
+
+import { useEffect, useState, Suspense, useRef } from "react";
+import { useSearchParams } from "next/navigation";
+import { Spin, Empty, Pagination, message, Button } from "antd";
+import { FilterOutlined } from "@ant-design/icons";
+import ListingCard from "@/components/search/ListingCard";
+import MapView from "@/components/search/MapView";
+import { searchListings, SearchParams } from "@/service/search";
+import styles from "@/styles/search-page.module.css";
+
+interface Listing {
+  _id: string;
+  host_id?: {
+    _id: string;
+    name: string;
+    avatar_url?: string;
+  };
+  title: string;
+  description?: string;
+  city: string;
+  country: string;
+  latitude?: number;
+  longitude?: number;
+  price_base: number;
+  currency: string;
+  guests?: number;
+  bedrooms?: number;
+  beds?: number;
+  bathrooms?: number;
+  avg_rating: number;
+  review_count: number;
+  amenities?: string[];
+}
+
+interface SearchResponse {
+  data: Listing[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+function SearchContent() {
+  const searchParams = useSearchParams();
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedListingId, setSelectedListingId] = useState<string | undefined>();
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
+  const [showMap, setShowMap] = useState(true);
+  const listingsContainerRef = useRef<HTMLDivElement>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 0,
+  });
+
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      try {
+        setLoading(true);
+
+        // Get search params from URL
+        const params: SearchParams = {
+          city: searchParams.get("city") || undefined,
+          country: searchParams.get("country") || undefined,
+          check_in: searchParams.get("check_in") || undefined,
+          check_out: searchParams.get("check_out") || undefined,
+          guests: searchParams.get("guests")
+            ? parseInt(searchParams.get("guests")!)
+            : undefined,
+          min_price: searchParams.get("min_price")
+            ? parseFloat(searchParams.get("min_price")!)
+            : undefined,
+          max_price: searchParams.get("max_price")
+            ? parseFloat(searchParams.get("max_price")!)
+            : undefined,
+          latitude: searchParams.get("latitude")
+            ? parseFloat(searchParams.get("latitude")!)
+            : undefined,
+          longitude: searchParams.get("longitude")
+            ? parseFloat(searchParams.get("longitude")!)
+            : undefined,
+          radius: searchParams.get("radius")
+            ? parseFloat(searchParams.get("radius")!)
+            : undefined,
+          page: searchParams.get("page")
+            ? parseInt(searchParams.get("page")!)
+            : 1,
+          limit: 12,
+        };
+
+        const result = await searchListings(params);
+        
+        console.log('Search params:', params);
+        console.log('Search result:', result);
+
+        if (result && result.data !== undefined) {
+          const listingsData = result.data || [];
+          setListings(listingsData);
+          
+          // Set map center from first listing or search params
+          if (listingsData.length > 0 && listingsData[0].latitude && listingsData[0].longitude) {
+            setMapCenter({
+              lat: listingsData[0].latitude,
+              lng: listingsData[0].longitude,
+            });
+          } else if (params.latitude && params.longitude) {
+            setMapCenter({
+              lat: params.latitude,
+              lng: params.longitude,
+            });
+          }
+          
+          if (result.pagination) {
+            setPagination({
+              page: result.pagination.page,
+              limit: result.pagination.limit,
+              total: result.pagination.total || 0,
+              totalPages: result.pagination.totalPages || 0,
+            });
+          }
+        } else {
+          setListings([]);
+          if (result?.statusCode !== 200) {
+            message.warning(result?.message || "Không tìm thấy kết quả phù hợp");
+          }
+        }
+      } catch (error: any) {
+        console.error("Search error:", error);
+        message.error(error?.message || "Có lỗi xảy ra khi tìm kiếm");
+        setListings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSearchResults();
+  }, [searchParams]);
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    window.location.href = `/search?${params.toString()}`;
+  };
+
+  const handleListingClick = (listingId: string) => {
+    setSelectedListingId(listingId);
+    // Scroll to listing card
+    const element = document.getElementById(`listing-${listingId}`);
+    if (element && listingsContainerRef.current) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  const handleMarkerClick = (listing: Listing) => {
+    setSelectedListingId(listing._id);
+    // Scroll to listing card
+    const element = document.getElementById(`listing-${listing._id}`);
+    if (element && listingsContainerRef.current) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  const getSearchSummary = () => {
+    const parts: string[] = [];
+    if (searchParams.get("city")) {
+      parts.push(searchParams.get("city")!);
+    }
+    if (searchParams.get("country")) {
+      parts.push(searchParams.get("country")!);
+    }
+    if (searchParams.get("check_in") && searchParams.get("check_out")) {
+      parts.push(
+        `${searchParams.get("check_in")} - ${searchParams.get("check_out")}`
+      );
+    }
+    if (searchParams.get("guests")) {
+      parts.push(`${searchParams.get("guests")} khách`);
+    }
+    return parts.length > 0 ? parts.join(" • ") : "Tất cả listings";
+  };
+
+  return (
+    <div className={styles.searchPageContainer}>
+      <div className={styles.searchContent}>
+        <div className={styles.searchHeader}>
+          <div className={styles.headerTop}>
+            <div>
+              <h1 className={styles.searchTitle}>
+                {!loading && pagination.total > 0 
+                  ? `Hơn ${pagination.total.toLocaleString()} chỗ ở`
+                  : "Kết quả tìm kiếm"}
+              </h1>
+              <p className={styles.searchSummary}>{getSearchSummary()}</p>
+            </div>
+            <Button icon={<FilterOutlined />}>Bộ lọc</Button>
+          </div>
+          {!loading && pagination.total > 0 && (
+            <div className={styles.priceBanner}>
+              <span>Giá đã bao gồm mọi khoản phí</span>
+            </div>
+          )}
+        </div>
+
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <Spin size="large" />
+            <p>Đang tìm kiếm...</p>
+          </div>
+        ) : listings.length === 0 ? (
+          <div className={styles.emptyContainer}>
+            <Empty
+              description="Không tìm thấy chỗ ở phù hợp"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+          </div>
+        ) : (
+          <div className={styles.searchResultsContainer}>
+            {/* Left Panel - Listings */}
+            <div className={styles.listingsPanel} ref={listingsContainerRef}>
+              <div className={styles.listingsGrid}>
+                {listings.map((listing) => (
+                  <div
+                    key={listing._id}
+                    id={`listing-${listing._id}`}
+                    className={`${styles.listingCardWrapper} ${
+                      selectedListingId === listing._id ? styles.selectedListing : ""
+                    }`}
+                    onClick={() => handleListingClick(listing._id)}
+                  >
+                    <ListingCard listing={listing} />
+                  </div>
+                ))}
+              </div>
+
+              {pagination.totalPages > 1 && (
+                <div className={styles.paginationContainer}>
+                  <Pagination
+                    current={pagination.page}
+                    total={pagination.total}
+                    pageSize={pagination.limit}
+                    onChange={handlePageChange}
+                    showSizeChanger={false}
+                    showQuickJumper
+                    showTotal={(total, range) =>
+                      `${range[0]}-${range[1]} của ${total} chỗ ở`
+                    }
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Right Panel - Map */}
+            {showMap && (
+              <div className={styles.mapPanel}>
+                <MapView
+                  listings={listings}
+                  center={mapCenter}
+                  onMarkerClick={handleMarkerClick}
+                  selectedListingId={selectedListingId}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.searchPageContainer}>
+          <div className={styles.loadingContainer}>
+            <Spin size="large" />
+            <p>Đang tải...</p>
+          </div>
+        </div>
+      }
+    >
+      <SearchContent />
+    </Suspense>
+  );
+}
+

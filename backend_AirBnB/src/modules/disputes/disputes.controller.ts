@@ -19,16 +19,16 @@ export class DisputesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.disputesService.findOne(+id);
+    return this.disputesService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDisputeDto: UpdateDisputeDto) {
-    return this.disputesService.update(+id, updateDisputeDto);
+    return this.disputesService.update(id, updateDisputeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.disputesService.remove(+id);
+    return this.disputesService.remove(id);
   }
 }
