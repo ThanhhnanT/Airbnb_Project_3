@@ -5,6 +5,9 @@ import { SearchListingDto } from './dto/search-listing.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Listing, ListingDocument } from './schemas/listing.schema';
 import { Booking, BookingDocument } from '../bookings/schemas/booking.schema';
+import { Review, ReviewDocument } from '../reviews/schemas/review.schema';
+import { ListingImage, ListingImageDocument } from '../listing_images/schemas/listing_image.schema';
+import { Calendar, CalendarDocument } from '../calendars/schemas/calendar.schema';
 import { Model, Types } from 'mongoose';
 
 @Injectable()
@@ -12,6 +15,9 @@ export class ListingsService {
   constructor(
     @InjectModel(Listing.name) private listingModel: Model<ListingDocument>,
     @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
+    @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
+    @InjectModel(ListingImage.name) private listingImageModel: Model<ListingImageDocument>,
+    @InjectModel(Calendar.name) private calendarModel: Model<CalendarDocument>,
   ) {}
 
   async create(createListingDto: CreateListingDto): Promise<Listing> {
@@ -50,6 +56,127 @@ export class ListingsService {
         throw error;
       }
       throw new InternalServerErrorException(`Error finding listing: ${error.message}`);
+    }
+  }
+
+  async getListingDetails(
+    id: string,
+    checkInDate?: string,
+    checkOutDate?: string,
+    guests?: number,
+  ) {
+    try {
+      const listing = await this.listingModel
+        .findById(id)
+        .populate('host_id', 'name email avatar_url bio')
+        .exec();
+
+      if (!listing) {
+        throw new NotFoundException(`Listing with ID ${id} not found`);
+      }
+
+      // Get images
+      const images = await this.listingImageModel
+        .find({ listing_id: new Types.ObjectId(id) })
+        .exec();
+
+      // Get reviews with reviewer info
+      const reviews = await this.reviewModel
+        .find({ listing_id: new Types.ObjectId(id) })
+        .populate('reviewer_id', 'name avatar_url')
+        .populate('booking_id')
+        .sort({ createdAt: -1 })
+        .exec();
+
+      // Calculate average rating from reviews
+      let avgRating = 0;
+      if (reviews.length > 0) {
+        const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+        avgRating = totalRating / reviews.length;
+      }
+
+      // Get calendar availability if dates are provided
+      let availability: {
+        isAvailable: boolean;
+        checkInDate: Date;
+        checkOutDate: Date;
+        nights: number;
+        totalPrice: number;
+        currency: string;
+      } | null = null;
+      if (checkInDate && checkOutDate) {
+        const checkIn = new Date(checkInDate);
+        const checkOut = new Date(checkOutDate);
+
+        // Check if dates are available
+        const calendarEntries = await this.calendarModel
+          .find({
+            listing_id: new Types.ObjectId(id),
+            date: {
+              $gte: checkIn,
+              $lt: checkOut,
+            },
+          })
+          .exec();
+
+        // Check for conflicting bookings
+        const conflictingBookings = await this.bookingModel.find({
+          listing_id: new Types.ObjectId(id),
+          status: { $in: ['pending', 'confirmed'] },
+          $or: [
+            {
+              check_in: { $lte: checkOut },
+              check_out: { $gte: checkIn },
+            },
+          ],
+        }).exec();
+
+        const isAvailable = calendarEntries.every(
+          (entry) => entry.status === 'available' && !conflictingBookings.length,
+        );
+
+        // Calculate price for the date range
+        let totalPrice = 0;
+        if (calendarEntries.length > 0) {
+          totalPrice = calendarEntries.reduce((sum, entry) => sum + (entry.price || listing.price_base), 0);
+        } else {
+          // Use base price if no calendar entries
+          const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+          totalPrice = listing.price_base * nights;
+        }
+
+        // Add cleaning fee and extra guest fee
+        totalPrice += listing.cleaning_fee || 0;
+        if (guests && guests > listing.guests) {
+          const extraGuests = guests - listing.guests;
+          totalPrice += (listing.extra_guest_fee || 0) * extraGuests;
+        }
+
+        availability = {
+          isAvailable,
+          checkInDate: checkIn,
+          checkOutDate: checkOut,
+          nights: Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)),
+          totalPrice,
+          currency: listing.currency || 'USD',
+        };
+      }
+
+      return {
+        listing: {
+          ...listing.toObject(),
+          avg_rating: avgRating || listing.avg_rating,
+          review_count: reviews.length,
+        },
+        images,
+        reviews,
+        availability,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error getting listing details: ${error.message}`);
     }
   }
 
@@ -219,6 +346,18 @@ export class ListingsService {
         throw error;
       }
       throw new InternalServerErrorException(`Error searching listings: ${error.message}`);
+    }
+  }
+
+  async findHostListings(hostId: string): Promise<Listing[]> {
+    try {
+      return await this.listingModel
+        .find({ host_id: new Types.ObjectId(hostId) })
+        .populate('host_id', 'name email avatar_url')
+        .sort({ createdAt: -1 })
+        .exec();
+    } catch (error) {
+      throw new InternalServerErrorException(`Error finding host listings: ${error.message}`);
     }
   }
 }

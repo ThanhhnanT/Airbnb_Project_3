@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
 import { ListingsService } from './listings.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
@@ -19,8 +19,19 @@ export class ListingsController {
   }
 
   @Post()
-  create(@Body() createListingDto: CreateListingDto) {
+  @ApiOperation({ summary: 'Tạo listing mới (host)' })
+  create(@Body() createListingDto: CreateListingDto, @Req() req: any) {
+    const userId = req.user?.id || req.user?.user_id;
+    // Override host_id with authenticated user
+    createListingDto.host_id = userId;
     return this.listingsService.create(createListingDto);
+  }
+
+  @Get('host/my-listings')
+  @ApiOperation({ summary: 'Lấy danh sách listings của host' })
+  getHostListings(@Req() req: any) {
+    const userId = req.user?.id || req.user?.user_id;
+    return this.listingsService.findHostListings(userId);
   }
 
   @Public()
@@ -29,7 +40,22 @@ export class ListingsController {
     return this.listingsService.findAll(query);
   }
 
+  @Public()
+  @Get(':id/details')
+  @ApiOperation({ summary: 'Lấy thông tin chi tiết đầy đủ của listing (bao gồm reviews, images, availability)' })
+  getListingDetails(
+    @Param('id') id: string,
+    @Query('checkInDate') checkInDate?: string,
+    @Query('checkOutDate') checkOutDate?: string,
+    @Query('guests') guests?: string,
+  ) {
+    const guestsNumber = guests ? parseInt(guests, 10) : undefined;
+    return this.listingsService.getListingDetails(id, checkInDate, checkOutDate, guestsNumber);
+  }
+
+  @Public()
   @Get(':id')
+  @ApiOperation({ summary: 'Lấy thông tin cơ bản của listing' })
   findOne(@Param('id') id: string) {
     return this.listingsService.findOne(id);
   }

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { PaymentsController } from './payments.controller';
 import { Payment, PaymentSchema } from './schemas/payment.schemas';
+import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -10,6 +11,10 @@ import { MongooseModule } from '@nestjs/mongoose';
       {
         name: Payment.name,
         schema: PaymentSchema,
+      },
+      {
+        name: Booking.name,
+        schema: BookingSchema,
       },
     ]),
   ],

@@ -16,6 +16,7 @@ import { MessagesModule } from '@/modules/messages/messages.module';
 import { PayoutsModule } from '@/modules/payouts/payouts.module';
 import { DisputesModule } from '@/modules/disputes/disputes.module';
 import { NotificationsModule } from '@/modules/notifications/notifications.module';
+import { AdminModule } from '@/modules/admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 // import { SeedModule } from './seed/seed.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -49,6 +50,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     PayoutsModule,
     DisputesModule,
     NotificationsModule,
+    AdminModule,
     AuthModule,
     // SeedModule,
        MailerModule.forRootAsync({
