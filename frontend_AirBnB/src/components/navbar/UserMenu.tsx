@@ -84,15 +84,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick }) => {
       ),
     },
     {
-      key: '2',
-      label: (
-        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <CarOutlined className={styles.menuItemIcon} />
-          <span className={styles.menuItemText}>Trở thành Host</span>
-        </span>
-      ),
-    },
-    {
       key: '3',
       label: (
         <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -126,7 +117,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick }) => {
 
   return (
     <Space align="center" size={20} className={styles.userMenuContainer}>
-      <Text strong className={styles.userMenuText}>Đón tiếp khách</Text>
+      <Text strong className={styles.userMenuText}>Trở thành Host</Text>
       <Dropdown 
         menu={{ 
           items: isLoggedIn ? menuLogin : menuLogout, 

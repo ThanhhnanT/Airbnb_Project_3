@@ -1,0 +1,73 @@
+.sidebarContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #001529;
+}
+
+.logo {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logoImage {
+  display: block;
+  margin: 0 auto;
+  height: auto;
+}
+
+.logoSmall {
+  display: none;
+}
+
+:global(.ant-layout-sider-collapsed) .logoLarge {
+  display: none;
+}
+
+:global(.ant-layout-sider-collapsed) .logoSmall {
+  display: block;
+}
+
+.menu {
+  flex: 1;
+  border-right: 0;
+  background-color: #001529;
+}
+
+.menu :global(.ant-menu-item),
+.menu :global(.ant-menu-submenu-title) {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.menu :global(.ant-menu-item:hover),
+.menu :global(.ant-menu-submenu-title:hover) {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu :global(.ant-menu-item-selected) {
+  background-color: #1890ff;
+  color: #fff;
+}
+
+.menu :global(.ant-menu-item-selected::after) {
+  display: none;
+}
+
+.menu :global(.ant-menu-submenu-selected > .ant-menu-submenu-title) {
+  color: #fff;
+}
+
+.menu :global(.ant-menu-submenu .ant-menu-item) {
+  background-color: transparent;
+}
+
+.menu :global(.ant-menu-submenu .ant-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu :global(.ant-menu-submenu .ant-menu-item-selected) {
+  background-color: #1890ff;
+}
+

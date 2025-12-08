@@ -1,0 +1,20 @@
+.createListingContainer {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.steps {
+  margin-bottom: 32px;
+}
+
+.form {
+  margin-top: 24px;
+}
+
+.formActions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+

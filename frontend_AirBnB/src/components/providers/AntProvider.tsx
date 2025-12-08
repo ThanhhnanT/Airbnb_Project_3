@@ -2,6 +2,7 @@
 
 import { ConfigProvider } from "antd";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { usePathname } from "next/navigation";
 import { commonStyle } from "@/styles/common";
 import Navbar from "@/components/navbar/Navbar";
 // import {message } from "antd"
@@ -9,6 +10,8 @@ import { MessageProvider } from "./Message";
 
 export default function AntdProvider({ children }: { children: React.ReactNode }) {
   const style = commonStyle();
+  const pathname = usePathname();
+  const showNavbar = !pathname?.startsWith("/admin");
   // const [messageApi, contextHolder] = message.useMessage();
   return (
    
@@ -32,7 +35,7 @@ export default function AntdProvider({ children }: { children: React.ReactNode }
         }}
       >
         <MessageProvider>
-          <Navbar/>
+          {showNavbar && <Navbar />}
           {children}
         </MessageProvider>
       

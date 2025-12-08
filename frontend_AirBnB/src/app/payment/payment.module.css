@@ -1,0 +1,24 @@
+.paymentContainer {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.paymentContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.bookingCard,
+.paymentCard {
+  border-radius: 12px;
+}
+

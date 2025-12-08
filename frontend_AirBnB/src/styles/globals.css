@@ -1,3 +1,9 @@
+/* Global Body Reset */
+body {
+  margin: 0;
+  padding: 0;
+}
+
 /* CSS Variables for AirBnB Theme */
 :root {
   /* Colors */

@@ -13,6 +13,22 @@
   width: 100%;
   max-width: 850px;
   box-sizing: border-box;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Collapsed State */
+.searchBarContainerCollapsed {
+  padding: 6px 8px 6px 20px;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+/* Expanded State */
+.searchBarContainerExpanded {
+  padding: 8px 8px 8px 35px;
+  min-width: 420px;
+  max-width: 850px;
 }
 
 /* Responsive: Tablet */
@@ -20,6 +36,18 @@
   .searchBarContainer {
     padding: 8px 8px 8px 20px;
     gap: 6px;
+    min-width: 300px;
+    max-width: 100%;
+  }
+  
+  .searchBarContainerCollapsed {
+    padding: 5px 6px 5px 16px;
+    min-width: 250px;
+    max-width: 400px;
+  }
+  
+  .searchBarContainerExpanded {
+    padding: 8px 8px 8px 20px;
     min-width: 300px;
     max-width: 100%;
   }
@@ -60,6 +88,21 @@
   white-space: nowrap;
 }
 
+/* Collapsed Search Item */
+.searchBarContainerCollapsed .searchItem {
+  padding: 6px 12px;
+  min-width: 80px;
+}
+
+.searchBarContainerCollapsed .searchItemLabel {
+  display: none;
+}
+
+.searchBarContainerCollapsed .searchItemValue {
+  font-size: var(--font-size-xs);
+  margin-top: 0;
+}
+
 .searchItemValue {
   display: block;
   overflow: hidden;
@@ -76,6 +119,11 @@
   
   .searchItemValue {
     font-size: 11px;
+  }
+  
+  .searchBarContainerCollapsed .searchItem {
+    padding: 5px 10px;
+    min-width: 70px;
   }
 }
 
@@ -126,12 +174,14 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   font-size: var(--font-size-sm);
+  transition: opacity 0.3s ease, display 0.3s ease;
 }
 
 .searchItemValue {
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
   margin-top: 4px;
+  transition: font-size 0.3s ease, margin-top 0.3s ease;
 }
 
 .searchButton {
@@ -146,6 +196,12 @@
   cursor: pointer;
   transition: all var(--transition-normal);
   box-shadow: 0 2px 8px var(--color-shadow-primary);
+}
+
+/* Collapsed Search Button */
+.searchBarContainerCollapsed .searchButton {
+  width: 40px;
+  height: 40px;
 }
 
 .searchButton:hover {
@@ -593,6 +649,18 @@
   gap: 40px;
   justify-content: center;
   flex-wrap: wrap;
+  transition: all 0.3s ease;
+  max-height: 50px;
+  overflow: hidden;
+}
+
+/* Collapsed Nav Tabs */
+.navTabsCollapsed {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  gap: 0;
 }
 
 .navTabItem {
@@ -650,6 +718,12 @@
   max-width: 100%;
   padding: 0;
   box-sizing: border-box;
+  transition: gap 0.3s ease;
+}
+
+/* Collapsed Wrapper - reduce gap when nav tabs are collapsed */
+.searchWrapper:has(.navTabsCollapsed) {
+  gap: 8px;
 }
 
 @media (max-width: 1024px) {

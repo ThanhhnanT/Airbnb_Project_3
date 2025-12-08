@@ -2,7 +2,7 @@
 
 import { Space, Typography, message } from "antd";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import type { MenuProps } from 'antd';
 import Cookies from "js-cookie";
 import { useMessageApi } from "../providers/Message";
@@ -17,9 +17,14 @@ const { Text } = Typography;
 export default function Navbar() {
   const messageApi = useMessageApi();
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [login, setLogin] = useState(false);
   const [verify, setVerify] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const isHomePage = pathname === '/';
 
   useEffect(() => {
     if (Cookies.get('access_token')) {
@@ -28,6 +33,46 @@ export default function Navbar() {
       setLogin(false);
     }
   }, [Cookies.get('access_token')]);
+
+  // Scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const scrollThreshold = 50;
+      
+      if (scrollY > scrollThreshold) {
+        setIsScrolled(true);
+        // If expanded and scrolling, collapse it
+        setIsExpanded((prev) => {
+          if (prev) {
+            return false;
+          }
+          return prev;
+        });
+      } else {
+        // On home page, only set isScrolled to false if at top
+        if (isHomePage) {
+          setIsScrolled(false);
+        }
+      }
+    };
+
+    // Set initial state based on page
+    if (!isHomePage) {
+      setIsScrolled(true);
+    } else {
+      // Check initial scroll position on home page
+      handleScroll();
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHomePage]);
+
+  // Reset expanded state when pathname changes
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [pathname]);
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (login) {
@@ -79,8 +124,15 @@ export default function Navbar() {
     setVerify(true);
   };
 
+  const handleExpandChange = (expanded: boolean) => {
+    setIsExpanded(expanded);
+  };
+
+  // Determine if navbar should be collapsed
+  const isCollapsed = isScrolled && !isExpanded;
+
   return (
-    <div className={styles.navbarContainer}>
+    <div className={`${styles.navbarContainer} ${isCollapsed ? styles.navbarContainerCollapsed : ''} ${isExpanded ? styles.navbarContainerExpanded : ''}`}>
       <VerifyEmailModal 
         open={verify} 
         onClose={() => setVerify(false)}
@@ -93,7 +145,7 @@ export default function Navbar() {
       />
       
       {/* Logo */}
-      <div className={styles.logoContainer}>
+      <div className={styles.logoContainer} onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
         <img
           src="/AirBnB_Big.png"
           alt="logo"
@@ -103,7 +155,11 @@ export default function Navbar() {
 
       {/* Search Bar */}
       <div className={styles.searchContainer}>
-        <SearchBar />
+        <SearchBar 
+          isExpanded={isExpanded}
+          isCollapsed={isCollapsed}
+          onExpandChange={handleExpandChange}
+        />
       </div>
 
       {/* User Menu */}

@@ -14,7 +14,13 @@ import styles from "@/styles/search.module.css";
 
 const { Text } = Typography;
 
-const SearchBar: React.FC = () => {
+interface SearchBarProps {
+  isExpanded?: boolean;
+  isCollapsed?: boolean;
+  onExpandChange?: (expanded: boolean) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed = false, onExpandChange }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
@@ -38,12 +44,16 @@ const SearchBar: React.FC = () => {
         setLocationOpen(false);
         setDateOpen(false);
         setGuestOpen(false);
+        // Collapse when clicking outside
+        if (onExpandChange && isExpanded) {
+          onExpandChange(false);
+        }
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isExpanded, onExpandChange]);
 
   const formatDate = (date: Dayjs | null): string => {
     if (!date) return "";
@@ -158,9 +168,17 @@ const SearchBar: React.FC = () => {
   };
 
 
+  const handleSearchBarClick = () => {
+    if (onExpandChange && !isExpanded) {
+      onExpandChange(true);
+    }
+  };
+
+  const shouldCollapse = isCollapsed && !isExpanded;
+
   return (
     <div className={styles.searchWrapper}>
-      <div className={styles.navTabs}>
+      <div className={`${styles.navTabs} ${shouldCollapse ? styles.navTabsCollapsed : ""}`}>
         <Text strong className={styles.navTabItem}>Nơi lưu trú</Text>
         <Text className={styles.navTabItem}>Trải nghiệm</Text>
         <Text className={styles.navTabItem}>Dịch vụ</Text>
@@ -169,7 +187,10 @@ const SearchBar: React.FC = () => {
       {/* Search Capsule */}
       <div
         ref={containerRef}
-        className={styles.searchBarContainer}
+        className={`${styles.searchBarContainer} ${
+          shouldCollapse ? styles.searchBarContainerCollapsed : styles.searchBarContainerExpanded
+        }`}
+        onClick={handleSearchBarClick}
         style={{ position: "relative", zIndex: 1, overflow: "visible" }}
       >
         {/* Location */}
