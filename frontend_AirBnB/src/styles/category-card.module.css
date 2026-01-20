@@ -1,0 +1,38 @@
+.categoryCard {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 1px solid #e8e8e8;
+}
+
+.categoryCard:hover {
+  border-color: #ff385c;
+  box-shadow: 0 4px 12px rgba(255, 56, 92, 0.15);
+  transform: translateY(-2px);
+}
+
+.categoryIcon {
+  font-size: 32px;
+  color: #ff385c;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.categoryLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .categoryIcon {
+    font-size: 24px;
+  }
+  
+  .categoryLabel {
+    font-size: 12px;
+  }
+}
+

@@ -228,6 +228,11 @@ export class ListingsService {
         limit = 10,
         sort_by = 'createdAt',
         sort_order = 'desc',
+        amenities,
+        bedrooms_min,
+        beds_min,
+        bathrooms_min,
+        keyword,
       } = searchDto;
 
       // Build filter query
@@ -278,12 +283,37 @@ export class ListingsService {
         }
       }
 
+      // Amenity filter (any-of)
+      if (amenities && Array.isArray(amenities) && amenities.length > 0) {
+        filter.amenities = { $in: amenities };
+      }
+
+      // Bedrooms / beds / bathrooms minimum
+      if (bedrooms_min !== undefined) {
+        filter.bedrooms = { $gte: bedrooms_min };
+      }
+      if (beds_min !== undefined) {
+        filter.beds = { $gte: beds_min };
+      }
+      if (bathrooms_min !== undefined) {
+        filter.bathrooms = { $gte: bathrooms_min };
+      }
+
+      // Keyword search on title/description
+      if (keyword) {
+        const regex = new RegExp(keyword, 'i');
+        filter.$or = [
+          { title: regex },
+          { description: regex },
+        ];
+      }
+
       // Build sort
       const sort: any = {};
       sort[sort_by] = sort_order === 'asc' ? 1 : -1;
 
       // Check availability if dates are provided
-      let bookedListingIds = new Set<string>();
+      let unavailableListingIds = new Set<string>();
       if (check_in && check_out) {
         const checkInDate = new Date(check_in);
         const checkOutDate = new Date(check_out);
@@ -292,24 +322,30 @@ export class ListingsService {
           throw new BadRequestException('Ngày check-out phải sau ngày check-in');
         }
 
-        // Get all bookings that overlap with the requested dates
-        const conflictingBookings = await this.bookingModel.find({
-          status: { $in: ['pending', 'confirmed'] },
-          $or: [
-            {
-              check_in: { $lte: checkOutDate },
-              check_out: { $gte: checkInDate },
+        // Calendars: any day in range not available
+        const blockedCalendars = await this.calendarModel.aggregate([
+          {
+            $match: {
+              date: { $gte: checkInDate, $lt: checkOutDate },
+              status: { $in: ['booked', 'blocked'] },
             },
-          ],
+          },
+          { $group: { _id: '$listing_id' } },
+        ]);
+
+        blockedCalendars.forEach((doc) => unavailableListingIds.add(doc._id.toString()));
+
+        // Bookings that overlap (excluding cancelled)
+        const conflictingBookings = await this.bookingModel.find({
+          status: { $nin: ['cancelled'] },
+          check_in: { $lte: checkOutDate },
+          check_out: { $gte: checkInDate },
         }).exec();
 
-        bookedListingIds = new Set(
-          conflictingBookings.map((booking) => booking.listing_id.toString())
-        );
+        conflictingBookings.forEach((b) => unavailableListingIds.add(b.listing_id.toString()));
 
-        // Add booked listings to filter (exclude booked listing IDs)
-        if (bookedListingIds.size > 0) {
-          const bookedIds = Array.from(bookedListingIds).map(id => new Types.ObjectId(id));
+        if (unavailableListingIds.size > 0) {
+          const bookedIds = Array.from(unavailableListingIds).map((id) => new Types.ObjectId(id));
           filter._id = { $nin: bookedIds };
         }
       }
@@ -330,8 +366,76 @@ export class ListingsService {
         .limit(limit)
         .exec();
 
+      // Enrich listings with cover image and availability/price if date range provided
+      const checkInDateObj = check_in ? new Date(check_in) : null;
+      const checkOutDateObj = check_out ? new Date(check_out) : null;
+      const nights =
+        checkInDateObj && checkOutDateObj
+          ? Math.ceil((checkOutDateObj.getTime() - checkInDateObj.getTime()) / (1000 * 60 * 60 * 24))
+          : null;
+
+      const data = await Promise.all(
+        listings.map(async (listing) => {
+          // cover image
+          const cover = await this.listingImageModel
+            .findOne({ listing_id: listing._id })
+            .sort({ is_cover: -1, createdAt: -1 })
+            .exec();
+          const cover_image = cover?.image_url?.[0] || null;
+
+          let availability: any = null;
+          if (checkInDateObj && checkOutDateObj && nights) {
+            const calendarEntries = await this.calendarModel
+              .find({
+                listing_id: listing._id,
+                date: { $gte: checkInDateObj, $lt: checkOutDateObj },
+              })
+              .exec();
+
+            const isAvailable =
+              calendarEntries.length === 0
+                ? true
+                : calendarEntries.every((entry) => entry.status === 'available');
+
+            let totalPrice = 0;
+            if (calendarEntries.length > 0) {
+              totalPrice = calendarEntries.reduce(
+                (sum, entry) => sum + (entry.price ?? listing.price_base),
+                0,
+              );
+            } else {
+              totalPrice = listing.price_base * nights;
+            }
+
+            // Cleaning fee (once per stay)
+            totalPrice += listing.cleaning_fee || 0;
+
+            // Extra guest fee (per extra guest, per night? Keep parity with existing logic: per stay)
+            if (guests && listing.guests && guests > listing.guests) {
+              const extraGuests = guests - listing.guests;
+              totalPrice += (listing.extra_guest_fee || 0) * extraGuests;
+            }
+
+            availability = {
+              isAvailable,
+              checkInDate: checkInDateObj,
+              checkOutDate: checkOutDateObj,
+              nights,
+              totalPrice,
+              currency: listing.currency || 'USD',
+            };
+          }
+
+          return {
+            ...listing.toObject(),
+            cover_image,
+            availability,
+          };
+        }),
+      );
+
       return {
-        data: listings,
+        data,
         pagination: {
           page,
           limit,

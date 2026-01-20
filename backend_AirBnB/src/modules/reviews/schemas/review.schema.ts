@@ -14,9 +14,6 @@ export class Review {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   reviewer_id: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  target_user_id: Types.ObjectId;
-
   @Prop({ type: Number, required: true, min: 1, max: 5 })
   rating: number;
 

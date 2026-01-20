@@ -1,0 +1,155 @@
+.listingCard {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #e8e8e8;
+}
+
+.listingCard:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background-color: #f5f5f5;
+}
+
+.listingImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.listingCard:hover .listingImage {
+  transform: scale(1.05);
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+.placeholderIcon {
+  font-size: 48px;
+  color: #d9d9d9;
+}
+
+.favoriteButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.favoriteButton:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+}
+
+.heartIcon {
+  font-size: 20px;
+  color: #ff385c;
+}
+
+.cardContent {
+  padding: 0;
+}
+
+.cardHeader {
+  margin-bottom: 12px;
+}
+
+.listingTitle {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listingLocation {
+  display: block;
+  font-size: 14px;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ratingSection {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.ratingStars {
+  font-size: 12px;
+}
+
+.ratingText {
+  font-size: 12px;
+  color: #666;
+}
+
+.noRatingText {
+  font-size: 12px;
+}
+
+.priceSection {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.priceAmount {
+  font-size: 16px;
+  color: #333;
+}
+
+.priceUnit {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .listingTitle {
+    font-size: 14px;
+  }
+  
+  .listingLocation {
+    font-size: 12px;
+  }
+  
+  .priceAmount {
+    font-size: 14px;
+  }
+  
+  .priceUnit {
+    font-size: 12px;
+  }
+}
+

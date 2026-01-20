@@ -1,7 +1,7 @@
 "use client";
 
 import { Space, Typography, message } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import type { MenuProps } from 'antd';
 import Cookies from "js-cookie";
@@ -35,26 +35,39 @@ export default function Navbar() {
   }, [Cookies.get('access_token')]);
 
   // Scroll detection
+  const lastScrollYRef = useRef(window.scrollY);
+  
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const scrollThreshold = 50;
+      // Use hysteresis: different thresholds for scrolling down vs up
+      // This prevents flickering when scroll position oscillates around a single threshold
+      const scrollDownThreshold = 50;  // When scrolling down, activate at 50px
+      const scrollUpThreshold = 30;    // When scrolling up, deactivate at 30px
       
-      if (scrollY > scrollThreshold) {
-        setIsScrolled(true);
-        // If expanded and scrolling, collapse it
-        setIsExpanded((prev) => {
-          if (prev) {
-            return false;
-          }
-          return prev;
-        });
-      } else {
-        // On home page, only set isScrolled to false if at top
-        if (isHomePage) {
+      // Determine scroll direction
+      const scrollingDown = scrollY > lastScrollYRef.current;
+      
+      if (isHomePage) {
+        // On home page, use hysteresis based on scroll direction
+        if (scrollingDown && scrollY > scrollDownThreshold) {
+          setIsScrolled(true);
+          // If expanded and scrolling, collapse it
+          setIsExpanded((prev) => {
+            if (prev) {
+              return false;
+            }
+            return prev;
+          });
+        } else if (!scrollingDown && scrollY < scrollUpThreshold) {
           setIsScrolled(false);
         }
+      } else {
+        // On other pages, always show scrolled state
+        setIsScrolled(true);
       }
+      
+      lastScrollYRef.current = scrollY;
     };
 
     // Set initial state based on page
@@ -62,6 +75,7 @@ export default function Navbar() {
       setIsScrolled(true);
     } else {
       // Check initial scroll position on home page
+      lastScrollYRef.current = window.scrollY;
       handleScroll();
     }
 

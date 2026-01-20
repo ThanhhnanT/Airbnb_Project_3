@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ListingImagesService } from './listing_images.service';
 import { CreateListingImageDto } from './dto/create-listing_image.dto';
 import { UpdateListingImageDto } from './dto/update-listing_image.dto';
+import { Public } from '@/auth/decorate/customize';
 
 @Controller('listing-images')
 export class ListingImagesController {
@@ -12,9 +13,10 @@ export class ListingImagesController {
     return this.listingImagesService.create(createListingImageDto);
   }
 
+  @Public()
   @Get()
-  findAll() {
-    return this.listingImagesService.findAll();
+  findAll(@Query('listingId') listingId?: string) {
+    return this.listingImagesService.findAll(listingId);
   }
 
   @Get(':id')

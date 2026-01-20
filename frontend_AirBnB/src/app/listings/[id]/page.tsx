@@ -49,8 +49,9 @@ interface ListingDetail {
   };
   images: Array<{
     _id: string;
-    url: string;
-    is_primary?: boolean;
+    listing_id: string | { toString(): string };
+    image_url: string[];
+    is_cover?: boolean;
   }>;
   reviews: Array<{
     _id: string;
@@ -173,11 +174,15 @@ export default function ListingDetailPage() {
       <div className={styles.imageSection}>
         {images && images.length > 0 ? (
           <Carousel autoplay>
-            {images.map((img) => (
-              <div key={img._id} className={styles.imageSlide}>
-                <img src={img.url} alt={listing.title} />
-              </div>
-            ))}
+            {images.flatMap((img) => 
+              img.image_url && Array.isArray(img.image_url) 
+                ? img.image_url.map((url, index) => (
+                    <div key={`${img._id}-${index}`} className={styles.imageSlide}>
+                      <img src={url} alt={listing.title} />
+                    </div>
+                  ))
+                : []
+            )}
           </Carousel>
         ) : (
           <div className={styles.placeholderImage}>

@@ -8,11 +8,11 @@ export class Favorite {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   user_id: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: 'Listing', required: true })
-  listing_id: Types.ObjectId;
+  @Prop({ type: [Types.ObjectId], ref: 'Listing', required: true })
+  listing_ids: Types.ObjectId[];
 }
 
 export const FavoriteSchema = SchemaFactory.createForClass(Favorite);
 
-// Create compound index to prevent duplicate favorites
-FavoriteSchema.index({ user_id: 1, listing_id: 1 }, { unique: true });
+// Prevent duplicate favorite per listing per user
+FavoriteSchema.index({ user_id: 1, listing_ids: 1 }, { unique: true });

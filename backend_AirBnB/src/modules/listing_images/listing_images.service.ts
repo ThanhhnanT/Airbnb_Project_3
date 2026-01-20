@@ -3,7 +3,7 @@ import { CreateListingImageDto } from './dto/create-listing_image.dto';
 import { UpdateListingImageDto } from './dto/update-listing_image.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { ListingImage, ListingImageDocument } from './schemas/listing_image.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class ListingImagesService {
@@ -22,7 +22,8 @@ export class ListingImagesService {
 
   async findAll(listingId?: string): Promise<ListingImage[]> {
     try {
-      const filter = listingId ? { listing_id: listingId } : {};
+      const filter = listingId ? { listing_id: new Types.ObjectId(listingId) } : {};
+      console.log("filter", filter);
       return await this.listingImageModel.find(filter).exec();
     } catch (error) {
       throw new InternalServerErrorException(`Error finding listing images: ${error.message}`);

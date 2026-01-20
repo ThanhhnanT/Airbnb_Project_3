@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsNumber, IsDateString, Min, IsInt } from 'class-validator';
+import { IsOptional, IsString, IsNumber, IsDateString, Min, IsInt, IsArray, ArrayNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchListingDto {
@@ -86,5 +86,37 @@ export class SearchListingDto {
   @IsNumber()
   @Min(0)
   radius?: number = 10; // Default 10km
+
+  @ApiProperty({ example: ['WiFi', 'Pool'], required: false, isArray: true })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  amenities?: string[];
+
+  @ApiProperty({ example: 2, required: false, description: 'Minimum bedrooms' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  bedrooms_min?: number;
+
+  @ApiProperty({ example: 2, required: false, description: 'Minimum beds' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  beds_min?: number;
+
+  @ApiProperty({ example: 1, required: false, description: 'Minimum bathrooms' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  bathrooms_min?: number;
+
+  @ApiProperty({ example: 'beachfront', required: false, description: 'Keyword search on title/description' })
+  @IsOptional()
+  @IsString()
+  keyword?: string;
 }
 
