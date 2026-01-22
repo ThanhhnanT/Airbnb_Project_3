@@ -1,11 +1,12 @@
 import { Injectable, ForbiddenException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User } from '../users/schemas/user.schema';
 import { Listing, ListingDocument } from '../listings/schemas/listing.schema';
 import { Booking, BookingDocument } from '../bookings/schemas/booking.schema';
 import { Payment, PaymentDocument } from '../payments/schemas/payment.schemas';
 import { Settings, SettingsDocument } from './schemas/settings.schema';
+import { ListingImage, ListingImageDocument } from '../listing_images/schemas/listing_image.schema';
 
 @Injectable()
 export class AdminService {
@@ -15,6 +16,7 @@ export class AdminService {
     @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
     @InjectModel(Settings.name) private settingsModel: Model<SettingsDocument>,
+    @InjectModel(ListingImage.name) private listingImageModel: Model<ListingImageDocument>,
   ) {}
 
   async verifyAdmin(userId: string): Promise<boolean> {
@@ -117,6 +119,34 @@ export class AdminService {
       };
     } catch (error) {
       throw new InternalServerErrorException(`Error getting listings: ${error.message}`);
+    }
+  }
+
+  async getListingDetails(id: string) {
+    try {
+      const listing = await this.listingModel
+        .findById(id)
+        .populate('host_id', 'name email avatar_url')
+        .exec();
+
+      if (!listing) {
+        throw new NotFoundException(`Listing with ID ${id} not found`);
+      }
+
+      // Get listing images
+      const listingImages = await this.listingImageModel
+        .find({ listing_id: new Types.ObjectId(id) })
+        .exec();
+
+      return {
+        listing,
+        images: listingImages,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error getting listing details: ${error.message}`);
     }
   }
 

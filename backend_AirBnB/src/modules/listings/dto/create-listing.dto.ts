@@ -3,9 +3,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
 export class CreateListingDto {
-  @ApiProperty({ description: 'Host ID' })
+  @ApiProperty({ description: 'Host ID', required: false })
   @IsString()
-  host_id: string;
+  @IsOptional()
+  host_id?: string;
 
   @ApiProperty({ description: 'Listing title' })
   @IsString()

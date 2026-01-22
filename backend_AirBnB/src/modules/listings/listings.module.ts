@@ -6,6 +6,7 @@ import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 import { Review, ReviewSchema } from '../reviews/schemas/review.schema';
 import { ListingImage, ListingImageSchema } from '../listing_images/schemas/listing_image.schema';
 import { Calendar, CalendarSchema } from '../calendars/schemas/calendar.schema';
+import { User, UserSchema } from '../users/schemas/user.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -30,6 +31,10 @@ import { MongooseModule } from '@nestjs/mongoose';
       {
         name: Calendar.name,
         schema: CalendarSchema,
+      },
+      {
+        name: User.name,
+        schema: UserSchema,
       },
     ]),
   ],

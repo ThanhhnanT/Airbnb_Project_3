@@ -7,6 +7,7 @@ import { Listing, ListingSchema } from '../listings/schemas/listing.schema';
 import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
 import { Payment, PaymentSchema } from '../payments/schemas/payment.schemas';
 import { Settings, SettingsSchema } from './schemas/settings.schema';
+import { ListingImage, ListingImageSchema } from '../listing_images/schemas/listing_image.schema';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { Settings, SettingsSchema } from './schemas/settings.schema';
       { name: Booking.name, schema: BookingSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: Settings.name, schema: SettingsSchema },
+      { name: ListingImage.name, schema: ListingImageSchema },
     ]),
   ],
   controllers: [AdminController],

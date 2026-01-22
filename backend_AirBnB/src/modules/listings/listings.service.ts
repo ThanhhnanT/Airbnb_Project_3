@@ -8,6 +8,7 @@ import { Booking, BookingDocument } from '../bookings/schemas/booking.schema';
 import { Review, ReviewDocument } from '../reviews/schemas/review.schema';
 import { ListingImage, ListingImageDocument } from '../listing_images/schemas/listing_image.schema';
 import { Calendar, CalendarDocument } from '../calendars/schemas/calendar.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 import { Model, Types } from 'mongoose';
 
 @Injectable()
@@ -18,12 +19,44 @@ export class ListingsService {
     @InjectModel(Review.name) private reviewModel: Model<ReviewDocument>,
     @InjectModel(ListingImage.name) private listingImageModel: Model<ListingImageDocument>,
     @InjectModel(Calendar.name) private calendarModel: Model<CalendarDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
   async create(createListingDto: CreateListingDto): Promise<Listing> {
     try {
-      const createdListing = new this.listingModel(createListingDto);
-      return await createdListing.save();
+      // Set status to 'inactive' by default for admin approval
+      const listingData = {
+        ...createListingDto,
+        status: 'inactive',
+      };
+      const createdListing = new this.listingModel(listingData);
+      const savedListing = await createdListing.save();
+
+      // Update user role to 'host' and add listing ID to listID
+      if (createListingDto.host_id) {
+        const userId = new Types.ObjectId(createListingDto.host_id);
+        const user = await this.userModel.findById(userId);
+        
+        if (user) {
+          // If user doesn't have host role, set it
+          if (!user.role || user.role.type !== 'host') {
+            user.role = {
+              type: 'host',
+              listID: [savedListing._id.toString()],
+            };
+          } else {
+            // If user already has host role, add listing ID to listID if not exists
+            const listID = user.role.listID || [];
+            if (!listID.includes(savedListing._id.toString())) {
+              listID.push(savedListing._id.toString());
+              user.role.listID = listID;
+            }
+          }
+          await user.save();
+        }
+      }
+
+      return savedListing;
     } catch (error) {
       if (error.code === 11000) {
         throw new BadRequestException('Listing already exists');

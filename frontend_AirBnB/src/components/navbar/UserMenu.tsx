@@ -3,6 +3,8 @@
 import React from "react";
 import { Avatar, Dropdown, Space, Typography } from "antd";
 import type { MenuProps } from 'antd';
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { 
   UserOutlined, 
   HeartOutlined, 
@@ -20,9 +22,23 @@ const { Text } = Typography;
 interface UserMenuProps {
   isLoggedIn: boolean;
   onMenuClick: MenuProps['onClick'];
+  onOpenAuthModal?: () => void;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuthModal }) => {
+  const router = useRouter();
+
+  const handleBecomeHostClick = () => {
+    if (!isLoggedIn) {
+      // If not logged in, open auth modal
+      if (onOpenAuthModal) {
+        onOpenAuthModal();
+      }
+    } else {
+      // If logged in, redirect to create listing page
+      router.push('/host/create');
+    }
+  };
   const menuLogin: MenuProps['items'] = [
     {
       key: '1',
@@ -118,7 +134,14 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick }) => {
 
   return (
     <Space align="center" size={20} className={styles.userMenuContainer}>
-      <Text strong className={styles.userMenuText}>Trở thành Host</Text>
+      <Text 
+        strong 
+        className={styles.userMenuText}
+        onClick={handleBecomeHostClick}
+        style={{ cursor: 'pointer' }}
+      >
+        Trở thành Host
+      </Text>
       <div className={styles.notificationIcon}>
         <BellOutlined className={styles.bellIcon} />
       </div>

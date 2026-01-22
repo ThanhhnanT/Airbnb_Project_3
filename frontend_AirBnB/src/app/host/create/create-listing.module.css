@@ -1,20 +1,91 @@
 .createListingContainer {
-  max-width: 800px;
+  max-width: 900px;
   margin: 40px auto;
   padding: 20px;
+  min-height: calc(100vh - 200px);
 }
 
-.steps {
+.header {
+  text-align: center;
   margin-bottom: 32px;
 }
 
+.header h2 {
+  margin-bottom: 8px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.steps {
+  margin-bottom: 48px;
+  padding: 0 20px;
+}
+
 .form {
-  margin-top: 24px;
+  margin-top: 32px;
+}
+
+.stepContent {
+  min-height: 400px;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.stepContent h4 {
+  margin-bottom: 24px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.formRow {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.formRow .ant-form-item {
+  margin-bottom: 0;
 }
 
 .formActions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 24px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.formActions .ant-btn {
+  min-width: 120px;
+  height: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .createListingContainer {
+    padding: 16px;
+    margin: 20px auto;
+  }
+
+  .stepContent {
+    padding: 16px;
+    min-height: 300px;
+  }
+
+  .formRow {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions .ant-btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
 }
 

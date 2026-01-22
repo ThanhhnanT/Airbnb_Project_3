@@ -191,6 +191,7 @@ export default function Navbar() {
         <UserMenu 
           isLoggedIn={login} 
           onMenuClick={handleMenuClick}
+          onOpenAuthModal={() => setOpen(true)}
         />
       </div>
     </div>

@@ -25,6 +25,12 @@ export class AdminController {
     return this.adminService.getAllListings(pageNum, limitNum);
   }
 
+  @Get('listings/:id')
+  @ApiOperation({ summary: 'Lấy chi tiết listing với images (admin)' })
+  async getListingDetails(@Param('id') id: string) {
+    return this.adminService.getListingDetails(id);
+  }
+
   @Get('bookings')
   @ApiOperation({ summary: 'Lấy danh sách tất cả bookings (admin)' })
   async getAllBookings(@Query('page') page?: string, @Query('limit') limit?: string) {

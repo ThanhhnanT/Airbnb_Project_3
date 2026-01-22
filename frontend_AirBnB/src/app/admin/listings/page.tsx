@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Table, Tag, Button, message, Card, Space, Input } from "antd";
-import { EditOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
-import { getAccess, patch, deleteData } from "@/helper/api";
+import { useRouter } from "next/navigation";
+import { Table, Tag, Button, message, Card, Space, Input, Select, Badge } from "antd";
+import { EditOutlined, DeleteOutlined, SearchOutlined, EyeOutlined } from "@ant-design/icons";
+import { getAccess, patchAccess, deleteData } from "@/helper/api";
 import type { ColumnsType } from "antd/es/table";
 
 interface Listing {
@@ -14,6 +15,7 @@ interface Listing {
   price_base: number;
   currency: string;
   status: string;
+  createdAt?: string;
   host_id?: {
     name: string;
     email: string;
@@ -21,9 +23,11 @@ interface Listing {
 }
 
 export default function AllListingsPage() {
+  const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchListings();
@@ -43,7 +47,7 @@ export default function AllListingsPage() {
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
-      await patch(`admin/listings/${id}/status`, { status });
+      await patchAccess(`admin/listings/${id}/status`, { status });
       message.success("Cập nhật trạng thái thành công");
       fetchListings();
     } catch (error) {
@@ -61,11 +65,15 @@ export default function AllListingsPage() {
     }
   };
 
-  const filteredListings = listings.filter(
-    (listing) =>
+  const filteredListings = listings.filter((listing) => {
+    const matchesSearch =
       listing.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      listing.city.toLowerCase().includes(searchText.toLowerCase())
-  );
+      listing.city.toLowerCase().includes(searchText.toLowerCase());
+    const matchesStatus = statusFilter === "all" || listing.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const pendingCount = listings.filter((l) => l.status === "inactive").length;
 
   const columns: ColumnsType<Listing> = [
     {
@@ -108,14 +116,40 @@ export default function AllListingsPage() {
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
-        <Tag color={status === "active" ? "green" : "red"}>{status}</Tag>
+        <Tag color={status === "active" ? "green" : "red"}>{status === "active" ? "Đã duyệt" : "Chờ duyệt"}</Tag>
       ),
+      filters: [
+        { text: "Tất cả", value: "all" },
+        { text: "Đã duyệt", value: "active" },
+        { text: "Chờ duyệt", value: "inactive" },
+      ],
+      onFilter: (value, record) => {
+        if (value === "all") return true;
+        return record.status === value;
+      },
+    },
+    {
+      title: "Ngày tạo",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date: string) => (date ? new Date(date).toLocaleDateString("vi-VN") : "N/A"),
+      sorter: (a, b) => {
+        if (!a.createdAt || !b.createdAt) return 0;
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      },
     },
     {
       title: "Hành động",
       key: "action",
       render: (_, record) => (
         <Space>
+          <Button
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => router.push(`/admin/listings/${record._id}`)}
+          >
+            Xem chi tiết
+          </Button>
           <Button
             size="small"
             onClick={() =>
@@ -125,7 +159,7 @@ export default function AllListingsPage() {
               )
             }
           >
-            {record.status === "active" ? "Vô hiệu hóa" : "Kích hoạt"}
+            {record.status === "active" ? "Vô hiệu hóa" : "Duyệt"}
           </Button>
           <Button
             size="small"
@@ -146,14 +180,33 @@ export default function AllListingsPage() {
         style={{ height: "100%", display: "flex", flexDirection: "column" }}
         bodyStyle={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}
       >
-        <Space style={{ marginBottom: 16, width: "100%" }} direction="vertical">
-          <Input
-            placeholder="Tìm kiếm theo tiêu đề hoặc thành phố..."
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ maxWidth: 400 }}
-          />
+        <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }} wrap>
+          <Space wrap>
+            <Input
+              placeholder="Tìm kiếm theo tiêu đề hoặc thành phố..."
+              prefix={<SearchOutlined />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{ maxWidth: 400 }}
+            />
+            <Select
+              value={statusFilter}
+              onChange={setStatusFilter}
+              style={{ width: 150 }}
+              placeholder="Lọc theo trạng thái"
+            >
+              <Select.Option value="all">Tất cả</Select.Option>
+              <Select.Option value="active">Đã duyệt</Select.Option>
+              <Select.Option value="inactive">Chờ duyệt</Select.Option>
+            </Select>
+          </Space>
+          {pendingCount > 0 && (
+            <Badge count={pendingCount} showZero>
+              <Tag color="orange" style={{ padding: "4px 12px", fontSize: 14 }}>
+                Có {pendingCount} listing chờ duyệt
+              </Tag>
+            </Badge>
+          )}
         </Space>
         <Table
           columns={columns}
@@ -162,6 +215,7 @@ export default function AllListingsPage() {
           loading={loading}
           pagination={{ pageSize: 10 }}
           scroll={{ y: "calc(100vh - 300px)" }}
+          rowClassName={(record) => (record.status === "inactive" ? "pending-listing-row" : "")}
         />
       </Card>
     </div>
