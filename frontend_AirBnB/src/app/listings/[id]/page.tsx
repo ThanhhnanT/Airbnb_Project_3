@@ -99,7 +99,10 @@ export default function ListingDetailPage() {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
+  const [bookingCardStopped, setBookingCardStopped] = useState(false);
   const bookingFormRef = useRef<HTMLDivElement>(null);
+  const reviewsSectionRef = useRef<HTMLDivElement>(null);
+  const bookingCardRef = useRef<HTMLDivElement>(null);
   
   // Flatten all image URLs - calculate early to avoid hook order issues
   const allImages = listingDetail?.images && listingDetail.images.length > 0
@@ -181,6 +184,40 @@ export default function ListingDetailPage() {
     // Only run on initial load or when listingId changes, not when searchParams change from form updates
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listingId]);
+
+  // Handle scroll to stop booking card when it reaches reviews section
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!reviewsSectionRef.current || !bookingCardRef.current) {
+        setBookingCardStopped(false);
+        return;
+      }
+      
+      const reviewsTop = reviewsSectionRef.current.offsetTop;
+      const bookingCardRect = bookingCardRef.current.getBoundingClientRect();
+      const bookingCardHeight = bookingCardRef.current.offsetHeight;
+      const scrollY = window.scrollY;
+      const bookingCardTop = bookingCardRect.top + scrollY;
+      
+      // Stop when booking card bottom would reach reviews section top (with 20px offset)
+      const stopPosition = reviewsTop - bookingCardHeight - 20;
+      
+      if (bookingCardTop >= stopPosition) {
+        setBookingCardStopped(true);
+      } else {
+        setBookingCardStopped(false);
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [listingDetail]);
 
   const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
     if (dates && dates[0] && dates[1]) {
@@ -531,91 +568,16 @@ export default function ListingDetailPage() {
               )}
             </div>
           </div>
-
-          {/* Reviews */}
-          {reviews && reviews.length > 0 && (
-            <div className={styles.reviewsSection}>
-              <h2>Đánh giá ({reviews.length})</h2>
-              
-              {/* Overall Rating Summary */}
-              <div className={styles.ratingSummary}>
-                <div className={styles.ratingDisplay}>
-                  <div className={styles.ratingNumber}>
-                    <span className={styles.ratingValue}>{listing.avg_rating.toFixed(1).replace('.', ',')}</span>
-                    <div className={styles.ratingIcons}>
-                      <span className={styles.leafIcon}>🌿</span>
-                      <span className={styles.leafIcon}>🌿</span>
-                    </div>
-                  </div>
-                  <div className={styles.ratingText}>
-                    <p className={styles.lovedByGuests}>Được khách yêu thích</p>
-                    <p className={styles.topPercentage}>
-                      Trong số các chỗ ở cho thuê đủ điều kiện dựa trên điểm xếp hạng, lượt đánh giá và độ tin cậy, nhà này nằm trong nhóm <strong>{calculateTopPercentage(listing.avg_rating, listing.review_count)}% chỗ ở hàng đầu</strong>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Individual Reviews Grid */}
-              <div className={styles.reviewsGrid}>
-                {reviews.map((review) => {
-                  const isExpanded = expandedReviews.has(review._id);
-                  const reviewerName = review.reviewer_id?.name || "Anonymous";
-                  const hasAvatar = review.reviewer_id?.avatar_url;
-                  const comment = review.comment || "";
-                  const shouldShowMore = shouldTruncate(comment);
-                  const displayComment = shouldShowMore && !isExpanded ? getTruncatedComment(comment) : comment;
-
-                  return (
-                    <div key={review._id} className={styles.reviewItem}>
-                      <div className={styles.reviewHeader}>
-                        {hasAvatar ? (
-                          <img 
-                            src={review.reviewer_id?.avatar_url} 
-                            alt={reviewerName}
-                            className={styles.reviewerAvatar}
-                          />
-                        ) : (
-                          <div className={styles.reviewerAvatarInitials}>
-                            {getInitials(reviewerName)}
-                          </div>
-                        )}
-                        <div className={styles.reviewerInfo}>
-                          <h4 className={styles.reviewerName}>{reviewerName}</h4>
-                          <p className={styles.reviewerActivity}>{getActivityText(review.reviewer_id)}</p>
-                        </div>
-                      </div>
-                      <div className={styles.reviewContent}>
-                        <div className={styles.reviewRating}>
-                          <Rate disabled value={review.rating} allowHalf />
-                          <span className={styles.reviewDate}>
-                            {formatVietnameseDate(review.createdAt)}
-                          </span>
-                        </div>
-                        {comment && (
-                          <div className={styles.reviewComment}>
-                            <p>{displayComment}</p>
-                            {shouldShowMore && (
-                              <button
-                                className={styles.showMoreButton}
-                                onClick={() => toggleReviewExpansion(review._id)}
-                              >
-                                {isExpanded ? "Hiển thị ít hơn" : "Hiển thị thêm"}
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Booking Card */}
-        <div className={styles.bookingCard}>
+        <div 
+          className={`${styles.bookingCard} ${bookingCardStopped ? styles.bookingCardStopped : ''}`}
+          ref={bookingCardRef}
+          style={bookingCardStopped && reviewsSectionRef.current ? {
+            top: `${reviewsSectionRef.current.offsetTop - (bookingCardRef.current?.offsetHeight || 0) - 20}px`
+          } : undefined}
+        >
           <div className={styles.priceSection}>
             <span className={styles.price}>
               <DollarOutlined /> {listing.price_base.toLocaleString()} {listing.currency}
@@ -719,6 +681,83 @@ export default function ListingDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Reviews Section - Outside grid to span full width */}
+      {reviews && reviews.length > 0 && (
+        <div className={styles.reviewsSection} ref={reviewsSectionRef}>
+          <h2>—</h2>
+          
+          {/* Overall Rating Summary */}
+          <div className={styles.ratingSummary}>
+            <div className={styles.ratingDisplay}>
+              <div className={styles.ratingNumber}>
+                <span className={styles.leafIcon}>🌿</span>
+                <span className={styles.ratingValue}>{listing.avg_rating.toFixed(1).replace('.', ',')}</span>
+                <span className={styles.leafIcon}>🌿</span>
+              </div>
+              <p className={styles.lovedByGuests}>Được khách yêu thích</p>
+              <p className={styles.topPercentage}>
+                Trong số các chỗ ở cho thuê đủ điều kiện dựa trên điểm xếp hạng, lượt đánh giá và độ tin cậy, nhà này nằm trong nhóm <strong>{calculateTopPercentage(listing.avg_rating, listing.review_count)}% chỗ ở hàng đầu</strong>
+              </p>
+            </div>
+          </div>
+
+          {/* Individual Reviews Grid */}
+          <div className={styles.reviewsGrid}>
+            {reviews.map((review) => {
+              const isExpanded = expandedReviews.has(review._id);
+              const reviewerName = review.reviewer_id?.name || "Anonymous";
+              const hasAvatar = review.reviewer_id?.avatar_url;
+              const comment = review.comment || "";
+              const shouldShowMore = shouldTruncate(comment);
+              const displayComment = shouldShowMore && !isExpanded ? getTruncatedComment(comment) : comment;
+
+              return (
+                <div key={review._id} className={styles.reviewItem}>
+                  <div className={styles.reviewHeader}>
+                    {hasAvatar ? (
+                      <img 
+                        src={review.reviewer_id?.avatar_url} 
+                        alt={reviewerName}
+                        className={styles.reviewerAvatar}
+                      />
+                    ) : (
+                      <div className={styles.reviewerAvatarInitials}>
+                        {getInitials(reviewerName)}
+                      </div>
+                    )}
+                    <div className={styles.reviewerInfo}>
+                      <h4 className={styles.reviewerName}>{reviewerName}</h4>
+                      <p className={styles.reviewerActivity}>{getActivityText(review.reviewer_id)}</p>
+                    </div>
+                  </div>
+                  <div className={styles.reviewContent}>
+                    <div className={styles.reviewRating}>
+                      <Rate disabled value={review.rating} allowHalf />
+                      <span className={styles.reviewDate}>
+                        {formatVietnameseDate(review.createdAt)}
+                      </span>
+                    </div>
+                    {comment && (
+                      <div className={styles.reviewComment}>
+                        <p>{displayComment}</p>
+                        {shouldShowMore && (
+                          <button
+                            className={styles.showMoreButton}
+                            onClick={() => toggleReviewExpansion(review._id)}
+                          >
+                            {isExpanded ? "Hiển thị ít hơn" : "Hiển thị thêm"}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

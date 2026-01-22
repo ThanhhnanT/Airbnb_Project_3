@@ -320,8 +320,7 @@
 
 .descriptionSection h2,
 .amenitiesSection h2,
-.detailsSection h2,
-.reviewsSection h2 {
+.detailsSection h2 {
   font-size: 22px;
   font-weight: 600;
   margin-bottom: 16px;
@@ -348,12 +347,20 @@
 /* Reviews Section */
 .reviewsSection {
   margin-top: 32px;
+  width: 100%;
 }
 
 .reviewsSection h2 {
-  font-size: 22px;
+  font-size: 0;
   font-weight: 600;
-  margin-bottom: 24px;
+  margin: 0 0 32px 0;
+  padding: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  text-align: center;
+  margin-top: 100px;
 }
 
 /* Overall Rating Summary */
@@ -365,43 +372,36 @@
 
 .ratingDisplay {
   display: flex;
-  align-items: flex-start;
-  gap: 24px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
 }
 
 .ratingNumber {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 16px;
 }
 
 .ratingValue {
-  font-size: 48px;
+  font-size: 64px;
   font-weight: 600;
   line-height: 1;
   color: #222;
-}
-
-.ratingIcons {
-  display: flex;
-  gap: 4px;
-  align-items: center;
 }
 
 .leafIcon {
-  font-size: 24px;
+  font-size: 32px;
   line-height: 1;
 }
 
-.ratingText {
-  flex: 1;
-}
-
 .lovedByGuests {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #222;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .topPercentage {
@@ -554,6 +554,12 @@
   padding: 24px;
   background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: position 0.2s ease;
+}
+
+.bookingCardStopped {
+  position: absolute;
+  right: 0;
 }
 
 .priceSection {
