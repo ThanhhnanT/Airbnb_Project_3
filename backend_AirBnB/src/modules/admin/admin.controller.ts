@@ -73,5 +73,25 @@ export class AdminController {
   async deleteListing(@Param('id') id: string) {
     return this.adminService.deleteListing(id);
   }
+
+  @Get('payments')
+  @ApiOperation({ summary: 'Lấy danh sách tất cả payments (admin)' })
+  async getAllPayments(@Query('page') page?: string, @Query('limit') limit?: string) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    return this.adminService.getAllPayments(pageNum, limitNum);
+  }
+
+  @Get('settings')
+  @ApiOperation({ summary: 'Lấy cài đặt hệ thống (admin)' })
+  async getSettings() {
+    return this.adminService.getSettings();
+  }
+
+  @Patch('settings')
+  @ApiOperation({ summary: 'Cập nhật cài đặt hệ thống (admin)' })
+  async updateSettings(@Body() settingsData: any) {
+    return this.adminService.updateSettings(settingsData);
+  }
 }
 

@@ -50,6 +50,10 @@ type DashboardStats = {
   totalListings?: number;
   totalBookings?: number;
   totalRevenue?: number;
+  totalGuests?: number;
+  totalHosts?: number;
+  totalAdmins?: number;
+  activeUsers?: number;
 };
 
 type DashboardResponse = {
@@ -242,6 +246,11 @@ export default function AdminDashboardPage() {
               value={stats.totalUsers || 0}
               prefix={<UserOutlined />}
             />
+            <div style={{ marginTop: 8, fontSize: 12, color: "#888" }}>
+              <div>Guest: {stats.totalGuests || 0}</div>
+              <div>Host: {stats.totalHosts || 0}</div>
+              <div>Admin: {stats.totalAdmins || 0}</div>
+            </div>
           </Card>
         </Col>
         <Col xs={12} md={6}>
@@ -279,6 +288,8 @@ export default function AdminDashboardPage() {
           <Card
             title="Online Store Visitors"
             extra={<Text className={styles.positiveChange}>+12.5% Since last week</Text>}
+            style={{ height: "100%" }}
+            bodyStyle={{ height: "300px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
           >
             <div className={styles.chartHeader}>
               <div>
@@ -306,6 +317,8 @@ export default function AdminDashboardPage() {
           <Card
             title="Sales"
             extra={<Text className={styles.positiveChange}>+33.1% Since last month</Text>}
+            style={{ height: "100%" }}
+            bodyStyle={{ height: "300px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
           >
             <div className={styles.chartHeader}>
               <div>
@@ -340,24 +353,34 @@ export default function AdminDashboardPage() {
 
       <Row gutter={24} className={styles.overviewRow}>
         <Col xs={24} lg={12}>
-          <Card title="Listings gần đây" className={styles.tableCard}>
+          <Card 
+            title="Listings gần đây" 
+            className={styles.tableCard}
+            bodyStyle={{ padding: "16px", height: "400px", overflow: "hidden" }}
+          >
             <Table
               dataSource={listings}
               columns={listingColumns}
               rowKey="_id"
               pagination={false}
               size="small"
+              scroll={{ y: 330 }}
             />
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="Bookings gần đây" className={styles.tableCard}>
+          <Card 
+            title="Bookings gần đây" 
+            className={styles.tableCard}
+            bodyStyle={{ padding: "16px", height: "400px", overflow: "hidden" }}
+          >
             <Table
               dataSource={bookings}
               columns={bookingColumns}
               rowKey="_id"
               pagination={false}
               size="small"
+              scroll={{ y: 330 }}
             />
           </Card>
         </Col>
@@ -365,7 +388,11 @@ export default function AdminDashboardPage() {
 
       <Row gutter={24} className={styles.overviewRow}>
         <Col xs={24} lg={12}>
-          <Card title="Tỷ lệ hệ thống">
+          <Card 
+            title="Tỷ lệ hệ thống"
+            style={{ height: "100%" }}
+            bodyStyle={{ height: "280px", display: "flex", flexDirection: "column", justifyContent: "center" }}
+          >
             <Row gutter={16}>
               <Col span={12}>
                 <div className={styles.progressCard}>
@@ -389,7 +416,11 @@ export default function AdminDashboardPage() {
           </Card>
         </Col>
         <Col xs={24} lg={12}>
-          <Card title="Online Store Overview">
+          <Card 
+            title="Online Store Overview"
+            style={{ height: "100%" }}
+            bodyStyle={{ height: "280px", display: "flex", flexDirection: "column", justifyContent: "center" }}
+          >
             <div className={styles.overviewList}>
               {overviewMetrics.map((metric) => (
                 <div key={metric.title} className={styles.overviewItem}>

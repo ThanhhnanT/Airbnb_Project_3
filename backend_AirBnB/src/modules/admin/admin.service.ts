@@ -5,6 +5,7 @@ import { User } from '../users/schemas/user.schema';
 import { Listing, ListingDocument } from '../listings/schemas/listing.schema';
 import { Booking, BookingDocument } from '../bookings/schemas/booking.schema';
 import { Payment, PaymentDocument } from '../payments/schemas/payment.schemas';
+import { Settings, SettingsDocument } from './schemas/settings.schema';
 
 @Injectable()
 export class AdminService {
@@ -13,6 +14,7 @@ export class AdminService {
     @InjectModel(Listing.name) private listingModel: Model<ListingDocument>,
     @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
+    @InjectModel(Settings.name) private settingsModel: Model<SettingsDocument>,
   ) {}
 
   async verifyAdmin(userId: string): Promise<boolean> {
@@ -35,6 +37,11 @@ export class AdminService {
         activeListings,
         pendingBookings,
         recentBookings,
+        totalGuests,
+        totalHosts,
+        totalAdmins,
+        activeUsers,
+        recentUsers,
       ] = await Promise.all([
         this.userModel.countDocuments().exec(),
         this.listingModel.countDocuments().exec(),
@@ -52,6 +59,16 @@ export class AdminService {
           .sort({ createdAt: -1 })
           .limit(10)
           .exec(),
+        this.userModel.countDocuments({ 'role.type': 'guest' }).exec(),
+        this.userModel.countDocuments({ 'role.type': 'host' }).exec(),
+        this.userModel.countDocuments({ 'role.type': 'admin' }).exec(),
+        this.userModel.countDocuments({ isActive: true }).exec(),
+        this.userModel
+          .find()
+          .select('name email role isActive email_verified createdAt')
+          .sort({ createdAt: -1 })
+          .limit(10)
+          .exec(),
       ]);
 
       return {
@@ -62,8 +79,13 @@ export class AdminService {
           totalRevenue: totalRevenue[0]?.total || 0,
           activeListings,
           pendingBookings,
+          totalGuests,
+          totalHosts,
+          totalAdmins,
+          activeUsers,
         },
         recentBookings,
+        recentUsers,
       };
     } catch (error) {
       throw new InternalServerErrorException(`Error getting dashboard: ${error.message}`);
@@ -231,6 +253,70 @@ export class AdminService {
         throw error;
       }
       throw new InternalServerErrorException(`Error deleting listing: ${error.message}`);
+    }
+  }
+
+  async getAllPayments(page: number = 1, limit: number = 10) {
+    try {
+      const skip = (page - 1) * limit;
+      const [payments, total] = await Promise.all([
+        this.paymentModel
+          .find()
+          .populate('booking_id', 'check_in check_out total_price currency')
+          .populate('user_id', 'name email')
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .exec(),
+        this.paymentModel.countDocuments().exec(),
+      ]);
+
+      return {
+        data: payments,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting payments: ${error.message}`);
+    }
+  }
+
+  async getSettings() {
+    try {
+      let settings = await this.settingsModel.findOne().exec();
+      if (!settings) {
+        // Create default settings if none exist
+        settings = await this.settingsModel.create({
+          siteName: 'Airbnb Clone',
+          siteDescription: 'Platform đặt phòng trực tuyến',
+          adminEmail: 'admin@example.com',
+        });
+      }
+      return settings;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting settings: ${error.message}`);
+    }
+  }
+
+  async updateSettings(settingsData: Partial<Settings>) {
+    try {
+      let settings = await this.settingsModel.findOne().exec();
+      if (!settings) {
+        settings = await this.settingsModel.create(settingsData);
+      } else {
+        settings = await this.settingsModel.findOneAndUpdate(
+          {},
+          settingsData,
+          { new: true, upsert: true }
+        ).exec();
+      }
+      return settings;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error updating settings: ${error.message}`);
     }
   }
 }

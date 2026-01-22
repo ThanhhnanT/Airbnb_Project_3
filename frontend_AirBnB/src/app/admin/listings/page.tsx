@@ -91,7 +91,17 @@ export default function AllListingsPage() {
     {
       title: "Host",
       key: "host",
-      render: (_, record) => record.host_id?.name || "N/A",
+      render: (_, record) => {
+        if (!record.host_id) return "N/A";
+        return (
+          <div>
+            <div>{record.host_id.name || "N/A"}</div>
+            <div style={{ fontSize: "12px", color: "#888" }}>
+              {record.host_id.email || ""}
+            </div>
+          </div>
+        );
+      },
     },
     {
       title: "Trạng thái",
@@ -131,8 +141,11 @@ export default function AllListingsPage() {
   ];
 
   return (
-    <div>
-      <Card>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Card 
+        style={{ height: "100%", display: "flex", flexDirection: "column" }}
+        bodyStyle={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}
+      >
         <Space style={{ marginBottom: 16, width: "100%" }} direction="vertical">
           <Input
             placeholder="Tìm kiếm theo tiêu đề hoặc thành phố..."
@@ -148,6 +161,7 @@ export default function AllListingsPage() {
           rowKey="_id"
           loading={loading}
           pagination={{ pageSize: 10 }}
+          scroll={{ y: "calc(100vh - 300px)" }}
         />
       </Card>
     </div>

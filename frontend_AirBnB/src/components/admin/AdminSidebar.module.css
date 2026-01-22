@@ -47,8 +47,8 @@
 }
 
 .menu :global(.ant-menu-item-selected) {
-  background-color: #1890ff;
-  color: #fff;
+  background-color: #ff4d4f !important;
+  color: #fff !important;
 }
 
 .menu :global(.ant-menu-item-selected::after) {
@@ -68,6 +68,11 @@
 }
 
 .menu :global(.ant-menu-submenu .ant-menu-item-selected) {
-  background-color: #1890ff;
+  background-color: #ff4d4f !important;
+  color: #fff !important;
+}
+
+.menu :global(.ant-menu-submenu .ant-menu-item-selected::after) {
+  display: none;
 }
 

@@ -98,6 +98,7 @@ export default function ListingDetailPage() {
   const [guestModalOpen, setGuestModalOpen] = useState(false);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [expandedReviews, setExpandedReviews] = useState<Set<string>>(new Set());
   const bookingFormRef = useRef<HTMLDivElement>(null);
   
   // Flatten all image URLs - calculate early to avoid hook order issues
@@ -299,6 +300,68 @@ export default function ListingDetailPage() {
     setCurrentImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
   };
 
+  // Helper function to get initials from name
+  const getInitials = (name: string): string => {
+    if (!name) return "?";
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name[0].toUpperCase();
+  };
+
+  // Format date in Vietnamese: "tháng X năm YYYY"
+  const formatVietnameseDate = (date: string): string => {
+    const d = dayjs(date);
+    const month = d.month() + 1; // dayjs months are 0-indexed
+    const year = d.year();
+    return `tháng ${month} năm ${year}`;
+  };
+
+  // Calculate activity on Airbnb (placeholder - requires backend update)
+  const getActivityText = (reviewerId?: { _id: string; name: string; avatar_url?: string }): string => {
+    // Placeholder: randomly assign activity for demo
+    // In production, this should come from reviewer's createdAt field
+    const activities = ["1 năm hoạt động trên Airbnb", "4 tháng hoạt động trên Airbnb", "2 năm hoạt động trên Airbnb"];
+    if (!reviewerId) return activities[0];
+    // Use reviewer ID to get consistent activity per reviewer
+    const hash = reviewerId._id.charCodeAt(0) % activities.length;
+    return activities[hash];
+  };
+
+  // Calculate top percentage based on rating and review count
+  const calculateTopPercentage = (avgRating: number, reviewCount: number): number => {
+    // Simplified logic: higher rating and more reviews = higher percentage
+    if (avgRating >= 4.8 && reviewCount >= 10) return 5;
+    if (avgRating >= 4.5 && reviewCount >= 5) return 10;
+    if (avgRating >= 4.0) return 20;
+    return 30;
+  };
+
+  // Toggle review expansion
+  const toggleReviewExpansion = (reviewId: string) => {
+    setExpandedReviews((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(reviewId)) {
+        newSet.delete(reviewId);
+      } else {
+        newSet.add(reviewId);
+      }
+      return newSet;
+    });
+  };
+
+  // Check if review comment should be truncated
+  const shouldTruncate = (comment: string): boolean => {
+    return comment && comment.length > 200;
+  };
+
+  // Get truncated comment
+  const getTruncatedComment = (comment: string): string => {
+    if (!comment) return "";
+    return comment.substring(0, 200) + "...";
+  };
+
   return (
     <div className={styles.listingDetailContainer}>
       {/* Image Gallery */}
@@ -473,25 +536,80 @@ export default function ListingDetailPage() {
           {reviews && reviews.length > 0 && (
             <div className={styles.reviewsSection}>
               <h2>Đánh giá ({reviews.length})</h2>
-              {reviews.map((review) => (
-                <div key={review._id} className={styles.reviewItem}>
-                  <div className={styles.reviewHeader}>
-                    <img 
-                      src={review.reviewer_id?.avatar_url || "/default-avatar.png"} 
-                      alt={review.reviewer_id?.name}
-                      className={styles.reviewerAvatar}
-                    />
-                    <div>
-                      <h4>{review.reviewer_id?.name || "Anonymous"}</h4>
-                      <Rate disabled value={review.rating} />
-                      <span className={styles.reviewDate}>
-                        {dayjs(review.createdAt).format("DD/MM/YYYY")}
-                      </span>
+              
+              {/* Overall Rating Summary */}
+              <div className={styles.ratingSummary}>
+                <div className={styles.ratingDisplay}>
+                  <div className={styles.ratingNumber}>
+                    <span className={styles.ratingValue}>{listing.avg_rating.toFixed(1).replace('.', ',')}</span>
+                    <div className={styles.ratingIcons}>
+                      <span className={styles.leafIcon}>🌿</span>
+                      <span className={styles.leafIcon}>🌿</span>
                     </div>
                   </div>
-                  {review.comment && <p>{review.comment}</p>}
+                  <div className={styles.ratingText}>
+                    <p className={styles.lovedByGuests}>Được khách yêu thích</p>
+                    <p className={styles.topPercentage}>
+                      Trong số các chỗ ở cho thuê đủ điều kiện dựa trên điểm xếp hạng, lượt đánh giá và độ tin cậy, nhà này nằm trong nhóm <strong>{calculateTopPercentage(listing.avg_rating, listing.review_count)}% chỗ ở hàng đầu</strong>
+                    </p>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Individual Reviews Grid */}
+              <div className={styles.reviewsGrid}>
+                {reviews.map((review) => {
+                  const isExpanded = expandedReviews.has(review._id);
+                  const reviewerName = review.reviewer_id?.name || "Anonymous";
+                  const hasAvatar = review.reviewer_id?.avatar_url;
+                  const comment = review.comment || "";
+                  const shouldShowMore = shouldTruncate(comment);
+                  const displayComment = shouldShowMore && !isExpanded ? getTruncatedComment(comment) : comment;
+
+                  return (
+                    <div key={review._id} className={styles.reviewItem}>
+                      <div className={styles.reviewHeader}>
+                        {hasAvatar ? (
+                          <img 
+                            src={review.reviewer_id?.avatar_url} 
+                            alt={reviewerName}
+                            className={styles.reviewerAvatar}
+                          />
+                        ) : (
+                          <div className={styles.reviewerAvatarInitials}>
+                            {getInitials(reviewerName)}
+                          </div>
+                        )}
+                        <div className={styles.reviewerInfo}>
+                          <h4 className={styles.reviewerName}>{reviewerName}</h4>
+                          <p className={styles.reviewerActivity}>{getActivityText(review.reviewer_id)}</p>
+                        </div>
+                      </div>
+                      <div className={styles.reviewContent}>
+                        <div className={styles.reviewRating}>
+                          <Rate disabled value={review.rating} allowHalf />
+                          <span className={styles.reviewDate}>
+                            {formatVietnameseDate(review.createdAt)}
+                          </span>
+                        </div>
+                        {comment && (
+                          <div className={styles.reviewComment}>
+                            <p>{displayComment}</p>
+                            {shouldShowMore && (
+                              <button
+                                className={styles.showMoreButton}
+                                onClick={() => toggleReviewExpansion(review._id)}
+                              >
+                                {isExpanded ? "Hiển thị ít hơn" : "Hiển thị thêm"}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

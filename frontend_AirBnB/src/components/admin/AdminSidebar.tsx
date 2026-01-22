@@ -78,7 +78,7 @@ export default function AdminSidebar() {
       getItem("All Bookings", "/admin/bookings", <UnorderedListOutlined />),
       getItem("Pending Bookings", "/admin/bookings/pending", <ClockCircleOutlined />),
     ]),
-    getItem("User s", "users", <UserOutlined />),
+    getItem("Users", "users", <UserOutlined />),
     getItem("Payments", "payments", <DollarOutlined />),
     getItem("Settings", "settings", <SettingOutlined />),
     { type: "divider" },
@@ -96,6 +96,15 @@ export default function AdminSidebar() {
     } else if (key === "dashboard") {
       router.push("/admin");
       setSelectedKeys(["dashboard"]);
+    } else if (key === "users") {
+      router.push("/admin/users");
+      setSelectedKeys(["users"]);
+    } else if (key === "payments") {
+      router.push("/admin/payments");
+      setSelectedKeys(["payments"]);
+    } else if (key === "settings") {
+      router.push("/admin/settings");
+      setSelectedKeys(["settings"]);
     } else if (key.startsWith("/")) {
       router.push(key);
       setSelectedKeys([key]);

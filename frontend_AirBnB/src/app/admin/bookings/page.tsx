@@ -142,8 +142,11 @@ export default function AllBookingsPage() {
   ];
 
   return (
-    <div>
-      <Card>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Card 
+        style={{ height: "100%", display: "flex", flexDirection: "column" }}
+        bodyStyle={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}
+      >
         <Space style={{ marginBottom: 16, width: "100%" }} direction="vertical">
           <Input
             placeholder="Tìm kiếm theo listing hoặc tên khách..."
@@ -159,6 +162,7 @@ export default function AllBookingsPage() {
           rowKey="_id"
           loading={loading}
           pagination={{ pageSize: 10 }}
+          scroll={{ y: "calc(100vh - 300px)" }}
         />
       </Card>
     </div>

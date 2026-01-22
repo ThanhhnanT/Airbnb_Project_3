@@ -117,14 +117,19 @@ export default function PendingBookingsPage() {
   ];
 
   return (
-    <div>
-      <Card title="Pending Bookings">
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Card 
+        title="Pending Bookings" 
+        style={{ height: "100%", display: "flex", flexDirection: "column" }}
+        bodyStyle={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}
+      >
         <Table
           columns={columns}
           dataSource={bookings}
           rowKey="_id"
           loading={loading}
           pagination={{ pageSize: 10 }}
+          scroll={{ y: "calc(100vh - 250px)" }}
         />
       </Card>
     </div>
