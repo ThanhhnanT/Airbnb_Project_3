@@ -10,7 +10,8 @@ import {
   WechatOutlined,
   LogoutOutlined, 
   UnorderedListOutlined, 
-  QuestionCircleOutlined 
+  QuestionCircleOutlined,
+  BellOutlined
 } from "@ant-design/icons";
 import styles from "@/styles/navbar.module.css";
 
@@ -118,6 +119,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick }) => {
   return (
     <Space align="center" size={20} className={styles.userMenuContainer}>
       <Text strong className={styles.userMenuText}>Trở thành Host</Text>
+      <div className={styles.notificationIcon}>
+        <BellOutlined className={styles.bellIcon} />
+      </div>
       <Dropdown 
         menu={{ 
           items: isLoggedIn ? menuLogin : menuLogout, 

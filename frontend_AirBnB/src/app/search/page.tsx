@@ -97,40 +97,116 @@ function SearchContent() {
 
         const result = await searchListings(params);
         
+        console.log('=== SEARCH DEBUG ===');
         console.log('Search params:', params);
         console.log('Search result:', result);
+        console.log('Result type:', typeof result);
+        console.log('Result keys:', result ? Object.keys(result) : 'null/undefined');
 
-        if (result && result.data !== undefined) {
-          const listingsData = result.data || [];
-          setListings(listingsData);
-          
-          // Set map center from first listing or search params
-          if (listingsData.length > 0 && listingsData[0].latitude && listingsData[0].longitude) {
+        // Check if result is valid
+        if (!result) {
+          console.error('Search result is null or undefined');
+          setListings([]);
+          message.error("Không thể kết nối đến server");
+          return;
+        }
+
+        // Check for error response
+        if (result.statusCode && result.statusCode !== 200) {
+          console.error('Search API error:', result.statusCode, result.message);
+          setListings([]);
+          message.warning(result.message || "Không tìm thấy kết quả phù hợp");
+          return;
+        }
+
+        // Validate and extract data
+        const listingsData = Array.isArray(result.data) ? result.data : (result.data ? [result.data] : []);
+        console.log('Listings data:', listingsData);
+        console.log('Listings count:', listingsData.length);
+        
+        // Validate and normalize listings structure
+        const validListings = listingsData
+          .filter((listing: any) => {
+            return listing && listing._id && listing.title;
+          })
+          .map((listing: any) => {
+            // Normalize coordinates - convert string to number if needed
+            if (listing.latitude && typeof listing.latitude === 'string') {
+              listing.latitude = parseFloat(listing.latitude);
+            }
+            if (listing.longitude && typeof listing.longitude === 'string') {
+              listing.longitude = parseFloat(listing.longitude);
+            }
+            
+            // Validate coordinates are valid numbers
+            const hasValidCoords = 
+              listing.latitude !== undefined && 
+              listing.latitude !== null && 
+              !isNaN(listing.latitude) &&
+              listing.longitude !== undefined && 
+              listing.longitude !== null && 
+              !isNaN(listing.longitude);
+            
+            if (!hasValidCoords) {
+              console.warn('Listing missing or invalid coordinates:', {
+                id: listing._id,
+                title: listing.title,
+                latitude: listing.latitude,
+                longitude: listing.longitude
+              });
+            }
+            
+            return listing;
+          });
+        
+        console.log('Valid listings count:', validListings.length);
+        console.log('Listings with coordinates:', validListings.filter((l: any) => l.latitude && l.longitude).length);
+        
+        setListings(validListings);
+        
+        // Set map center from first listing or search params
+        if (validListings.length > 0) {
+          const firstListing = validListings[0];
+          if (firstListing.latitude && firstListing.longitude) {
+            console.log('Setting map center from first listing:', firstListing.latitude, firstListing.longitude);
             setMapCenter({
-              lat: listingsData[0].latitude,
-              lng: listingsData[0].longitude,
+              lat: firstListing.latitude,
+              lng: firstListing.longitude,
             });
           } else if (params.latitude && params.longitude) {
+            console.log('Setting map center from search params:', params.latitude, params.longitude);
             setMapCenter({
               lat: params.latitude,
               lng: params.longitude,
             });
           }
-          
-          if (result.pagination) {
-            setPagination({
-              page: result.pagination.page,
-              limit: result.pagination.limit,
-              total: result.pagination.total || 0,
-              totalPages: result.pagination.totalPages || 0,
-            });
-          }
-        } else {
-          setListings([]);
-          if (result?.statusCode !== 200) {
-            message.warning(result?.message || "Không tìm thấy kết quả phù hợp");
-          }
+        } else if (params.latitude && params.longitude) {
+          console.log('No listings, setting map center from search params:', params.latitude, params.longitude);
+          setMapCenter({
+            lat: params.latitude,
+            lng: params.longitude,
+          });
         }
+        
+        // Set pagination
+        if (result.pagination) {
+          setPagination({
+            page: result.pagination.page || 1,
+            limit: result.pagination.limit || 12,
+            total: result.pagination.total || 0,
+            totalPages: result.pagination.totalPages || 0,
+          });
+        } else {
+          // Default pagination if not provided
+          setPagination({
+            page: 1,
+            limit: 12,
+            total: validListings.length,
+            totalPages: 1,
+          });
+        }
+        
+        console.log('=== END SEARCH DEBUG ===');
       } catch (error: any) {
         console.error("Search error:", error);
         message.error(error?.message || "Có lỗi xảy ra khi tìm kiếm");

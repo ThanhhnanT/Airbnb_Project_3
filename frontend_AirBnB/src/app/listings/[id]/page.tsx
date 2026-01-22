@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Spin, Empty, Button, Carousel, Rate, Tag, Divider, message, DatePicker } from "antd";
+import { Spin, Empty, Button, Rate, Tag, Divider, message, Typography } from "antd";
 import { 
   HeartOutlined, 
   ShareAltOutlined, 
@@ -11,13 +11,18 @@ import {
   HomeOutlined,
   UserOutlined,
   CalendarOutlined,
-  DollarOutlined
+  DollarOutlined,
+  RightOutlined,
+  LeftOutlined,
+  CloseOutlined
 } from "@ant-design/icons";
 import { getAccess } from "@/helper/api";
 import dayjs, { Dayjs } from "dayjs";
+import DatePickerModal from "@/components/search/DatePickerModal";
+import GuestSelector, { GuestCounts } from "@/components/search/GuestSelector";
 import styles from "./listing-detail.module.css";
 
-const { RangePicker } = DatePicker;
+const { Text } = Typography;
 
 interface ListingDetail {
   listing: {
@@ -83,14 +88,60 @@ export default function ListingDetailPage() {
   const [listingDetail, setListingDetail] = useState<ListingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
-  const [guests, setGuests] = useState(1);
+  const [guestCounts, setGuestCounts] = useState<GuestCounts>({
+    adults: 1,
+    children: 0,
+    infants: 0,
+    pets: 0,
+  });
+  const [dateModalOpen, setDateModalOpen] = useState(false);
+  const [guestModalOpen, setGuestModalOpen] = useState(false);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const bookingFormRef = useRef<HTMLDivElement>(null);
+  
+  // Flatten all image URLs - calculate early to avoid hook order issues
+  const allImages = listingDetail?.images && listingDetail.images.length > 0
+    ? listingDetail.images.flatMap((img) => 
+        img.image_url && Array.isArray(img.image_url) ? img.image_url : []
+      )
+    : [];
+
+  // Create a stable key from search params for dependency array
+  const searchParamsKey = `${searchParams.get("checkInDate") || searchParams.get("check_in") || ""}_${searchParams.get("checkOutDate") || searchParams.get("check_out") || ""}_${searchParams.get("guests") || ""}`;
+
+  // Keyboard navigation for image modal - must be called before conditional returns
+  useEffect(() => {
+    if (!imageModalOpen || allImages.length === 0) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        setCurrentImageIndex((prev) => {
+          const newIndex = prev > 0 ? prev - 1 : allImages.length - 1;
+          return newIndex;
+        });
+      } else if (e.key === 'ArrowRight') {
+        setCurrentImageIndex((prev) => {
+          const newIndex = prev < allImages.length - 1 ? prev + 1 : 0;
+          return newIndex;
+        });
+      } else if (e.key === 'Escape') {
+        setImageModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [imageModalOpen, allImages.length]);
 
   useEffect(() => {
     const fetchListingDetails = async () => {
       try {
         setLoading(true);
-        const checkInDate = searchParams.get("checkInDate");
-        const checkOutDate = searchParams.get("checkOutDate");
+        
+        // Check both formats: check_in/check_out (from search) and checkInDate/checkOutDate
+        const checkInDate = searchParams.get("checkInDate") || searchParams.get("check_in");
+        const checkOutDate = searchParams.get("checkOutDate") || searchParams.get("check_out");
         const guestsParam = searchParams.get("guests");
 
         let url = `listings/${listingId}/details`;
@@ -98,7 +149,14 @@ export default function ListingDetailPage() {
           url += `?checkInDate=${checkInDate}&checkOutDate=${checkOutDate}`;
           if (guestsParam) {
             url += `&guests=${guestsParam}`;
-            setGuests(parseInt(guestsParam));
+            const totalGuests = parseInt(guestsParam);
+            // Convert total guests to GuestCounts format
+            setGuestCounts({
+              adults: Math.max(1, totalGuests),
+              children: 0,
+              infants: 0,
+              pets: 0,
+            });
           }
           setDateRange([
             dayjs(checkInDate),
@@ -119,18 +177,68 @@ export default function ListingDetailPage() {
     if (listingId) {
       fetchListingDetails();
     }
-  }, [listingId, searchParams]);
+    // Only run on initial load or when listingId changes, not when searchParams change from form updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listingId]);
 
   const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
     if (dates && dates[0] && dates[1]) {
       setDateRange(dates);
-      // Update URL with new dates
+      const totalGuests = guestCounts.adults + guestCounts.children;
+      
+      // Update URL without reloading page
       const newParams = new URLSearchParams(searchParams.toString());
       newParams.set("checkInDate", dates[0].format("YYYY-MM-DD"));
       newParams.set("checkOutDate", dates[1].format("YYYY-MM-DD"));
-      newParams.set("guests", guests.toString());
-      router.push(`/listings/${listingId}?${newParams.toString()}`);
+      newParams.set("guests", totalGuests.toString());
+      
+      // Use replace with shallow routing to avoid page reload
+      window.history.replaceState(
+        {},
+        '',
+        `/listings/${listingId}?${newParams.toString()}`
+      );
+      
+      // Refetch listing details with new dates
+      const url = `listings/${listingId}/details?checkInDate=${dates[0].format("YYYY-MM-DD")}&checkOutDate=${dates[1].format("YYYY-MM-DD")}&guests=${totalGuests}`;
+      getAccess(url).then(setListingDetail).catch(console.error);
     }
+  };
+
+  const handleGuestChange = (guests: GuestCounts) => {
+    setGuestCounts(guests);
+    // Update URL with new guest count
+    if (dateRange[0] && dateRange[1]) {
+      const totalGuests = guests.adults + guests.children;
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.set("checkInDate", dateRange[0].format("YYYY-MM-DD"));
+      newParams.set("checkOutDate", dateRange[1].format("YYYY-MM-DD"));
+      newParams.set("guests", totalGuests.toString());
+      
+      // Use replace with shallow routing to avoid page reload
+      window.history.replaceState(
+        {},
+        '',
+        `/listings/${listingId}?${newParams.toString()}`
+      );
+      
+      // Refetch listing details with new guest count
+      const url = `listings/${listingId}/details?checkInDate=${dateRange[0].format("YYYY-MM-DD")}&checkOutDate=${dateRange[1].format("YYYY-MM-DD")}&guests=${totalGuests}`;
+      getAccess(url).then(setListingDetail).catch(console.error);
+    }
+  };
+
+  const formatDateRange = (): string => {
+    if (!dateRange[0] || !dateRange[1]) {
+      return "Thêm ngày";
+    }
+    return `${dateRange[0].format("DD/MM/YYYY")} - ${dateRange[1].format("DD/MM/YYYY")}`;
+  };
+
+  const formatGuests = (): string => {
+    const total = guestCounts.adults + guestCounts.children + guestCounts.infants;
+    if (total === 0) return "Thêm khách";
+    return `${total} ${total === 1 ? "khách" : "khách"}`;
   };
 
   const handleReserve = () => {
@@ -139,11 +247,17 @@ export default function ListingDetailPage() {
       return;
     }
     
+    const totalGuests = guestCounts.adults + guestCounts.children;
+    if (totalGuests === 0) {
+      message.warning("Vui lòng chọn số lượng khách");
+      return;
+    }
+    
     const bookingData = {
       listingId: listingId,
       checkInDate: dateRange[0].format("YYYY-MM-DD"),
       checkOutDate: dateRange[1].format("YYYY-MM-DD"),
-      guests: guests,
+      guests: totalGuests.toString(),
     };
     
     router.push(`/payment?${new URLSearchParams(bookingData as any).toString()}`);
@@ -168,28 +282,105 @@ export default function ListingDetailPage() {
 
   const { listing, images, reviews, availability } = listingDetail;
 
+  // Get first 5 images for grid display
+  const displayImages = allImages.slice(0, 5);
+  const remainingCount = allImages.length - 5;
+
+  const handleImageClick = (index: number) => {
+    setCurrentImageIndex(index);
+    setImageModalOpen(true);
+  };
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prev) => (prev > 0 ? prev - 1 : allImages.length - 1));
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prev) => (prev < allImages.length - 1 ? prev + 1 : 0));
+  };
+
   return (
     <div className={styles.listingDetailContainer}>
       {/* Image Gallery */}
       <div className={styles.imageSection}>
-        {images && images.length > 0 ? (
-          <Carousel autoplay>
-            {images.flatMap((img) => 
-              img.image_url && Array.isArray(img.image_url) 
-                ? img.image_url.map((url, index) => (
-                    <div key={`${img._id}-${index}`} className={styles.imageSlide}>
-                      <img src={url} alt={listing.title} />
+        {displayImages.length > 0 ? (
+          <div className={styles.imageGrid}>
+            {/* Main large image */}
+            <div 
+              className={styles.mainImage}
+              onClick={() => handleImageClick(0)}
+            >
+              <img src={displayImages[0]} alt={listing.title} />
+            </div>
+            
+            {/* 4 smaller images */}
+            <div className={styles.sideImages}>
+              {displayImages.slice(1, 5).map((url, index) => (
+                <div
+                  key={index + 1}
+                  className={styles.sideImage}
+                  onClick={() => handleImageClick(index + 1)}
+                >
+                  <img src={url} alt={`${listing.title} - ${index + 2}`} />
+                  {index === 3 && remainingCount > 0 && (
+                    <div 
+                      className={styles.viewAllOverlay}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleImageClick(4);
+                      }}
+                    >
+                      <Button type="primary" className={styles.viewAllButton}>
+                        Hiển thị tất cả ảnh
+                      </Button>
                     </div>
-                  ))
-                : []
-            )}
-          </Carousel>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
           <div className={styles.placeholderImage}>
             <HomeOutlined style={{ fontSize: 64, color: "#ccc" }} />
           </div>
         )}
       </div>
+
+      {/* Image Modal Slider */}
+      {imageModalOpen && allImages.length > 0 && (
+        <div className={styles.imageModal}>
+          <div className={styles.imageModalBackdrop} onClick={() => setImageModalOpen(false)} />
+          <Button
+            className={styles.imageModalClose}
+            icon={<CloseOutlined />}
+            onClick={() => setImageModalOpen(false)}
+          />
+          <div className={styles.imageModalContent}>
+            <div className={styles.imageModalImageContainer}>
+              <Button
+                className={styles.imageModalPrev}
+                icon={<LeftOutlined />}
+                onClick={handlePrevImage}
+              />
+              <div className={styles.imageModalImageWrapper}>
+                <img 
+                  src={allImages[currentImageIndex]} 
+                  alt={`${listing.title} - ${currentImageIndex + 1}`}
+                  className={styles.imageModalImage}
+                />
+                <div className={styles.imageModalCounter}>
+                  {currentImageIndex + 1} / {allImages.length}
+                </div>
+              </div>
+              <Button
+                className={styles.imageModalNext}
+                icon={<RightOutlined />}
+                onClick={handleNextImage}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={styles.contentSection}>
         <div className={styles.mainContent}>
@@ -314,28 +505,69 @@ export default function ListingDetailPage() {
             <span className={styles.priceUnit}>/ đêm</span>
           </div>
 
-          <div className={styles.bookingForm}>
-            <div className={styles.datePickerSection}>
+          <div className={styles.bookingForm} ref={bookingFormRef}>
+            <div 
+              className={styles.datePickerSection}
+              onClick={() => {
+                setDateModalOpen(true);
+                setGuestModalOpen(false);
+              }}
+              style={{ cursor: 'pointer' }}
+            >
               <label>Ngày</label>
-              <RangePicker
-                value={dateRange}
-                onChange={handleDateChange}
-                format="DD/MM/YYYY"
-                disabledDate={(current) => current && current < dayjs().startOf('day')}
-                className={styles.datePicker}
-              />
+              <div className={styles.dateDisplay}>
+                <Text>{formatDateRange()}</Text>
+                <CalendarOutlined />
+              </div>
             </div>
+            {dateModalOpen && (
+              <>
+                <div 
+                  className={styles.modalBackdrop} 
+                  onClick={() => setDateModalOpen(false)}
+                />
+                <div style={{ position: 'relative', zIndex: 10000 }}>
+                  <DatePickerModal
+                    visible={dateModalOpen}
+                    onClose={() => setDateModalOpen(false)}
+                    onSelect={handleDateChange}
+                    initialDates={dateRange}
+                  />
+                </div>
+              </>
+            )}
 
-            <div className={styles.guestsSection}>
+            <div 
+              className={styles.guestsSection}
+              style={{ cursor: 'pointer' }}
+            >
               <label>Số khách</label>
-              <input
-                type="number"
-                min={1}
-                max={listing.guests}
-                value={guests}
-                onChange={(e) => setGuests(parseInt(e.target.value) || 1)}
-                className={styles.guestsInput}
-              />
+              <div 
+                className={styles.guestsDisplay}
+                onClick={() => {
+                  setGuestModalOpen(true);
+                  setDateModalOpen(false);
+                }}
+              >
+                <Text>{formatGuests()}</Text>
+                <UserOutlined />
+              </div>
+              {guestModalOpen && (
+                <>
+                  <div 
+                    className={styles.modalBackdrop} 
+                    onClick={() => setGuestModalOpen(false)}
+                  />
+                  <GuestSelector
+                    visible={guestModalOpen}
+                    onClose={() => setGuestModalOpen(false)}
+                    onConfirm={handleGuestChange}
+                    initialGuests={guestCounts}
+                    maxGuests={listing.guests}
+                    allowPets={false}
+                  />
+                </>
+              )}
             </div>
 
             {availability && (

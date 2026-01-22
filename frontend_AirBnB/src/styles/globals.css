@@ -1,7 +1,13 @@
 /* Global Body Reset */
-body {
+html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  background-color: #f8f6f6;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 /* CSS Variables for AirBnB Theme */

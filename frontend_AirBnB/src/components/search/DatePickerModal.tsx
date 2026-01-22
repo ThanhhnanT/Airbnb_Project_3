@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DatePicker, Tabs, Typography, Space, Button } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import type { Dayjs } from "dayjs";
@@ -14,6 +14,7 @@ interface DatePickerModalProps {
   visible: boolean;
   onClose: () => void;
   onSelect: (dates: [Dayjs | null, Dayjs | null] | null, flexible?: number) => void;
+  initialDates?: [Dayjs | null, Dayjs | null] | null;
 }
 
 const flexibleOptions = [
@@ -28,11 +29,19 @@ const flexibleOptions = [
 const DatePickerModal: React.FC<DatePickerModalProps> = ({ 
   visible, 
   onClose, 
-  onSelect 
+  onSelect,
+  initialDates
 }) => {
   const [activeTab, setActiveTab] = useState<string>("day");
-  const [selectedDates, setSelectedDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  const [selectedDates, setSelectedDates] = useState<[Dayjs | null, Dayjs | null] | null>(initialDates || null);
   const [flexibleDays, setFlexibleDays] = useState<number>(0);
+
+  // Update selectedDates when initialDates change
+  useEffect(() => {
+    if (initialDates) {
+      setSelectedDates(initialDates);
+    }
+  }, [initialDates]);
 
 
   const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {

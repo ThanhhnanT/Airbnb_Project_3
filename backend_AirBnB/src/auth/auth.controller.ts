@@ -8,7 +8,8 @@ import {
   BadRequestException,
   InternalServerErrorException,
   HttpException,
-  HttpStatus
+  HttpStatus,
+  ForbiddenException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './passport/local-auth.guard';
@@ -117,6 +118,43 @@ export class AuthController {
         throw error;
       }
       throw new InternalServerErrorException(`Lỗi khi xác thực email: ${error.message}`);
+    }
+  }
+
+  @ApiOperation({summary: 'Admin đăng nhập'})
+  @ApiResponse({ status: 200, description: 'Đăng nhập admin thành công' })
+  @ApiResponse({ status: 401, description: 'Email hoặc mật khẩu không đúng' })
+  @ApiResponse({ status: 403, description: 'Chỉ admin mới có quyền truy cập' })
+  @ApiResponse({ status: 500, description: 'Lỗi server' })
+  @UseGuards(LocalAuthGuard)
+  @Public()
+  @ApiBody({ type: LoginAuthDto })
+  @Post('admin/login')
+  async adminLogin(@Request() req: any) {
+    try {
+      const user = req.user as any; 
+      
+      if (!user) {
+        throw new BadRequestException('Thông tin đăng nhập không hợp lệ');
+      }
+
+      // Check if user is admin
+      if (user.role?.type !== 'admin') {
+        throw new ForbiddenException('Chỉ admin mới có quyền truy cập');
+      }
+
+      const { _id, email } = user;
+      
+      if (!_id || !email) {
+        throw new BadRequestException('Thông tin người dùng không đầy đủ');
+      }
+
+      return await this.authService.signIn(_id, email);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Lỗi khi đăng nhập admin: ${error.message}`);
     }
   }
 }

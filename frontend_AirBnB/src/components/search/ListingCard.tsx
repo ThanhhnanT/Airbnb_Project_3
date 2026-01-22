@@ -1,13 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Typography, Rate, Space, Tag } from "antd";
 import {
   HomeOutlined,
   UserOutlined,
   EnvironmentOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { getListingImages, ListingImage } from "@/service/listings";
 import styles from "@/styles/listing-card.module.css";
 
 const { Text, Title } = Typography;
@@ -32,6 +35,7 @@ interface Listing {
   avg_rating: number;
   review_count: number;
   amenities?: string[];
+  cover_image?: string | null;
 }
 
 interface ListingCardProps {
@@ -40,9 +44,89 @@ interface ListingCardProps {
 
 const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
   const router = useRouter();
+  const [images, setImages] = useState<string[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        setImageLoading(true);
+        
+        // Fetch all images
+        const listingImages = await getListingImages(listing._id);
+        if (listingImages && listingImages.length > 0) {
+          const allImageUrls: string[] = [];
+          
+          listingImages.forEach((img: ListingImage) => {
+            if (img.image_url && Array.isArray(img.image_url)) {
+              allImageUrls.push(...img.image_url);
+            }
+          });
+
+          if (allImageUrls.length > 0) {
+            setImages(allImageUrls);
+          } else if (listing.cover_image) {
+            // Fallback to cover_image if no images from API
+            setImages([listing.cover_image]);
+          }
+        } else if (listing.cover_image) {
+          // Use cover_image if API returns no images
+          setImages([listing.cover_image]);
+        }
+      } catch (error) {
+        console.error("Error fetching listing images:", error);
+        // Fallback to cover_image if available
+        if (listing.cover_image) {
+          setImages([listing.cover_image]);
+        }
+      } finally {
+        setImageLoading(false);
+      }
+    };
+
+    fetchImages();
+  }, [listing._id, listing.cover_image]);
+
+  // Auto-play carousel when hovered
+  useEffect(() => {
+    if (isHovered && images.length > 1) {
+      autoPlayRef.current = setInterval(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % images.length);
+      }, 2000); // Change image every 2 seconds
+    } else {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+        autoPlayRef.current = null;
+      }
+    }
+
+    return () => {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
+    };
+  }, [isHovered, images.length]);
 
   const handleCardClick = () => {
     router.push(`/listings/${listing._id}`);
+  };
+
+  const handlePrevious = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const handleDotClick = (index: number) => {
+    setCurrentImageIndex(index);
   };
 
   const formatPrice = (price: number, currency: string) => {
@@ -53,15 +137,91 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
     }).format(price);
   };
 
+  const hasImages = images.length > 0 && !imageLoading;
+
   return (
     <div
       className={styles.listingCard}
       onClick={handleCardClick}
     >
-      <div className={styles.cardImageContainer}>
-        <div className={styles.cardImagePlaceholder}>
-          <HomeOutlined className={styles.cardImageIcon} />
-        </div>
+      <div 
+        className={styles.cardImageContainer}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        ref={imageContainerRef}
+      >
+        {imageLoading ? (
+          <div className={styles.cardImagePlaceholder}>
+            <HomeOutlined className={styles.cardImageIcon} />
+          </div>
+        ) : hasImages ? (
+          <>
+            <div className={styles.imageSlider}>
+              {images.map((imageUrl, index) => (
+                <div
+                  key={index}
+                  className={`${styles.slide} ${
+                    index === currentImageIndex ? styles.slideActive : ""
+                  }`}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`${listing.title} - Image ${index + 1}`}
+                    className={styles.cardImage}
+                    onError={(e) => {
+                      // Hide broken images
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            {/* Navigation buttons */}
+            {images.length > 1 && (
+              <>
+                <button
+                  className={`${styles.navButton} ${styles.navButtonPrev}`}
+                  onClick={handlePrevious}
+                  aria-label="Previous image"
+                >
+                  <LeftOutlined />
+                </button>
+                <button
+                  className={`${styles.navButton} ${styles.navButtonNext}`}
+                  onClick={handleNext}
+                  aria-label="Next image"
+                >
+                  <RightOutlined />
+                </button>
+              </>
+            )}
+
+            {/* Dots indicator */}
+            {images.length > 1 && (
+              <div className={styles.dotsContainer}>
+                {images.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`${styles.dot} ${
+                      index === currentImageIndex ? styles.dotActive : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDotClick(index);
+                    }}
+                    aria-label={`Go to image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className={styles.cardImagePlaceholder}>
+            <HomeOutlined className={styles.cardImageIcon} />
+          </div>
+        )}
+
         <div 
           className={styles.favoriteButton}
           onClick={(e) => {

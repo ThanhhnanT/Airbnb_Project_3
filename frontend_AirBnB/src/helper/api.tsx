@@ -132,3 +132,14 @@ export const postAccess = async (path: string, data: object) => {
     throw error;
   }
 };
+
+export const patchAccess = async (path: string, data: object) => {
+  try {
+    const tokenHeader = getTokenHeader();
+    const res = await axios.patch(API_DOMAIN + path, data, { ...config, headers: { ...config.headers, ...tokenHeader } });
+    return res.data;
+  } catch (error) {
+    console.log('API Error:', error);
+    throw error;
+  }
+};

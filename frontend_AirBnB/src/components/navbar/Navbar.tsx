@@ -35,16 +35,23 @@ export default function Navbar() {
   }, [Cookies.get('access_token')]);
 
   // Scroll detection
-  const lastScrollYRef = useRef(window.scrollY);
+  const lastScrollYRef = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
+  const lastToggleAtRef = useRef(0);
   
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       // Use hysteresis: different thresholds for scrolling down vs up
       // This prevents flickering when scroll position oscillates around a single threshold
-      const scrollDownThreshold = 50;  // When scrolling down, activate at 50px
-      const scrollUpThreshold = 30;    // When scrolling up, deactivate at 30px
-      
+      const scrollDownThreshold = 70;  // When scrolling down, activate at 70px
+      const scrollUpThreshold = 20;    // When scrolling up, deactivate at 20px
+
+      // Ignore scroll-driven state changes during navbar resize transition
+      if (Date.now() - lastToggleAtRef.current < 350) {
+        lastScrollYRef.current = scrollY;
+        return;
+      }
+
       // Determine scroll direction
       const scrollingDown = scrollY > lastScrollYRef.current;
       
@@ -52,6 +59,7 @@ export default function Navbar() {
         // On home page, use hysteresis based on scroll direction
         if (scrollingDown && scrollY > scrollDownThreshold) {
           setIsScrolled(true);
+          lastToggleAtRef.current = Date.now();
           // If expanded and scrolling, collapse it
           setIsExpanded((prev) => {
             if (prev) {
@@ -61,6 +69,7 @@ export default function Navbar() {
           });
         } else if (!scrollingDown && scrollY < scrollUpThreshold) {
           setIsScrolled(false);
+          lastToggleAtRef.current = Date.now();
         }
       } else {
         // On other pages, always show scrolled state
@@ -101,12 +110,13 @@ export default function Navbar() {
           messageApi.info('Tin nhắn của bạn');
           break;
         case '4':
-          messageApi.info('Hồ sơ của bạn');
+          router.push('/profile');
           break;
         case '5': 
           messageApi.success('Đăng xuất thành công');
           Cookies.remove("access_token"); 
-          setLogin(false);              
+          setLogin(false);
+          router.push('/');
           break;
         default:
           break;

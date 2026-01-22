@@ -1,16 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { AdminAuthGuard } from '@/auth/passport/admin-auth.guard';
 
 @ApiTags('Admin')
 @Controller('admin')
+@UseGuards(AdminAuthGuard)
+@ApiBearerAuth()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Get('dashboard')
   @ApiOperation({ summary: 'Lấy thống kê dashboard admin' })
   async getDashboard(@Req() req: any) {
-    const userId = req.user?.id || req.user?.user_id;
+    const userId = req.user?._id || req.user?.id || req.user?.user_id;
     return this.adminService.getDashboard(userId);
   }
 

@@ -13,6 +13,41 @@
   color: var(--color-text);
 }
 
+.notificationIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.notificationIcon:hover {
+  background-color: var(--color-background-secondary);
+}
+
+.bellIcon {
+  font-size: 20px;
+  color: var(--color-text);
+  transition: all var(--transition-normal);
+}
+
+.notificationIcon:hover .bellIcon {
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .bellIcon {
+    font-size: 18px;
+  }
+  
+  .notificationIcon {
+    padding: 6px;
+  }
+}
+
 @media (max-width: 1024px) {
   .userMenuContainer {
     gap: 16px;
@@ -176,6 +211,11 @@
   transition: all 0.3s ease;
 }
 
+.navbarContainer > * {
+  display: flex;
+  align-items: center;
+}
+
 /* Collapsed State */
 .navbarContainerCollapsed {
   padding: 8px 16px;
@@ -193,6 +233,8 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  height: 100%;
+  justify-content: flex-start;
 }
 
 .searchContainer {
@@ -200,9 +242,11 @@
   min-width: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
   max-width: 100%;
   overflow: visible;
   position: relative;
+  height: 100%;
 }
 
 .userMenuContainerWrapper {
@@ -210,6 +254,8 @@
   min-width: fit-content;
   display: flex;
   align-items: center;
+  height: 100%;
+  justify-content: flex-end;
 }
 
 @media (max-width: 1024px) {

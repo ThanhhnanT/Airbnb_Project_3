@@ -18,3 +18,11 @@ export const handleVerify = async (data: object) => {
   const res = await post ('auth/verify_email', data)
   return res
 }
+
+export const handleAdminLogin = async (data: {
+  email: string,
+  password: string
+}) => {
+  const res = await post('auth/admin/login', data)
+  return res
+}

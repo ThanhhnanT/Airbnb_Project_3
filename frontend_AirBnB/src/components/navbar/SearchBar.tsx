@@ -28,6 +28,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed =
   const [guestOpen, setGuestOpen] = useState(false);
   
   const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [displayLocation, setDisplayLocation] = useState<string>("");
   const [selectedDates, setSelectedDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [guests, setGuests] = useState<GuestCounts>({
     adults: 0,
@@ -92,7 +93,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed =
       if (selectedLocation) {
         // Check if it's a "nearby" location with coordinates
         if (selectedLocation.startsWith('nearby:')) {
-          const coords = selectedLocation.replace('nearby:', '').split(',');
+          // Format: "nearby:lat,lng|cityName" or "nearby:lat,lng"
+          const locationPart = selectedLocation.replace('nearby:', '').split('|')[0];
+          const coords = locationPart.split(',');
           if (coords.length === 2) {
             latitude = parseFloat(coords[0]);
             longitude = parseFloat(coords[1]);
@@ -204,7 +207,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed =
         >
           <Text className={styles.searchItemLabel}>Địa điểm</Text>
           <Text className={styles.searchItemValue}>
-            {selectedLocation || "Tìm kiếm điểm đến"}
+            {displayLocation || selectedLocation || "Tìm kiếm điểm đến"}
           </Text>
         </div>
         {locationOpen && (
@@ -215,6 +218,27 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed =
               onClose={() => setLocationOpen(false)}
               onSelect={(location) => {
                 setSelectedLocation(location);
+                
+                // Extract display name for nearby locations
+                if (location.startsWith('nearby:')) {
+                  const parts = location.replace('nearby:', '').split('|');
+                  if (parts.length > 1) {
+                    // Has city name: "nearby:lat,lng|cityName"
+                    setDisplayLocation(parts[1]);
+                  } else {
+                    // No city name, show coordinates
+                    const coords = parts[0].split(',');
+                    if (coords.length === 2) {
+                      setDisplayLocation(`Vị trí hiện tại`);
+                    } else {
+                      setDisplayLocation(location);
+                    }
+                  }
+                } else {
+                  // Regular location, use as display name
+                  setDisplayLocation(location);
+                }
+                
                 setLocationOpen(false);
               }}
             />

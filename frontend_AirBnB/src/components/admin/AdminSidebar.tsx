@@ -17,6 +17,7 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import styles from "./AdminSidebar.module.css";
 
 type MenuItem = Required<MenuProps>["items"][number];
@@ -89,8 +90,8 @@ export default function AdminSidebar() {
       // Handle logout
       if (typeof window !== "undefined") {
         // Clear cookies/tokens
-        document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        router.push("/login");
+        Cookies.remove("access_token");
+        router.push("/admin/login");
       }
     } else if (key === "dashboard") {
       router.push("/admin");

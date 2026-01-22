@@ -75,6 +75,61 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
   const [searchValue, setSearchValue] = useState("");
   const [gettingLocation, setGettingLocation] = useState(false);
 
+  const reverseGeocode = async (latitude: number, longitude: number): Promise<string> => {
+    try {
+      // Use OpenStreetMap Nominatim API for reverse geocoding (free, no API key needed)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=vi`,
+        {
+          headers: {
+            'User-Agent': 'AirBnB-App' // Required by Nominatim
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error('Reverse geocoding failed');
+      }
+      
+      const data = await response.json();
+      
+      // Extract city/province name from address
+      const address = data.address || {};
+      // Try different fields for city name (varies by country)
+      const cityName = 
+        address.city || 
+        address.town || 
+        address.municipality || 
+        address.county || 
+        address.state_district ||
+        address.state ||
+        address.province ||
+        '';
+      
+      const provinceName = 
+        address.state || 
+        address.province || 
+        address.region ||
+        '';
+      
+      // Format: "City, Province" or just "City"
+      if (cityName && provinceName && cityName !== provinceName) {
+        return `${cityName}, ${provinceName}`;
+      } else if (cityName) {
+        return cityName;
+      } else if (provinceName) {
+        return provinceName;
+      } else {
+        // Fallback to formatted coordinates
+        return `Vị trí hiện tại (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+      }
+    } catch (error) {
+      console.error("Reverse geocoding error:", error);
+      // Fallback to formatted coordinates
+      return `Vị trí hiện tại (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+    }
+  };
+
   const handleNearbyClick = async () => {
     if (!navigator.geolocation) {
       alert("Trình duyệt của bạn không hỗ trợ định vị");
@@ -83,12 +138,23 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
 
     setGettingLocation(true);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
-        // Pass coordinates as special format
-        onSelect(`nearby:${latitude},${longitude}`);
-        setGettingLocation(false);
-        onClose();
+        
+        try {
+          // Get city name from coordinates
+          const cityName = await reverseGeocode(latitude, longitude);
+          
+          // Pass both city name and coordinates: "nearby:lat,lng|cityName"
+          onSelect(`nearby:${latitude},${longitude}|${cityName}`);
+        } catch (error) {
+          console.error("Error in reverse geocoding:", error);
+          // Fallback: just pass coordinates
+          onSelect(`nearby:${latitude},${longitude}`);
+        } finally {
+          setGettingLocation(false);
+          onClose();
+        }
       },
       (error) => {
         console.error("Error getting location:", error);
