@@ -11,6 +11,9 @@ import {
   MessageOutlined,
   CalendarOutlined,
   CrownOutlined,
+  CreditCardOutlined,
+  DollarOutlined,
+  BankOutlined,
 } from "@ant-design/icons";
 import styles from "@/app/host/(dashboard)/manage/host-manage.module.css";
 
@@ -41,6 +44,8 @@ const items: MenuItem[] = [
   getItem("Đơn đặt phòng", "/host/bookings", <BookOutlined />),
   getItem("Tin nhắn", "/host/messages", <MessageOutlined />),
   getItem("Lịch", "/host/calendar", <CalendarOutlined />),
+  getItem("Thanh toán", "/host/payouts", <DollarOutlined />),
+  getItem("Thông tin ngân hàng", "/host/bank-account", <BankOutlined />),
 ];
 
 export default function HostSidebar({ collapsed, userInfo }: HostSidebarProps) {
@@ -60,6 +65,10 @@ export default function HostSidebar({ collapsed, userInfo }: HostSidebarProps) {
       setSelectedKeys(["/host/messages"]);
     } else if (pathname.startsWith("/host/calendar")) {
       setSelectedKeys(["/host/calendar"]);
+    } else if (pathname.startsWith("/host/payouts")) {
+      setSelectedKeys(["/host/payouts"]);
+    } else if (pathname.startsWith("/host/bank-account")) {
+      setSelectedKeys(["/host/bank-account"]);
     }
   }, [pathname]);
 

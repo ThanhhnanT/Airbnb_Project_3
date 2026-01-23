@@ -15,14 +15,13 @@ import {
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  BellOutlined,
-  MailOutlined,
   SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import NotificationBell from "@/components/notifications/NotificationBell";
 import { getUserProfile } from "@/service/user";
 import styles from "./admin-layout.module.css";
 
@@ -71,8 +70,8 @@ export default function AdminLayout({
           return;
         }
 
-        // Fetch user profile to check role
-        const user = await getUserProfile();
+        // Fetch user profile to check role (dùng admin_token)
+        const user = await getUserProfile(true);
         if (!user || user.role?.type !== "admin") {
           // Not admin, redirect to login
           Cookies.remove("admin_token");
@@ -180,22 +179,7 @@ export default function AdminLayout({
               className={styles.search}
             />
             <Space size="large" align="center" className={styles.actionGroup}>
-              <Badge count={3} size="small">
-                <Button
-                  type="text"
-                  shape="circle"
-                  icon={<MailOutlined />}
-                  className={styles.iconButton}
-                />
-              </Badge>
-              <Badge count={7} size="small">
-                <Button
-                  type="text"
-                  shape="circle"
-                  icon={<BellOutlined />}
-                  className={styles.iconButton}
-                />
-              </Badge>
+              <NotificationBell />
               <Space size={8} align="center">
                 <Avatar icon={<UserOutlined />} />
                 <div className={styles.profileMeta}>

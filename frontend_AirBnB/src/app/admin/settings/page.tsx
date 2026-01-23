@@ -17,7 +17,7 @@ export default function SettingsPage() {
   const fetchSettings = async () => {
     try {
       setFetching(true);
-      const result = await getAccess("admin/settings");
+      const result = await getAccess("admin/settings", {}, true); // Use admin token
       if (result) {
         form.setFieldsValue({
           siteName: result.siteName || "Airbnb Clone",
@@ -35,7 +35,7 @@ export default function SettingsPage() {
   const handleSubmit = async (values: any) => {
     try {
       setLoading(true);
-      await patchAccess("admin/settings", values);
+      await patchAccess("admin/settings", values, true); // Use admin token
       message.success("Cập nhật cài đặt thành công");
     } catch (error: any) {
       const errorMessage =

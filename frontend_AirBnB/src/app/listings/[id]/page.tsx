@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Spin, Empty, Button, Rate, Tag, Divider, message, Typography } from "antd";
+import { Spin, Empty, Button, Rate, Tag, Divider, Typography } from "antd";
 import { 
   HeartOutlined, 
   ShareAltOutlined, 
@@ -16,10 +16,11 @@ import {
   LeftOutlined,
   CloseOutlined
 } from "@ant-design/icons";
-import { getAccess } from "@/helper/api";
+import { getAccess, postAccess } from "@/helper/api";
 import dayjs, { Dayjs } from "dayjs";
 import DatePickerModal from "@/components/search/DatePickerModal";
 import GuestSelector, { GuestCounts } from "@/components/search/GuestSelector";
+import { useMessageApi } from "@/components/providers/Message";
 import styles from "./listing-detail.module.css";
 
 const { Text } = Typography;
@@ -84,6 +85,7 @@ export default function ListingDetailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const listingId = params.id as string;
+  const messageApi = useMessageApi();
   
   const [listingDetail, setListingDetail] = useState<ListingDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -172,7 +174,7 @@ export default function ListingDetailPage() {
         setListingDetail(result);
       } catch (error: any) {
         console.error("Error fetching listing details:", error);
-        message.error("Không thể tải thông tin chi tiết");
+        messageApi.error("Không thể tải thông tin chi tiết");
       } finally {
         setLoading(false);
       }
@@ -279,31 +281,92 @@ export default function ListingDetailPage() {
     return `${total} ${total === 1 ? "khách" : "khách"}`;
   };
 
-  const handleReserve = () => {
-    if (!dateRange[0] || !dateRange[1]) {
-      message.warning("Vui lòng chọn ngày check-in và check-out");
-      return;
+  const handleReserve = async (e?: React.MouseEvent) => {
+    // Prevent default form submission behavior
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
-    if (!availability || !availability.isAvailable) {
-      message.warning("Khoảng thời gian này không còn phòng trống");
+    
+    // Validate dates are selected
+    if (!dateRange[0] || !dateRange[1]) {
+      messageApi.error("Vui lòng chọn ngày check-in và check-out");
       return;
     }
 
+    // Validate check-in date is not in the past
+    const today = dayjs().startOf('day');
+    const checkIn = dateRange[0].startOf('day');
+    if (checkIn.isBefore(today)) {
+      messageApi.error("Ngày check-in không thể là ngày trong quá khứ");
+      return;
+    }
+
+    // Validate check-out date is after check-in date
+    const checkOut = dateRange[1].startOf('day');
+    if (!checkOut.isAfter(checkIn)) {
+      messageApi.error("Ngày check-out phải sau ngày check-in");
+      return;
+    }
+
+    // Validate guest count
     const totalGuests = guestCounts.adults + guestCounts.children;
     if (totalGuests === 0) {
-      message.warning("Vui lòng chọn số lượng khách");
+      messageApi.error("Vui lòng chọn số lượng khách (ít nhất 1 khách)");
+      return;
+    }
+
+    // Validate guest count doesn't exceed listing capacity
+    if (listingDetail?.listing && totalGuests > listingDetail.listing.guests) {
+      messageApi.error(`Số lượng khách không được vượt quá ${listingDetail.listing.guests} khách`);
+      return;
+    }
+
+    // Validate availability
+    if (!listingDetail?.availability || !listingDetail.availability.isAvailable) {
+      messageApi.error("Khoảng thời gian này không còn phòng trống");
       return;
     }
     
-    const bookingData = {
-      listingId: listingId,
-      checkInDate: dateRange[0].format("YYYY-MM-DD"),
-      checkOutDate: dateRange[1].format("YYYY-MM-DD"),
-      guests: totalGuests.toString(),
-      totalPrice: availability?.totalPrice?.toString() || "",
-    };
-    
-    router.push(`/payment?${new URLSearchParams(bookingData as any).toString()}`);
+    // All validations passed, try to create booking first
+    try {
+      const checkInDate = dateRange[0].format("YYYY-MM-DD");
+      const checkOutDate = dateRange[1].format("YYYY-MM-DD");
+      
+      // Create booking before redirecting
+      const booking = await postAccess("bookings", {
+        listing_id: listingId,
+        check_in: checkInDate,
+        check_out: checkOutDate,
+        guests: totalGuests,
+      });
+
+      if (!booking || !booking._id) {
+        messageApi.error("Không thể tạo đặt phòng");
+        return;
+      }
+
+      // Booking created successfully, proceed to payment
+      const bookingData = {
+        bookingId: booking._id, // Pass bookingId to avoid creating duplicate
+        listingId: listingId,
+        checkInDate: checkInDate,
+        checkOutDate: checkOutDate,
+        guests: totalGuests.toString(),
+        totalPrice: listingDetail.availability?.totalPrice?.toString() || "",
+      };
+      
+      router.push(`/payment?${new URLSearchParams(bookingData as any).toString()}`);
+    } catch (error: any) {
+      // Handle API errors
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Không thể tạo đặt phòng. Vui lòng thử lại hoặc chọn khoảng ngày khác.";
+      messageApi.error(errorMessage);
+      // Don't redirect on error
+      return;
+    }
   };
 
   if (loading) {
@@ -675,6 +738,7 @@ export default function ListingDetailPage() {
 
             <Button
               type="primary"
+              htmlType="button"
               size="large"
               block
               onClick={handleReserve}

@@ -44,7 +44,7 @@ export default function PaymentsPage() {
   const fetchPayments = async (page: number = 1, limit: number = 10) => {
     try {
       setLoading(true);
-      const result = await getAccess(`admin/payments?page=${page}&limit=${limit}`);
+      const result = await getAccess(`admin/payments?page=${page}&limit=${limit}`, {}, true); // Use admin token
       setPayments(result?.data || []);
       if (result?.pagination) {
         setPagination({

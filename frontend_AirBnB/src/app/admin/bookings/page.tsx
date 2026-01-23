@@ -43,7 +43,7 @@ export default function AllBookingsPage() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const result = await getAccess("admin/bookings");
+      const result = await getAccess("admin/bookings", {}, true); // Use admin token
       setBookings(result.data || []);
     } catch (error) {
       message.error("Không thể tải danh sách bookings");
@@ -54,7 +54,7 @@ export default function AllBookingsPage() {
 
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
-      await patch(`admin/bookings/${id}/status`, { status });
+      await patch(`admin/bookings/${id}/status`, { status }, true); // Use admin token
       message.success("Cập nhật trạng thái thành công");
       fetchBookings();
     } catch (error) {

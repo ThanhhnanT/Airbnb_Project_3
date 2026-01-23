@@ -36,7 +36,7 @@ export default function AllListingsPage() {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      const result = await getAccess("admin/listings");
+      const result = await getAccess("admin/listings", {}, true); // Use admin token
       setListings(result.data || []);
     } catch (error) {
       message.error("Không thể tải danh sách listings");
@@ -57,7 +57,7 @@ export default function AllListingsPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteData(`admin/listings/${id}`);
+      await deleteData(`admin/listings/${id}`, true); // Use admin token
       message.success("Xóa listing thành công");
       fetchListings();
     } catch (error) {

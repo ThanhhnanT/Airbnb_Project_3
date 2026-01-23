@@ -80,6 +80,7 @@ export default function AdminSidebar() {
     ]),
     getItem("Users", "users", <UserOutlined />),
     getItem("Payments", "payments", <DollarOutlined />),
+    getItem("Payouts", "payouts", <DollarOutlined />),
     getItem("Settings", "settings", <SettingOutlined />),
     { type: "divider" },
     getItem("Logout", "logout", <LogoutOutlined />),
@@ -102,6 +103,9 @@ export default function AdminSidebar() {
     } else if (key === "payments") {
       router.push("/admin/payments");
       setSelectedKeys(["payments"]);
+    } else if (key === "payouts") {
+      router.push("/admin/payouts");
+      setSelectedKeys(["payouts"]);
     } else if (key === "settings") {
       router.push("/admin/settings");
       setSelectedKeys(["settings"]);
