@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query, BadRequestException } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
@@ -10,8 +10,12 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Post()
-  create(@Body() createBookingDto: CreateBookingDto) {
-    return this.bookingsService.create(createBookingDto);
+  create(@Body() createBookingDto: CreateBookingDto, @Req() req: any) {
+    const userId = req.user?.id || req.user?.user_id;
+    if (!userId) {
+      throw new BadRequestException('Người dùng chưa đăng nhập');
+    }
+    return this.bookingsService.create(createBookingDto, userId);
   }
 
   @Get()

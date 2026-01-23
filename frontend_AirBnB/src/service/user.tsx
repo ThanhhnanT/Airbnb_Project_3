@@ -1,19 +1,17 @@
-import { getAccess, postAccess } from "@/helper/api";
 import axios from "axios";
 import Cookies from "js-cookie";
 
 const API_DOMAIN = process.env.API || 'http://localhost:9000/';
 
-const getTokenHeader = () => {
-  // Ưu tiên token admin nếu có, nếu không thì dùng token user thường
-  const adminToken = Cookies.get('admin_token');
-  const token = adminToken || Cookies.get('access_token');
+// Chỉ dùng access_token cho các API liên quan đến user profile
+const getUserTokenHeader = () => {
+  const token = Cookies.get('access_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 export const getUserProfile = async () => {
   try {
-    const tokenHeader = getTokenHeader();
+    const tokenHeader = getUserTokenHeader();
     const result = await axios.get(API_DOMAIN + 'auth/profile', {
       headers: {
         Accept: "application/json",
@@ -35,7 +33,7 @@ export const updateUserProfile = async (userId: string, data: {
   avatar_url?: string;
 }) => {
   try {
-    const tokenHeader = getTokenHeader();
+    const tokenHeader = getUserTokenHeader();
     const result = await axios.patch(API_DOMAIN + `users/${userId}`, data, {
       headers: {
         Accept: "application/json",

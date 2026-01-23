@@ -153,12 +153,23 @@ export class ListingsService {
           })
           .exec();
 
-        // Check for conflicting bookings
+        // Chỉ giữ chỗ tạm thời cho booking pending trong 5 phút gần nhất
+        const pendingExpiry = new Date(Date.now() - 5 * 60 * 1000);
+
+        // Check for conflicting bookings:
+        // - confirmed: luôn tính là trùng
+        // - pending: chỉ tính là trùng nếu được tạo trong vòng 5 phút gần nhất
         const conflictingBookings = await this.bookingModel.find({
           listing_id: new Types.ObjectId(id),
-          status: { $in: ['pending', 'confirmed'] },
           $or: [
             {
+              status: 'confirmed',
+              check_in: { $lte: checkOut },
+              check_out: { $gte: checkIn },
+            },
+            {
+              status: 'pending',
+              createdAt: { $gte: pendingExpiry },
               check_in: { $lte: checkOut },
               check_out: { $gte: checkIn },
             },
@@ -370,10 +381,22 @@ export class ListingsService {
         blockedCalendars.forEach((doc) => unavailableListingIds.add(doc._id.toString()));
 
         // Bookings that overlap (excluding cancelled)
+        // Giữ booking pending tối đa 5 phút trong tính toán availability
+        const pendingExpiry = new Date(Date.now() - 5 * 60 * 1000);
         const conflictingBookings = await this.bookingModel.find({
-          status: { $nin: ['cancelled'] },
-          check_in: { $lte: checkOutDate },
-          check_out: { $gte: checkInDate },
+          $or: [
+            {
+              status: { $nin: ['cancelled', 'pending'] },
+              check_in: { $lte: checkOutDate },
+              check_out: { $gte: checkInDate },
+            },
+            {
+              status: 'pending',
+              createdAt: { $gte: pendingExpiry },
+              check_in: { $lte: checkOutDate },
+              check_out: { $gte: checkInDate },
+            },
+          ],
         }).exec();
 
         conflictingBookings.forEach((b) => unavailableListingIds.add(b.listing_id.toString()));

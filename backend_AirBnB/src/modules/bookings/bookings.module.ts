@@ -3,6 +3,7 @@ import { BookingsService } from './bookings.service';
 import { BookingsController } from './bookings.controller';
 import { Booking, BookingSchema } from './schemas/booking.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Listing, ListingSchema } from '../listings/schemas/listing.schema';
 
 @Module({
   imports: [
@@ -10,6 +11,10 @@ import { MongooseModule } from '@nestjs/mongoose';
       {
         name: Booking.name,
         schema: BookingSchema,
+      },
+      {
+        name: Listing.name,
+        schema: ListingSchema,
       },
     ]),
   ],

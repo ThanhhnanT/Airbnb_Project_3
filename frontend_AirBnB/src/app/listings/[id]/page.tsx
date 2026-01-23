@@ -284,7 +284,11 @@ export default function ListingDetailPage() {
       message.warning("Vui lòng chọn ngày check-in và check-out");
       return;
     }
-    
+    if (!availability || !availability.isAvailable) {
+      message.warning("Khoảng thời gian này không còn phòng trống");
+      return;
+    }
+
     const totalGuests = guestCounts.adults + guestCounts.children;
     if (totalGuests === 0) {
       message.warning("Vui lòng chọn số lượng khách");
@@ -296,6 +300,7 @@ export default function ListingDetailPage() {
       checkInDate: dateRange[0].format("YYYY-MM-DD"),
       checkOutDate: dateRange[1].format("YYYY-MM-DD"),
       guests: totalGuests.toString(),
+      totalPrice: availability?.totalPrice?.toString() || "",
     };
     
     router.push(`/payment?${new URLSearchParams(bookingData as any).toString()}`);

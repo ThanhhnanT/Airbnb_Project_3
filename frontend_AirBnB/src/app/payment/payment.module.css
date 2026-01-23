@@ -1,15 +1,3 @@
-.paymentContainer {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 20px;
-}
-
-.paymentContent {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
 .loadingContainer {
   display: flex;
   justify-content: center;
@@ -17,8 +5,106 @@
   min-height: 400px;
 }
 
-.bookingCard,
-.paymentCard {
+.paymentPage {
+  max-width: 1120px;
+  margin: 32px auto;
+  padding: 0 16px 48px;
+}
+
+.breadcrumbs {
+  margin-bottom: 8px;
+}
+
+.pageHeader {
+  margin-bottom: 32px;
+}
+
+.pageTitle {
+  font-weight: 800;
+}
+
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 992px) {
+  .contentGrid {
+    grid-template-columns: 3fr 2fr;
+    gap: 40px;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sectionCard {
   border-radius: 12px;
+}
+
+.paymentMethodHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.paymentMethodLogos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardElementWrapper {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+}
+
+.summaryRight {
+  position: sticky;
+  top: 96px;
+}
+
+.summaryImage {
+  width: 112px;
+  height: 84px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.summaryRow:last-child {
+  margin-bottom: 0;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.priceTotalRow {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.termsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
 }
 

@@ -9,7 +9,7 @@ import {
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getListingImages, ListingImage } from "@/service/listings";
 import styles from "@/styles/listing-card.module.css";
 
@@ -44,6 +44,7 @@ interface ListingCardProps {
 
 const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [images, setImages] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -112,7 +113,22 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
   }, [isHovered, images.length]);
 
   const handleCardClick = () => {
-    router.push(`/listings/${listing._id}`);
+    const checkIn = searchParams.get("check_in");
+    const checkOut = searchParams.get("check_out");
+    const guests = searchParams.get("guests");
+
+    // Nếu không có thông tin tìm kiếm, giữ behavior cũ
+    if (!checkIn || !checkOut || !guests) {
+      router.push(`/listings/${listing._id}`);
+      return;
+    }
+
+    const query = new URLSearchParams();
+    query.set("checkInDate", checkIn);
+    query.set("checkOutDate", checkOut);
+    query.set("guests", guests);
+
+    router.push(`/listings/${listing._id}?${query.toString()}`);
   };
 
   const handlePrevious = (e: React.MouseEvent) => {
