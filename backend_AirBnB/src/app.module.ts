@@ -18,6 +18,7 @@ import { DisputesModule } from '@/modules/disputes/disputes.module';
 import { NotificationsModule } from '@/modules/notifications/notifications.module';
 import { AdminModule } from '@/modules/admin/admin.module';
 import { AuthModule } from './auth/auth.module';
+import { UploadModule } from '@/modules/upload/upload.module';
 // import { SeedModule } from './seed/seed.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
@@ -52,6 +53,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     NotificationsModule,
     AdminModule,
     AuthModule,
+    UploadModule,
     // SeedModule,
        MailerModule.forRootAsync({
       imports: [ConfigModule],

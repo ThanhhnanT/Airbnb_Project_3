@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, Dropdown, Space, Typography } from "antd";
 import type { MenuProps } from 'antd';
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { 
   UserOutlined, 
   HeartOutlined, 
@@ -15,6 +14,7 @@ import {
   QuestionCircleOutlined,
   BellOutlined
 } from "@ant-design/icons";
+import { getUserProfile } from "@/service/user";
 import styles from "@/styles/navbar.module.css";
 
 const { Text } = Typography;
@@ -27,6 +27,25 @@ interface UserMenuProps {
 
 const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuthModal }) => {
   const router = useRouter();
+  const [userRole, setUserRole] = useState<'guest' | 'host' | 'admin' | null>(null);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (isLoggedIn) {
+        try {
+          const user = await getUserProfile();
+          setUserRole(user?.role?.type || 'guest');
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+          setUserRole('guest');
+        }
+      } else {
+        setUserRole(null);
+      }
+    };
+
+    fetchUserRole();
+  }, [isLoggedIn]);
 
   const handleBecomeHostClick = () => {
     if (!isLoggedIn) {
@@ -35,8 +54,14 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
         onOpenAuthModal();
       }
     } else {
-      // If logged in, redirect to create listing page
-      router.push('/host/create');
+      // If logged in and is host, redirect to manage listings page
+      // Otherwise, redirect to create listing page
+      if (userRole === 'host') {
+        // TODO: Update this route when manage listings page is created
+        router.push('/host/create');
+      } else {
+        router.push('/host/create');
+      }
     }
   };
   const menuLogin: MenuProps['items'] = [
@@ -140,7 +165,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
         onClick={handleBecomeHostClick}
         style={{ cursor: 'pointer' }}
       >
-        Trở thành Host
+        {userRole === 'host' ? 'Quản lý phòng' : 'Trở thành Host'}
       </Text>
       <div className={styles.notificationIcon}>
         <BellOutlined className={styles.bellIcon} />

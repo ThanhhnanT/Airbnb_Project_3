@@ -33,6 +33,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     country: string;
     postal_code?: string;
   }>({ city: "", country: "" });
+
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [searchAddress, setSearchAddress] = useState("");
@@ -40,6 +41,28 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   const mapRef = useRef<google.maps.Map | null>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const autocompleteInputRef = useRef<HTMLInputElement>(null);
+
+  // Check if Google Maps is already loaded
+  useEffect(() => {
+    if (typeof window !== "undefined" && typeof google !== "undefined" && google.maps) {
+      setIsMapLoaded(true);
+      setTimeout(() => {
+        if (google.maps.places) {
+          setPlacesLoaded(true);
+        }
+      }, 100);
+    }
+  }, []);
+
+  // Update selectedLocation when initialLat/initialLng change
+  useEffect(() => {
+    if (initialLat && initialLng) {
+      const location = { lat: initialLat, lng: initialLng };
+      setSelectedLocation(location);
+      // Reverse geocode to get address
+      reverseGeocode(initialLat, initialLng);
+    }
+  }, [initialLat, initialLng]);
 
   const defaultCenter = selectedLocation || { lat: 10.7769, lng: 106.7009 }; // Ho Chi Minh City default
 
@@ -249,9 +272,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           <h3 style={{ marginBottom: 8 }}>
             <EnvironmentOutlined /> Chọn vị trí trên bản đồ
           </h3>
-          <p style={{ color: "#666", marginBottom: 16 }}>
-            Tìm kiếm địa chỉ hoặc nhấp vào bản đồ để chọn vị trí. Địa chỉ sẽ được tự động điền.
-          </p>
         </div>
 
         {/* Search Input with Google Places Autocomplete */}
@@ -294,14 +314,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
               />
             </div>
           </div>
-          <p style={{ fontSize: "12px", color: "#999", marginTop: 4 }}>
-            Nhập địa chỉ và chọn từ danh sách gợi ý
-          </p>
-          {placesLoaded && (
-            <p style={{ fontSize: "12px", color: "#52c41a", marginTop: 4 }}>
-              ✓ Places library đã được tải
-            </p>
-          )}
         </div>
 
         <div style={{ marginBottom: 16, height: "400px", position: "relative" }}>

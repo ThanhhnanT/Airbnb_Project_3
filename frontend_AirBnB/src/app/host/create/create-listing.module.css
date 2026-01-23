@@ -17,8 +17,128 @@
 }
 
 .steps {
-  margin-bottom: 48px;
+  margin-bottom: 20px;
   padding: 0 20px;
+}
+
+.steps :global(.ant-steps-item-description) {
+  display: none;
+}
+
+.steps :global(.ant-steps-item-title) {
+  display: none !important;
+}
+
+.steps :global(.ant-steps-item-content) {
+  display: none !important;
+}
+
+/* Icon hiển thị số trong ô tròn */
+.steps :global(.ant-steps-item-icon) {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 50%;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  color: #000;
+  position: relative;
+  z-index: 10;
+}
+
+/* Tăng độ trong suốt cho số ở step chưa active */
+.steps :global(.ant-steps-item-wait .ant-steps-item-icon) {
+  background-color: #fff;
+  border-color: #d9d9d9;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* Step đã hoàn thành - hiển thị checkmark */
+.steps :global(.ant-steps-item-finish .ant-steps-item-icon) {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+  color: #fff;
+}
+
+.steps :global(.ant-steps-item-finish .ant-steps-icon) {
+  display: none;
+}
+
+.steps :global(.ant-steps-item-finish .ant-steps-item-icon::after) {
+  content: "✓";
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 32px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Step hiện tại - hiển thị số */
+.steps :global(.ant-steps-item-process .ant-steps-item-icon) {
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
+  color: #fff;
+}
+
+/* Line màu đỏ cho các step đã hoàn thành */
+.steps :global(.ant-steps-item-finish > .ant-steps-item-container > .ant-steps-item-tail::after) {
+  background-color: #ff4d4f;
+  height: 2px;
+}
+
+.steps :global(.ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-tail::after) {
+  background-color: #d9d9d9;
+  height: 2px;
+}
+
+.steps :global(.ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-tail::after) {
+  background-color: #d9d9d9;
+  height: 2px;
+}
+
+/* Điều chỉnh line để không đi qua icon - line dừng trước icon */
+.steps :global(.ant-steps-item-tail) {
+  top: 16px;
+  left: calc(100% - 16px);
+  width: calc(100% - 16px);
+  padding: 0;
+  margin-left: 0;
+  display: block !important;
+  position: absolute;
+  z-index: 1;
+}
+
+.steps :global(.ant-steps-item-tail::after) {
+  width: calc(100% - 16px);
+  margin-left: 0;
+  height: 2px;
+  display: block !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Đảm bảo line hiển thị và dừng trước icon tiếp theo */
+.steps :global(.ant-steps-item:not(:last-child) .ant-steps-item-tail) {
+  display: block !important;
+}
+
+/* Đảm bảo icon có z-index cao hơn line và có background để che line */
+.steps :global(.ant-steps-item-icon) {
+  position: relative;
+  z-index: 10;
+  background-color: #fff !important;
+}
+
+.steps :global(.ant-steps-item-finish .ant-steps-item-icon),
+.steps :global(.ant-steps-item-process .ant-steps-item-icon) {
+  background-color: #ff4d4f !important;
 }
 
 .form {
@@ -31,12 +151,30 @@
   background: #fafafa;
   border-radius: 8px;
   margin-bottom: 24px;
+  margin-top: 20px;
 }
 
 .stepContent h4 {
   margin-bottom: 24px;
   color: #1a1a1a;
   font-weight: 600;
+}
+
+/* Bỏ border radius cho textarea mô tả và wrapper */
+.stepContent :global(textarea.ant-input),
+.stepContent :global(.ant-input-affix-wrapper textarea),
+.stepContent :global(.ant-input-textarea-affix-wrapper textarea),
+.stepContent :global(textarea#description),
+.stepContent :global(.ant-input-affix-wrapper),
+.stepContent :global(.ant-input-textarea-affix-wrapper),
+.stepContent :global(.ant-input-textarea-affix-wrapper.ant-input-outlined) {
+  border-radius: 0 !important;
+  -webkit-border-radius: 0 !important;
+  -moz-border-radius: 0 !important;
+}
+
+.stepContent :global(.ant-input-affix-wrapper.ant-input-outlined) {
+  border-radius: 0 !important;
 }
 
 .formRow {

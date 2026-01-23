@@ -1,66 +1,186 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { Upload, Button, message, Card, Image, Typography } from "antd";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import { Upload, Button, message, Card, Image as AntImage, Typography } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import { PlusOutlined, DeleteOutlined, StarOutlined, StarFilled } from "@ant-design/icons";
 
 const { Text } = Typography;
 
+interface ImageFile {
+  file: File;
+  preview: string; // base64 preview
+}
+
 interface ImageUploaderProps {
-  onImagesChange: (images: string[]) => void;
+  onImagesChange: (images: ImageFile[]) => void;
   minImages?: number;
   maxImages?: number;
+  initialImages?: string[]; // Add initial images prop
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({
   onImagesChange,
   minImages = 5,
   maxImages = 20,
+  initialImages = [],
 }) => {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  // Initialize fileList from initialImages if provided
+  const [fileList, setFileList] = useState<UploadFile[]>(() => {
+    if (initialImages && initialImages.length > 0) {
+      return initialImages.map((url, index) => ({
+        uid: `initial-${index}-${Date.now()}`,
+        name: `image-${index + 1}`,
+        status: "done" as const,
+        url: url,
+      }));
+    }
+    return [];
+  });
   const [coverIndex, setCoverIndex] = useState<number>(0);
   const onImagesChangeRef = useRef(onImagesChange);
+  
+  // Update fileList when initialImages change (only on mount or when initialImages length changes significantly)
+  const prevInitialImagesLengthRef = useRef(initialImages.length);
+  
+  useEffect(() => {
+    // Restore fileList from initialImages ONLY when component first mounts (fileList is empty)
+    // Don't restore during upload or when files already exist
+    if (initialImages && initialImages.length > 0 && fileList.length === 0 && imageFiles.size === 0) {
+      console.log("useEffect restore - component just mounted, restoring from initialImages:", initialImages.length);
+      const newFileList = initialImages.map((url, index) => {
+        return {
+          uid: `initial-${index}-${Date.now()}`,
+          name: `image-${index + 1}`,
+          status: "done" as const,
+          url: url,
+        };
+      });
+      setFileList(newFileList);
+      
+      // Restore imageFiles map from initialImages (base64 previews)
+      const restoredImageFiles: ImageFile[] = [];
+      const newImageFilesMap = new Map<string, ImageFile>();
+      
+      newFileList.forEach((file, index) => {
+        if (file.url && file.url.startsWith('data:')) {
+          // Create placeholder imageFile from base64 preview
+          const placeholder: ImageFile = {
+            file: new File([], `image-${index + 1}`, { type: 'image/jpeg' }),
+            preview: file.url,
+          };
+          newImageFilesMap.set(file.uid, placeholder);
+          restoredImageFiles.push(placeholder);
+        }
+      });
+      
+      setImageFiles(newImageFilesMap);
+      prevInitialImagesLengthRef.current = initialImages.length;
+      
+      // Notify parent about restored images
+      if (restoredImageFiles.length > 0) {
+        setTimeout(() => {
+          console.log("useEffect restore - notifying with restoredImageFiles:", restoredImageFiles.length);
+          onImagesChangeRef.current(restoredImageFiles);
+        }, 0);
+      }
+    }
+  }, [initialImages.length]); // Only depend on length to avoid infinite loop, and only restore on mount
 
   // Keep ref updated
   onImagesChangeRef.current = onImagesChange;
 
+  // Store file objects with previews
+  const [imageFiles, setImageFiles] = useState<Map<string, ImageFile>>(new Map());
+
+  // Sync imageFiles with parent when it changes (but not during initial render)
+  // Disabled to avoid conflicts with notifyImagesChange calls
+  // useEffect(() => {
+  //   const doneFiles = fileList.filter((f) => f.status === "done");
+  //   if (doneFiles.length > 0 && imageFiles.size > 0) {
+  //     const imageFilesArray: ImageFile[] = [];
+  //     doneFiles.forEach((file) => {
+  //       const imageFile = imageFiles.get(file.uid);
+  //       if (imageFile) {
+  //         imageFilesArray.push(imageFile);
+  //       }
+  //     });
+  //     if (imageFilesArray.length > 0) {
+  //       // Use setTimeout to avoid calling during render
+  //       setTimeout(() => {
+  //         onImagesChangeRef.current(imageFilesArray);
+  //       }, 0);
+  //     }
+  //   }
+  // }, [imageFiles, fileList]);
+
   // Calculate image count from fileList
-  const doneFiles = fileList.filter((f) => f.status === "done" && f.url);
+  const doneFiles = fileList.filter((f) => f.status === "done");
   const imageCount = doneFiles.length;
-  const imageUrls = doneFiles.map((f) => f.url || "");
 
-  // Update parent whenever imageUrls change
-  useEffect(() => {
-    onImagesChangeRef.current(imageUrls);
-  }, [imageUrls.join(",")]);
-
-  // Helper function to extract image URLs and notify parent
-  const notifyImagesChange = (files: UploadFile[]) => {
-    const doneFiles = files.filter((f) => f.status === "done" && f.url);
-    const imageUrls = doneFiles.map((f) => f.url || "");
-    onImagesChangeRef.current(imageUrls);
+  // Helper function to extract image files and notify parent
+  const notifyImagesChange = (files: UploadFile[], imageFilesMap?: Map<string, ImageFile>) => {
+    const doneFiles = files.filter((f) => f.status === "done");
+    const imageFilesArray: ImageFile[] = [];
+    const mapToUse = imageFilesMap || imageFiles;
+    
+    console.log("notifyImagesChange - doneFiles:", doneFiles.length, "mapSize:", mapToUse.size);
+    
+    doneFiles.forEach((file) => {
+      const imageFile = mapToUse.get(file.uid);
+      if (imageFile) {
+        imageFilesArray.push(imageFile);
+      } else {
+        console.warn("ImageFile not found for uid:", file.uid);
+      }
+    });
+    
+    console.log("notifyImagesChange - imageFilesArray:", imageFilesArray.length);
+    onImagesChangeRef.current(imageFilesArray);
   };
 
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
+    console.log("handleChange - newFileList length:", newFileList.length);
     // Merge with existing fileList to preserve files that were processed in customRequest
     setFileList((prev) => {
-      // Keep files that are already done (processed in customRequest)
+      // Keep all files that are already done (processed in customRequest)
       const doneFiles = prev.filter((f) => f.status === "done" && f.url);
+      console.log("handleChange - doneFiles length:", doneFiles.length);
+      
       // Add new files from newFileList that aren't already in doneFiles
+      // These are files that are still uploading or just added
       const newFiles = newFileList.filter(
-        (f) => !doneFiles.some((df) => df.uid === f.uid)
+        (f) => !doneFiles.some((df) => df.uid === f.uid) && f.status !== "done"
       );
+      console.log("handleChange - newFiles length:", newFiles.length);
+      
       const merged = [...doneFiles, ...newFiles];
-      notifyImagesChange(merged);
+      console.log("handleChange - merged length:", merged.length);
+      
+      // Don't notify here - let customRequest handle it to avoid duplicate calls
+      // The notification will be done in customRequest when each file is processed
+      
       return merged;
     });
   };
 
   const handleRemove = (file: UploadFile) => {
     const newFileList = fileList.filter((item) => item.uid !== file.uid);
+    
+    // Remove from imageFiles map
+    setImageFiles((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(file.uid);
+      
+      // Notify parent after state update
+      setTimeout(() => {
+        notifyImagesChange(newFileList, newMap);
+      }, 0);
+      
+      return newMap;
+    });
+    
     setFileList(newFileList);
-    notifyImagesChange(newFileList);
     
     // Adjust cover index if needed
     if (coverIndex >= newFileList.length && newFileList.length > 0) {
@@ -98,41 +218,128 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
       try {
         onProgress?.({ percent: 0 });
         
-        // Convert file to base64
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const url = e.target?.result as string;
+        // Compress image before converting to base64 to reduce payload size
+        const compressImage = (file: File, maxWidth: number = 1600, maxHeight: number = 1600, quality: number = 0.7): Promise<string> => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const img = new window.Image(); // Use window.Image to avoid conflict with antd Image component
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Calculate new dimensions
+                if (width > height) {
+                  if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                  }
+                } else {
+                  if (height > maxHeight) {
+                    width = (width * maxHeight) / height;
+                    height = maxHeight;
+                  }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                  reject(new Error('Could not get canvas context'));
+                  return;
+                }
+
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                resolve(compressedBase64);
+              };
+              img.onerror = () => reject(new Error('Failed to load image'));
+              img.src = e.target?.result as string;
+            };
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsDataURL(file);
+          });
+        };
+
+        // Compress and convert file to base64 for preview
+        const base64Preview = await compressImage(file as File);
+        
+        // Store file with preview
+        const fileObj = file as UploadFile;
+        const imageFile: ImageFile = {
+          file: file as File,
+          preview: base64Preview,
+        };
+        
+        // Update the file in fileList with preview URL
+        setFileList((prev) => {
+          console.log("customRequest - prev fileList length:", prev.length, "fileObj.uid:", fileObj.uid);
           
-          // Update the file in fileList
-          setFileList((prev) => {
-            const fileObj = file as UploadFile;
-            const updated = prev.map((f) => {
-              // Match by uid or by name if uid doesn't match
-              if (f.uid === fileObj.uid || 
-                  (f.name === fileObj.name && f.status === "uploading")) {
+          // Check if file already exists
+          const existingIndex = prev.findIndex(
+            (f) => f.uid === fileObj.uid || 
+                   (f.name === fileObj.name && f.status === "uploading")
+          );
+          
+          let updated: UploadFile[];
+          if (existingIndex >= 0) {
+            // Update existing file
+            updated = prev.map((f, index) => {
+              if (index === existingIndex) {
                 return {
                   ...f,
                   status: "done" as const,
-                  url: url,
+                  url: base64Preview, // Use base64 for preview
                 };
               }
               return f;
             });
+          } else {
+            // Add new file if it doesn't exist
+            updated = [
+              ...prev,
+              {
+                uid: fileObj.uid,
+                name: fileObj.name || `image-${prev.length + 1}`,
+                status: "done" as const,
+                url: base64Preview,
+              },
+            ];
+          }
+          
+          console.log("customRequest - updated fileList length:", updated.length, "done files:", updated.filter(f => f.status === "done").length);
+          
+          // Update imageFiles and prepare map for notification
+          setImageFiles((prevMap) => {
+            const newMap = new Map(prevMap);
+            newMap.set(fileObj.uid, imageFile);
+            console.log("customRequest - imageFiles map size:", newMap.size);
             
-            // Notify parent
-            setTimeout(() => notifyImagesChange(updated), 0);
-            return updated;
+            // Notify parent with ALL done files
+            // Get all previously done files from prev + current file
+            const prevDoneFiles = prev.filter((f) => f.status === "done" && f.url);
+            const currentDoneFile = updated.find((f) => f.uid === fileObj.uid && f.status === "done");
+            const allDoneFiles = currentDoneFile 
+              ? [...prevDoneFiles.filter(f => f.uid !== fileObj.uid), currentDoneFile]
+              : prevDoneFiles;
+            
+            console.log("customRequest - prevDoneFiles:", prevDoneFiles.length, "allDoneFiles:", allDoneFiles.length, "uids:", allDoneFiles.map(f => f.uid));
+            
+            // Notify parent after state update
+            setTimeout(() => {
+              notifyImagesChange(allDoneFiles, newMap);
+            }, 0);
+            
+            return newMap;
           });
           
-          onProgress?.({ percent: 100 });
-          onSuccess?.(url);
-        };
+          return updated;
+        });
         
-        reader.onerror = () => {
-          onError?.(new Error("Failed to read file"));
-        };
-        
-        reader.readAsDataURL(file as Blob);
+        onProgress?.({ percent: 100 });
+        onSuccess?.(base64Preview);
       } catch (error) {
         onError?.(error as Error);
       }
@@ -216,7 +423,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                       justifyContent: "center",
                     }}
                   >
-                    <Image
+                    <AntImage
                       src={file.url}
                       alt={file.name || "Preview"}
                       style={{ 

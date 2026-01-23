@@ -71,7 +71,7 @@ export class Listing {
   @Prop({ type: Number, default: 0 })
   review_count: number;
 
-  @Prop({ type: String, enum: ['active', 'inactive'], default: 'active' })
+  @Prop({ type: String, enum: ['active', 'inactive'], default: 'inactive' })
   status: string;
 }
 
