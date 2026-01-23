@@ -107,7 +107,7 @@ export default function AdminDashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const result = (await getAccess("admin/dashboard")) as DashboardResponse | undefined;
+      const result = (await getAccess("admin/dashboard", {}, true)) as DashboardResponse | undefined; // Use admin token
       if (result) {
         setDashboardData(result);
       }
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
 
   const fetchBookings = async () => {
     try {
-      const result = (await getAccess("admin/bookings?limit=10")) as
+      const result = (await getAccess("admin/bookings?limit=10", {}, true)) as // Use admin token
         | { data?: Booking[] }
         | undefined;
       setBookings(result?.data || []);

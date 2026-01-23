@@ -38,7 +38,7 @@ export default function PendingBookingsPage() {
   const fetchPendingBookings = async () => {
     try {
       setLoading(true);
-      const result = await getAccess("admin/bookings");
+      const result = await getAccess("admin/bookings", {}, true); // Use admin token
       const allBookings = result.data || [];
       setBookings(allBookings.filter((b: Booking) => b.status === "pending"));
     } catch (error) {

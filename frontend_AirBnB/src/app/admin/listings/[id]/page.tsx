@@ -83,7 +83,7 @@ export default function AdminListingDetailPage() {
   const fetchListingDetails = async () => {
     try {
       setLoading(true);
-      const result = await getAccess(`admin/listings/${listingId}`);
+      const result = await getAccess(`admin/listings/${listingId}`, {}, true); // Use admin token
       setListing(result.listing);
       setImages(result.images || []);
     } catch (error) {
@@ -96,7 +96,7 @@ export default function AdminListingDetailPage() {
 
   const handleApprove = async () => {
     try {
-      await patchAccess(`admin/listings/${listingId}/status`, { status: "active" });
+      await patchAccess(`admin/listings/${listingId}/status`, { status: "active" }, true); // Use admin token
       message.success("Listing đã được duyệt thành công!");
       setApproveModalVisible(false);
       fetchListingDetails();
@@ -108,7 +108,7 @@ export default function AdminListingDetailPage() {
   const handleReject = async () => {
     try {
       // Keep status as inactive or delete
-      await patchAccess(`admin/listings/${listingId}/status`, { status: "inactive" });
+      await patchAccess(`admin/listings/${listingId}/status`, { status: "inactive" }, true); // Use admin token
       message.success("Listing đã bị từ chối");
       setRejectModalVisible(false);
       fetchListingDetails();
@@ -123,7 +123,7 @@ export default function AdminListingDetailPage() {
       content: "Bạn có chắc chắn muốn xóa listing này?",
       onOk: async () => {
         try {
-          await deleteData(`admin/listings/${listingId}`);
+          await deleteData(`admin/listings/${listingId}`, true); // Use admin token
           message.success("Xóa listing thành công");
           router.push("/admin/listings");
         } catch (error) {

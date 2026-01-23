@@ -7,6 +7,7 @@ import { commonStyle } from "@/styles/common";
 import Navbar from "@/components/navbar/Navbar";
 // import {message } from "antd"
 import { MessageProvider } from "./Message";
+import { SocketProvider } from "./SocketProvider";
 
 export default function AntdProvider({ children }: { children: React.ReactNode }) {
   const style = commonStyle();
@@ -36,8 +37,10 @@ export default function AntdProvider({ children }: { children: React.ReactNode }
         }}
       >
         <MessageProvider>
-          {showNavbar && <Navbar />}
-          {children}
+          <SocketProvider>
+            {showNavbar && <Navbar />}
+            {children}
+          </SocketProvider>
         </MessageProvider>
       
       </ConfigProvider>

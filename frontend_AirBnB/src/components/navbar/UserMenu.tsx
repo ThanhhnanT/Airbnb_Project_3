@@ -12,9 +12,9 @@ import {
   LogoutOutlined, 
   UnorderedListOutlined, 
   QuestionCircleOutlined,
-  BellOutlined
 } from "@ant-design/icons";
 import { getUserProfile } from "@/service/user";
+import NotificationBell from "@/components/notifications/NotificationBell";
 import styles from "@/styles/navbar.module.css";
 
 const { Text } = Typography;
@@ -166,9 +166,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
       >
         {userRole === 'host' ? 'Quản lý phòng' : 'Trở thành Host'}
       </Text>
-      <div className={styles.notificationIcon}>
-        <BellOutlined className={styles.bellIcon} />
-      </div>
+      {isLoggedIn && <NotificationBell />}
       <Dropdown 
         menu={{ 
           items: isLoggedIn ? menuLogin : menuLogout, 

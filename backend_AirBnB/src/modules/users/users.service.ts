@@ -11,14 +11,27 @@ import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import {MailerService} from '@nestjs-modules/mailer'
 import { VerifyDto } from '../../auth/dto/verify-email.dto';
+import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
+import { CreateStripeAccountDto } from './dto/stripe-connect.dto';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) 
-  private userModel: Model<User>,
-  private readonly mailerService: MailerService
-  
-) {}
+  private stripe: Stripe;
+
+  constructor(
+    @InjectModel(User.name) 
+    private userModel: Model<User>,
+    private readonly mailerService: MailerService,
+    private configService: ConfigService,
+  ) {
+    const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
+    if (stripeSecretKey) {
+      this.stripe = new Stripe(stripeSecretKey, {
+        apiVersion: '2025-11-17.clover',
+      });
+    }
+  }
   
  isEmailExist = async (email: string): Promise<boolean> => {
   try {
@@ -374,6 +387,278 @@ export class UsersService {
       return user.role?.listID?.includes(listingId) || false;
     }
     return false;
+  }
+
+  // Stripe Connect methods
+  async createStripeConnectAccount(userId: string, createStripeAccountDto: CreateStripeAccountDto) {
+    try {
+      if (!this.stripe) {
+        throw new InternalServerErrorException('Stripe is not configured');
+      }
+
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (user.role?.type !== 'host') {
+        throw new BadRequestException('Only hosts can create Stripe Connect accounts');
+      }
+
+      // Check if account already exists
+      if (user.stripe_account_id) {
+        throw new BadRequestException('Stripe Connect account already exists for this user');
+      }
+
+      const { email, country, type = 'express' } = createStripeAccountDto;
+
+      // Create Stripe Connect account
+      let account;
+      try {
+        const countryCode = country.toUpperCase();
+        
+        // Determine capabilities based on country
+        // Some countries like Vietnam don't support card_payments capability
+        const capabilities: any = {
+          transfers: { requested: true },
+        };
+
+        // Only request card_payments for supported countries
+        // Vietnam and some other countries only support transfers
+        const countriesWithoutCardPayments = ['VN', 'TH', 'ID', 'PH', 'MY'];
+        if (!countriesWithoutCardPayments.includes(countryCode)) {
+          capabilities.card_payments = { requested: true };
+        }
+
+        // Account creation parameters
+        // For cross-border countries (VN, TH, etc.), use controller parameter
+        // which automatically creates recipient service agreement account
+        const crossBorderCountries = ['VN', 'TH', 'ID', 'PH', 'MY'];
+        
+        let accountParams: any;
+        
+        if (crossBorderCountries.includes(countryCode)) {
+          // For cross-border countries: use controller parameter with country
+          // This creates a recipient service agreement account automatically
+          accountParams = {
+            email: email || user.email,
+            country: countryCode,
+            controller: {
+              stripe_dashboard: {
+                type: 'express',
+              },
+              fees: {
+                payer: 'application',
+              },
+              losses: {
+                payments: 'application',
+              },
+            },
+            // Specify tos_acceptance with service_agreement for recipient accounts
+            tos_acceptance: {
+              service_agreement: 'recipient',
+              date: Math.floor(Date.now() / 1000),
+              ip: '0.0.0.0', // Will be updated during onboarding
+            },
+          };
+          // Capabilities will be requested during onboarding
+        } else {
+          // For other countries: standard account creation
+          accountParams = {
+            type: type === 'express' ? 'express' : 'standard',
+            country: countryCode,
+            email: email || user.email,
+            capabilities: capabilities,
+          };
+        }
+
+        account = await this.stripe.accounts.create(accountParams);
+      } catch (stripeError: any) {
+        if (stripeError?.code === 'account_invalid' || stripeError?.message?.includes('Connect')) {
+          throw new BadRequestException(
+            'Stripe Connect chưa được kích hoạt. Vui lòng đăng ký Stripe Connect tại https://stripe.com/connect hoặc liên hệ admin để kích hoạt tính năng này.'
+          );
+        }
+        if (stripeError?.message?.includes('card_payments') || stripeError?.message?.includes('capability')) {
+          throw new BadRequestException(
+            `Quốc gia ${country.toUpperCase()} không hỗ trợ card_payments capability. Chỉ có thể sử dụng transfers. ${stripeError.message}`
+          );
+        }
+        if (stripeError?.message?.includes('service_agreement') || stripeError?.message?.includes('recipient')) {
+          // Service agreement will be handled automatically by Stripe during onboarding
+          // For cross-border countries, Stripe uses recipient agreement when only transfers is requested
+          throw new BadRequestException(
+            `Lỗi tạo tài khoản cho quốc gia ${country.toUpperCase()}. Stripe sẽ tự động xử lý service agreement trong quá trình đăng ký. ${stripeError.message}`
+          );
+        }
+        throw stripeError;
+      }
+
+      // Update user with Stripe account ID
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          stripe_account_id: account.id,
+          stripe_account_status: 'pending',
+        },
+        { new: true }
+      );
+
+      return {
+        account_id: account.id,
+        status: 'pending',
+        message: 'Stripe Connect account created successfully',
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error creating Stripe Connect account: ${error.message}`);
+    }
+  }
+
+  async getStripeConnectAccountLink(userId: string) {
+    try {
+      if (!this.stripe) {
+        throw new InternalServerErrorException('Stripe is not configured');
+      }
+
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (!user.stripe_account_id) {
+        throw new BadRequestException('Stripe Connect account not found. Please create one first.');
+      }
+
+      const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+
+      // Create account link for onboarding
+      const accountLinkParams: any = {
+        account: user.stripe_account_id,
+        refresh_url: `${frontendUrl}/host/payout-setup/callback?refresh=true`,
+        return_url: `${frontendUrl}/host/payout-setup/callback?success=true`,
+        type: 'account_onboarding',
+      };
+
+      // Try to get account to check if it's a cross-border account
+      try {
+        const account = await this.stripe.accounts.retrieve(user.stripe_account_id);
+        const countryCode = account.country?.toUpperCase();
+        const crossBorderCountries = ['VN', 'TH', 'ID', 'PH', 'MY'];
+        
+        // For cross-border countries, try to specify recipient service agreement type in account link
+        // Note: This may not be a valid parameter, but worth trying
+        if (countryCode && crossBorderCountries.includes(countryCode)) {
+          // Service agreement type should be handled automatically by Stripe
+          // based on controller parameter used during account creation
+        }
+      } catch (err) {
+        // If account retrieval fails, continue without country check
+        console.log('Could not retrieve account for country check:', err);
+      }
+
+      const accountLink = await this.stripe.accountLinks.create(accountLinkParams);
+
+      return {
+        url: accountLink.url,
+        expires_at: accountLink.expires_at,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error getting account link: ${error.message}`);
+    }
+  }
+
+  async verifyStripeAccount(userId: string) {
+    try {
+      if (!this.stripe) {
+        throw new InternalServerErrorException('Stripe is not configured');
+      }
+
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (!user.stripe_account_id) {
+        throw new BadRequestException('Stripe Connect account not found');
+      }
+
+      // Retrieve account from Stripe
+      const account = await this.stripe.accounts.retrieve(user.stripe_account_id);
+
+      // Check if account is ready for payouts
+      const chargesEnabled = account.charges_enabled;
+      const payoutsEnabled = account.payouts_enabled;
+      const detailsSubmitted = account.details_submitted;
+
+      let status: 'unverified' | 'pending' | 'verified' = 'unverified';
+      let payoutEnabled = false;
+
+      if (chargesEnabled && payoutsEnabled && detailsSubmitted) {
+        status = 'verified';
+        payoutEnabled = true;
+      } else if (detailsSubmitted) {
+        status = 'pending';
+      }
+
+      // Update user status
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        userId,
+        {
+          stripe_account_status: status,
+          payout_enabled: payoutEnabled,
+        },
+        { new: true }
+      );
+
+      return {
+        account_id: account.id,
+        status: status,
+        payout_enabled: payoutEnabled,
+        charges_enabled: chargesEnabled,
+        payouts_enabled: payoutsEnabled,
+        details_submitted: detailsSubmitted,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error verifying Stripe account: ${error.message}`);
+    }
+  }
+
+  async getStripeAccountStatus(userId: string) {
+    try {
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      if (!user.stripe_account_id) {
+        return {
+          has_account: false,
+          status: 'unverified',
+          payout_enabled: false,
+        };
+      }
+
+      return {
+        has_account: true,
+        account_id: user.stripe_account_id,
+        status: user.stripe_account_status || 'unverified',
+        payout_enabled: user.payout_enabled || false,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error getting account status: ${error.message}`);
+    }
   }
 
   // Set user role to admin (không có listID)

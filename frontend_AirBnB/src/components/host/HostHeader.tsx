@@ -1,13 +1,13 @@
 "use client";
 
-import { Button, Badge, Input } from "antd";
+import { Button, Input } from "antd";
 import {
   PlusCircleOutlined,
-  BellOutlined,
   SettingOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { useRouter, usePathname } from "next/navigation";
+import NotificationBell from "@/components/notifications/NotificationBell";
 import styles from "@/app/host/(dashboard)/manage/host-manage.module.css";
 
 interface HostHeaderProps {
@@ -41,13 +41,7 @@ export default function HostHeader({ showSearch = true }: HostHeaderProps) {
           Tạo chỗ ở mới
         </Button>
         <div className={styles.headerDivider} />
-        <Badge count={3} size="small">
-          <Button
-            type="text"
-            icon={<BellOutlined />}
-            className={styles.iconButton}
-          />
-        </Badge>
+        <NotificationBell />
         <Button
           type="text"
           icon={<SettingOutlined />}

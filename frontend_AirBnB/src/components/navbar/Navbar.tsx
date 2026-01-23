@@ -89,7 +89,7 @@ export default function Navbar() {
           messageApi.info('Danh sách yêu thích của bạn');
           break;
         case '2':
-          messageApi.info('Chuyến đi của bạn');
+          router.push('/trips');
           break;
         case '3':
           messageApi.info('Tin nhắn của bạn');

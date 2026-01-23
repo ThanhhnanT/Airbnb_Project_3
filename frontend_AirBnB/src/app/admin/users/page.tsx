@@ -30,7 +30,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const result = await getAccess("admin/users");
+      const result = await getAccess("admin/users", {}, true); // Use admin token
       setUsers(result.data || []);
     } catch (error) {
       message.error("Không thể tải danh sách users");

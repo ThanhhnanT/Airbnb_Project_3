@@ -64,6 +64,19 @@ export class User {
   
   @Prop() 
   codeExpired: Date;
+
+  @Prop({ type: String })
+  stripe_account_id: string;
+
+  @Prop({ 
+    type: String, 
+    enum: ['unverified', 'pending', 'verified'],
+    default: 'unverified'
+  })
+  stripe_account_status: string;
+
+  @Prop({ type: Boolean, default: false })
+  payout_enabled: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

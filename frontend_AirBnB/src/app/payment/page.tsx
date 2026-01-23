@@ -176,7 +176,11 @@ function PaymentForm({
 
       if (paymentIntent && paymentIntent.status === "succeeded") {
         messageApi.success("Thanh toán thành công!");
-        router.push(`/bookings/${bookingId}`);
+        
+        // Check if host has bank account (this will be handled by backend)
+        // If backend returns error about bank account, show notification
+        // For now, just redirect - backend will handle notification via Socket.IO
+        router.push(`/trips`);
       } else {
         messageApi.warning("Thanh toán chưa hoàn tất, vui lòng thử lại");
       }
@@ -454,57 +458,91 @@ export default function PaymentPage() {
   useEffect(() => {
     const init = async () => {
       try {
+        const bookingIdParam = searchParams.get("bookingId");
         const listingIdParam = searchParams.get("listingId");
         const checkIn = searchParams.get("checkInDate");
         const checkOut = searchParams.get("checkOutDate");
         const guestsParam = searchParams.get("guests");
         const totalPriceParam = searchParams.get("totalPrice");
 
-        if (
-          !listingIdParam ||
-          !checkIn ||
-          !checkOut ||
-          !guestsParam ||
-          !totalPriceParam
-        ) {
-          messageApi.error("Thiếu thông tin đặt phòng");
-          router.push("/");
-          return;
-        }
-
-        const guestsNumber = parseInt(guestsParam, 10);
-        const totalPriceNumber = parseFloat(totalPriceParam);
-
         let booking;
-        try {
-          booking = await postAccess("bookings", {
-            listing_id: listingIdParam,
-            check_in: checkIn,
-            check_out: checkOut,
-            guests: guestsNumber,
-          });
-        } catch (err: any) {
-          // Nếu tạo booking thất bại (ví dụ: trùng lịch), báo lỗi và đưa về trang listing thay vì về home
-          const errorMessage =
-            err?.response?.data?.message ||
-            "Không thể tạo đặt phòng. Vui lòng chọn khoảng ngày khác.";
-          messageApi.error(errorMessage);
-          router.push(`/listings/${listingIdParam}`);
-          return;
+
+        // If bookingId is provided, use it instead of creating a new booking
+        if (bookingIdParam) {
+          try {
+            booking = await getAccess(`bookings/${bookingIdParam}`);
+            if (!booking || !booking._id) {
+              messageApi.error("Không tìm thấy thông tin đặt phòng");
+              setLoading(false);
+              router.push("/");
+              return;
+            }
+          } catch (err: any) {
+            const errorMessage =
+              err?.response?.data?.message ||
+              "Không thể tải thông tin đặt phòng.";
+            messageApi.error(errorMessage);
+            setLoading(false);
+            return;
+          }
+        } else {
+          // Fallback: Create booking if bookingId is not provided (for backward compatibility)
+          if (
+            !listingIdParam ||
+            !checkIn ||
+            !checkOut ||
+            !guestsParam ||
+            !totalPriceParam
+          ) {
+            messageApi.error("Thiếu thông tin đặt phòng");
+            setLoading(false);
+            router.push("/");
+            return;
+          }
+
+          const guestsNumber = parseInt(guestsParam, 10);
+
+          try {
+            booking = await postAccess("bookings", {
+              listing_id: listingIdParam,
+              check_in: checkIn,
+              check_out: checkOut,
+              guests: guestsNumber,
+            });
+          } catch (err: any) {
+            // Nếu tạo booking thất bại (ví dụ: trùng lịch), chỉ hiển thị message, không làm gì khác
+            const errorMessage =
+              err?.response?.data?.message ||
+              "Không thể tạo đặt phòng. Vui lòng chọn khoảng ngày khác.";
+            messageApi.error(errorMessage);
+            setLoading(false);
+            return;
+          }
+
+          if (!booking || !booking._id) {
+            messageApi.error("Không thể tạo đặt phòng");
+            setLoading(false);
+            return;
+          }
         }
 
-        if (!booking || !booking._id) {
-          messageApi.error("Không thể tạo đặt phòng");
-          router.push(`/listings/${listingIdParam}`);
-          return;
-        }
+        // Use booking data to get listing info
+        const listingIdFromBooking = booking.listing_id?._id || booking.listing_id || listingIdParam || "";
+        const checkInFromBooking = booking.check_in 
+          ? new Date(booking.check_in).toISOString().split('T')[0] 
+          : (checkIn || "");
+        const checkOutFromBooking = booking.check_out 
+          ? new Date(booking.check_out).toISOString().split('T')[0] 
+          : (checkOut || "");
+        const guestsFromBooking = booking.guests || parseInt(guestsParam || "1", 10);
+        const totalPriceNumber = booking.total_price || parseFloat(totalPriceParam || "0");
 
         const details = await getAccess(
-          `listings/${listingIdParam}/details`,
+          `listings/${listingIdFromBooking}/details`,
           {
-            checkInDate: checkIn,
-            checkOutDate: checkOut,
-            guests: guestsNumber,
+            checkInDate: checkInFromBooking,
+            checkOutDate: checkOutFromBooking,
+            guests: guestsFromBooking,
           }
         );
 
@@ -516,6 +554,8 @@ export default function PaymentPage() {
             ? details.images[0].image_url[0]
             : undefined;
 
+        const finalTotalPrice = booking.total_price || totalPriceNumber || 0;
+
         setListingSummary({
           title: listing?.title || "Chỗ ở của bạn",
           city: listing?.city || "",
@@ -523,8 +563,8 @@ export default function PaymentPage() {
           imageUrl: firstImage,
           avgRating: listing?.avg_rating,
           reviewCount: listing?.review_count,
-          pricePerNight: listing?.price_base || totalPriceNumber,
-          currency: listing?.currency || "USD",
+          pricePerNight: listing?.price_base || 0,
+          currency: listing?.currency || booking.currency || "USD",
           cleaningFee: listing?.cleaning_fee || 0,
         });
 
@@ -541,23 +581,19 @@ export default function PaymentPage() {
         }
 
         setBookingId(booking._id);
-        setListingId(listingIdParam);
-        setCheckInDate(checkIn);
-        setCheckOutDate(checkOut);
-        setGuests(guestsNumber);
-        setTotalPrice(totalPriceNumber);
+        setListingId(listingIdFromBooking);
+        setCheckInDate(checkInFromBooking);
+        setCheckOutDate(checkOutFromBooking);
+        setGuests(guestsFromBooking);
+        setTotalPrice(finalTotalPrice);
+        
+        // Set loading to false after all data is loaded successfully
+        setLoading(false);
       } catch (error: any) {
         console.error("Init payment error:", error);
-        const listingIdParam = searchParams.get("listingId");
         const errorMessage =
           error?.response?.data?.message || "Không thể khởi tạo thanh toán";
         messageApi.error(errorMessage);
-        if (listingIdParam) {
-          router.push(`/listings/${listingIdParam}`);
-        } else {
-          router.push("/");
-        }
-      } finally {
         setLoading(false);
       }
     };
