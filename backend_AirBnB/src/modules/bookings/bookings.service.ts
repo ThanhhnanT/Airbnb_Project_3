@@ -3,7 +3,7 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Booking, BookingDocument } from './schemas/booking.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class BookingsService {
@@ -29,6 +29,22 @@ export class BookingsService {
       return await this.bookingModel.find(filter).populate('listing_id guest_id host_id').exec();
     } catch (error) {
       throw new InternalServerErrorException(`Error finding bookings: ${error.message}`);
+    }
+  }
+
+  async findHostBookings(hostId: string, status?: string): Promise<Booking[]> {
+    try {
+      const filter: any = { host_id: hostId };
+      if (status) {
+        filter.status = status;
+      }
+      return await this.bookingModel
+        .find(filter)
+        .populate('listing_id guest_id')
+        .sort({ createdAt: -1 })
+        .exec();
+    } catch (error) {
+      throw new InternalServerErrorException(`Error finding host bookings: ${error.message}`);
     }
   }
 
@@ -75,6 +91,36 @@ export class BookingsService {
         throw error;
       }
       throw new InternalServerErrorException(`Error deleting booking: ${error.message}`);
+    }
+  }
+
+  async countBookingsByListingForHost(hostId: string): Promise<{ listingId: string; count: number }[]> {
+    try {
+      const result = await this.bookingModel.aggregate([
+        {
+          $match: {
+            host_id: new Types.ObjectId(hostId),
+            status: { $ne: 'cancelled' },
+          },
+        },
+        {
+          $group: {
+            _id: '$listing_id',
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            listingId: { $toString: '$_id' },
+            count: 1,
+            _id: 0,
+          },
+        },
+      ]).exec();
+
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error counting bookings by listing: ${error.message}`);
     }
   }
 }

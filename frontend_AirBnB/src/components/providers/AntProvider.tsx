@@ -11,7 +11,8 @@ import { MessageProvider } from "./Message";
 export default function AntdProvider({ children }: { children: React.ReactNode }) {
   const style = commonStyle();
   const pathname = usePathname();
-  const showNavbar = !pathname?.startsWith("/admin");
+  const showNavbar =
+    !pathname?.startsWith("/admin") && !pathname?.startsWith("/host");
   // const [messageApi, contextHolder] = message.useMessage();
   return (
    

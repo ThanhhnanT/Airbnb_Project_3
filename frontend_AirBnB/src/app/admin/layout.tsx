@@ -65,7 +65,7 @@ export default function AdminLayout({
       }
 
       try {
-        const token = Cookies.get("access_token");
+        const token = Cookies.get("admin_token");
         if (!token) {
           router.push("/admin/login");
           return;
@@ -75,7 +75,7 @@ export default function AdminLayout({
         const user = await getUserProfile();
         if (!user || user.role?.type !== "admin") {
           // Not admin, redirect to login
-          Cookies.remove("access_token");
+          Cookies.remove("admin_token");
           router.push("/admin/login");
           return;
         }
@@ -85,7 +85,7 @@ export default function AdminLayout({
         setIsAuthenticated(true);
       } catch (error) {
         console.error("Error checking admin auth:", error);
-        Cookies.remove("access_token");
+        Cookies.remove("admin_token");
         router.push("/admin/login");
       } finally {
         setIsCheckingAuth(false);

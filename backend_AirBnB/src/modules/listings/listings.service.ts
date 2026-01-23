@@ -109,8 +109,9 @@ export class ListingsService {
       }
 
       // Get images
+      const listingIdForImages = Types.ObjectId.isValid(id) ? [new Types.ObjectId(id), id] : [id];
       const images = await this.listingImageModel
-        .find({ listing_id: new Types.ObjectId(id) })
+        .find({ listing_id: { $in: listingIdForImages } })
         .exec();
 
       // Get reviews with reviewer info
@@ -411,7 +412,7 @@ export class ListingsService {
         listings.map(async (listing) => {
           // cover image
           const cover = await this.listingImageModel
-            .findOne({ listing_id: listing._id })
+            .findOne({ listing_id: { $in: [listing._id, listing._id.toString()] } })
             .sort({ is_cover: -1, createdAt: -1 })
             .exec();
           const cover_image = cover?.image_url?.[0] || null;
@@ -486,13 +487,57 @@ export class ListingsService {
     }
   }
 
-  async findHostListings(hostId: string): Promise<Listing[]> {
+  async findHostListings(userId: string): Promise<any[]> {
     try {
-      return await this.listingModel
-        .find({ host_id: new Types.ObjectId(hostId) })
+      const userObjectId = new Types.ObjectId(userId);
+      const user = await this.userModel.findById(userObjectId).exec();
+
+      const listIds = (user?.role?.listID || [])
+        .map((id: string) => {
+          try {
+            return new Types.ObjectId(id);
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean) as Types.ObjectId[];
+
+      const orConditions: any[] = [
+        { host_id: userObjectId },
+        // Trường hợp host_id đang lưu kiểu string trong DB
+        { host_id: userId },
+      ];
+
+      if (listIds.length > 0) {
+        orConditions.push({ _id: { $in: listIds } });
+      }
+
+      const filter: any = { $or: orConditions };
+
+      const listings = await this.listingModel
+        .find(filter)
         .populate('host_id', 'name email avatar_url')
         .sort({ createdAt: -1 })
         .exec();
+
+      // Enrich listings with cover images
+      const enrichedListings = await Promise.all(
+        listings.map(async (listing) => {
+          const cover = await this.listingImageModel
+            .findOne({ listing_id: { $in: [listing._id, listing._id.toString()] } })
+            .sort({ is_cover: -1, createdAt: -1 })
+            .exec();
+          
+          const cover_image = cover?.image_url?.[0] || null;
+
+          return {
+            ...listing.toObject(),
+            cover_image,
+          };
+        }),
+      );
+
+      return enrichedListings;
     } catch (error) {
       throw new InternalServerErrorException(`Error finding host listings: ${error.message}`);
     }

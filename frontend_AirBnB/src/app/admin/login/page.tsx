@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     // If already logged in as admin, redirect to dashboard
-    const token = Cookies.get("access_token");
+    const token = Cookies.get("admin_token");
     if (token) {
       // Check if user is admin by trying to access profile
       // This will be handled by the layout, but we can redirect here too
@@ -70,13 +70,14 @@ export default function AdminLoginPage() {
         }
 
         // Success case
-        if (!res.access_token) {
+        if (!res.admin_token) {
           messageApi.error("Đăng nhập thất bại. Không nhận được token.");
           setLoading(false);
           return;
         }
 
-        Cookies.set("access_token", res.access_token);
+        // Lưu token riêng cho admin
+        Cookies.set("admin_token", res.admin_token);
         messageApi.success("Đăng nhập thành công");
         router.push("/admin");
       } catch (e: any) {

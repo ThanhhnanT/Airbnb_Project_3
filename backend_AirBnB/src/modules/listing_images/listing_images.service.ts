@@ -22,8 +22,15 @@ export class ListingImagesService {
 
   async findAll(listingId?: string): Promise<ListingImage[]> {
     try {
-      const filter = listingId ? { listing_id: new Types.ObjectId(listingId) } : {};
-      console.log("filter", filter);
+      const filter = listingId
+        ? {
+            listing_id: {
+              $in: Types.ObjectId.isValid(listingId)
+                ? [new Types.ObjectId(listingId), listingId]
+                : [listingId],
+            },
+          }
+        : {};
       return await this.listingImageModel.find(filter).exec();
     } catch (error) {
       throw new InternalServerErrorException(`Error finding listing images: ${error.message}`);

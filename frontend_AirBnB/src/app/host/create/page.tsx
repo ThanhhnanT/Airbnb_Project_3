@@ -358,13 +358,21 @@ export default function CreateListingPage() {
           console.error("Error saving images to listing:", imageError);
           // Listing is already created, so we still show success but warn about images
           messageApi.warning("Listing đã được tạo nhưng có lỗi khi lưu ảnh. Vui lòng thử upload lại sau.");
-          router.push(`/listings/${listingResult._id}`);
+          if (typeof window !== "undefined") {
+            window.open("/host/manage", "_blank", "noopener,noreferrer");
+          }
+          // Quay về trang home ở tab hiện tại
+          router.push("/");
           return;
         }
       }
-
+      
       messageApi.success("Listing đã được tạo và đang chờ duyệt từ admin!");
-      router.push(`/listings/${listingResult._id}`);
+      if (typeof window !== "undefined") {
+        window.open("/host/manage", "_blank", "noopener,noreferrer");
+      }
+      // Quay về trang home ở tab hiện tại
+      router.push("/");
     } catch (error: any) {
       console.error("Error creating listing:", error);
       console.error("Error response:", error?.response?.data);

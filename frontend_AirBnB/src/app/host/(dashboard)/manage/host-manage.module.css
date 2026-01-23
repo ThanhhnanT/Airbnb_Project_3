@@ -1,0 +1,456 @@
+.hostLayout {
+  min-height: 100vh;
+  background: #f6f7f8;
+}
+
+.sider {
+  background: #fff;
+  border-right: 1px solid #dce0e5;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  overflow: auto;
+}
+
+/* Ensure AntD sider never uses dark theme styles */
+.hostLayout :global(.ant-layout-sider),
+.hostLayout :global(.ant-layout-sider-dark) {
+  background: #fff !important;
+}
+
+.hostLayout :global(.ant-layout-sider-dark .ant-layout-sider-trigger) {
+  background: #fff !important;
+  color: #111418 !important;
+  border-top: 1px solid #dce0e5;
+}
+
+.sidebarContent {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 16px;
+  justify-content: space-between;
+}
+
+.branding {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  margin-bottom: 24px;
+}
+
+.brandIcon {
+  background: #197fe6;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111418;
+}
+
+.brandSubtitle {
+  font-size: 12px;
+  color: #637588;
+}
+
+.sidebarMenu {
+  flex: 1;
+  border: none;
+  background: transparent;
+}
+
+.sidebarMenu :global(.ant-menu-item) {
+  margin: 4px 0;
+  border-radius: 8px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.sidebarMenu :global(.ant-menu-item-selected) {
+  background: rgba(25, 127, 230, 0.1);
+  color: #197fe6;
+  border: 1px solid rgba(25, 127, 230, 0.2);
+}
+
+.activeMenuItem {
+  background: rgba(25, 127, 230, 0.1) !important;
+  color: #197fe6 !important;
+  border: 1px solid rgba(25, 127, 230, 0.2) !important;
+  font-weight: 700 !important;
+}
+
+.sidebarFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #dce0e5;
+}
+
+.upgradeButton {
+  height: 40px;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.userName {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111418;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userRole {
+  font-size: 10px;
+  color: #637588;
+  line-height: 1.2;
+}
+
+.contentLayout {
+  transition: margin-left 0.2s;
+  min-height: 100vh;
+}
+
+.header {
+  background: #fff !important;
+  border-bottom: 1px solid #dce0e5;
+  padding: 0 32px !important;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Override AntD default dark header for this page */
+.hostLayout :global(.ant-layout-header) {
+  background: #fff !important;
+  color: #111418 !important;
+}
+
+.headerLeft {
+  flex: 1;
+  max-width: 400px;
+}
+
+.searchInput {
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  background: #f6f7f8;
+  border: none;
+}
+
+.searchInput :global(.ant-input) {
+  background: transparent;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerDivider {
+  width: 1px;
+  height: 24px;
+  background: #dce0e5;
+  margin: 0 8px;
+}
+
+.iconButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f6f7f8;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconButton:hover {
+  background: #e2e5e9;
+}
+
+.content {
+  padding: 32px;
+  background: #f6f7f8;
+}
+
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.pageHeader > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pageTitle {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 0 !important;
+  color: #111418;
+}
+
+.pageSubtitle {
+  font-size: 14px;
+  color: #637588;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.filters :global(.ant-btn) {
+  border-radius: 8px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.sortContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sortLabel {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #637588;
+}
+
+.tableContainer {
+  background: #fff;
+  border: 1px solid #dce0e5;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.listingsTable {
+  background: #fff;
+}
+
+.listingsTable :global(.ant-table-thead > tr > th) {
+  background: #f6f7f8;
+  border-bottom: 1px solid #dce0e5;
+  padding: 16px 24px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #637588;
+}
+
+.listingsTable :global(.ant-table-tbody > tr) {
+  transition: background-color 0.2s;
+}
+
+.listingsTable :global(.ant-table-tbody > tr:hover) {
+  background: rgba(246, 247, 248, 0.5);
+}
+
+.listingsTable :global(.ant-table-tbody > tr > td) {
+  padding: 16px 24px;
+  border-bottom: 1px solid #dce0e5;
+}
+
+.listingCell {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.listingImage {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  background-color: #e5e7eb;
+}
+
+.listingInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.listingTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111418;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.listingAddress {
+  font-size: 12px;
+  color: #637588;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.priceText {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111418;
+}
+
+.bookingBadge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bookingText {
+  color: inherit;
+}
+
+.actionButton {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #637588;
+}
+
+.actionButton:hover {
+  background: #f6f7f8;
+  color: #111418;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contentLayout {
+    margin-left: 0;
+  }
+
+  .sider {
+    position: fixed;
+    z-index: 1000;
+  }
+
+  .header {
+    padding: 0 16px;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 64px;
+  }
+
+  .headerLeft {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

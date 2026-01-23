@@ -54,11 +54,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
         onOpenAuthModal();
       }
     } else {
-      // If logged in and is host, redirect to manage listings page
+      // If logged in and is host, open manage listings page in new tab
       // Otherwise, redirect to create listing page
       if (userRole === 'host') {
-        // TODO: Update this route when manage listings page is created
-        router.push('/host/create');
+        window.open('/host/manage', '_blank', 'noopener,noreferrer');
       } else {
         router.push('/host/create');
       }

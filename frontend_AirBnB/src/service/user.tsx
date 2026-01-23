@@ -5,7 +5,9 @@ import Cookies from "js-cookie";
 const API_DOMAIN = process.env.API || 'http://localhost:9000/';
 
 const getTokenHeader = () => {
-  const token = Cookies.get('access_token'); 
+  // Ưu tiên token admin nếu có, nếu không thì dùng token user thường
+  const adminToken = Cookies.get('admin_token');
+  const token = adminToken || Cookies.get('access_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 

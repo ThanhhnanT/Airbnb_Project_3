@@ -103,7 +103,9 @@ export const upImage = async (path: String, data: object) => {
 
 
 const getTokenHeader = () => {
-  const token = Cookies.get('access_token'); 
+  // Ưu tiên dùng admin_token cho trang quản trị, fallback sang access_token cho user thường
+  const adminToken = Cookies.get('admin_token');
+  const token = adminToken || Cookies.get('access_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Input, Typography, Button, Spin } from "antd";
+import React, { useEffect, useRef, useState } from "react";
+import { Input, Typography, Button, Spin, InputRef } from "antd";
 import { 
   AimOutlined, 
   EnvironmentOutlined, 
@@ -67,6 +67,13 @@ const suggestedDestinations = [
   }
 ];
 
+type PlaceSuggestion = {
+  placeId: string;
+  mainText: string;
+  secondaryText?: string;
+  description: string;
+};
+
 const LocationDropdown: React.FC<LocationDropdownProps> = ({ 
   visible, 
   onClose, 
@@ -74,6 +81,85 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
 }) => {
   const [searchValue, setSearchValue] = useState("");
   const [gettingLocation, setGettingLocation] = useState(false);
+  const [isPlacesLoading, setIsPlacesLoading] = useState(false);
+  const [placesError, setPlacesError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<PlaceSuggestion[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  const searchInputRef = useRef<InputRef | null>(null);
+  const autocompleteServiceRef = useRef<any | null>(null);
+  const placesServiceRef = useRef<any | null>(null);
+
+  // Helper: load Google Maps JS with Places library
+  const loadGoogleMapsPlaces = async (): Promise<any | null> => {
+    if (typeof window === "undefined") return null;
+
+    // If already loaded with Places, reuse
+    try {
+      if (typeof google !== "undefined" && google.maps && google.maps.places) {
+        return google;
+      }
+    } catch {
+      // ignore, will try to inject script
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      console.warn("Google Maps API key is missing. Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your .env file.");
+      setPlacesError("MISSING_API_KEY");
+      return null;
+    }
+
+    // Avoid injecting script multiple times
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      'script[src^="https://maps.googleapis.com/maps/api/js"]'
+    );
+    if (existingScript) {
+      // Wait a bit for it to finish loading if needed
+      return new Promise((resolve) => {
+        existingScript.addEventListener("load", () => {
+          try {
+            if (typeof google !== "undefined" && google.maps && google.maps.places) {
+              resolve(google);
+            } else {
+              resolve(null);
+            }
+          } catch {
+            resolve(null);
+          }
+        });
+      });
+    }
+
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=vi`;
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        try {
+          if (typeof google !== "undefined" && google.maps && google.maps.places) {
+            resolve(google);
+          } else {
+            setPlacesError("LOAD_FAILED");
+            resolve(null);
+          }
+        } catch {
+          setPlacesError("LOAD_FAILED");
+          resolve(null);
+        }
+      };
+
+      script.onerror = () => {
+        console.error("Failed to load Google Maps Places script");
+        setPlacesError("LOAD_FAILED");
+        resolve(null);
+      };
+
+      document.head.appendChild(script);
+    });
+  };
 
   const reverseGeocode = async (latitude: number, longitude: number): Promise<string> => {
     try {
@@ -127,6 +213,216 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
       console.error("Reverse geocoding error:", error);
       // Fallback to formatted coordinates
       return `Vị trí hiện tại (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+    }
+  };
+
+  // Initialize Google Places services when dropdown is visible
+  useEffect(() => {
+    let cancelled = false;
+
+    const initPlacesServices = async () => {
+      if (!visible) return;
+
+      setPlacesError(null);
+      setIsPlacesLoading(true);
+
+      const g = await loadGoogleMapsPlaces();
+      if (!g || cancelled) {
+        setIsPlacesLoading(false);
+        return;
+      }
+
+      try {
+        if (!autocompleteServiceRef.current) {
+          autocompleteServiceRef.current = new g.maps.places.AutocompleteService();
+        }
+        if (!placesServiceRef.current) {
+          // PlacesService needs a DOM element, can be a dummy div
+          const dummy = document.createElement("div");
+          placesServiceRef.current = new g.maps.places.PlacesService(dummy);
+        }
+      } catch (error) {
+        console.error("Error initializing Google Places services:", error);
+        setPlacesError("INIT_FAILED");
+      } finally {
+        if (!cancelled) {
+          setIsPlacesLoading(false);
+        }
+      }
+    };
+
+    initPlacesServices();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [visible]);
+
+  // Debounced search for predictions
+  useEffect(() => {
+    if (!visible) return;
+
+    // Clear suggestions when input empty
+    if (!searchValue.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const handler = setTimeout(() => {
+      const service = autocompleteServiceRef.current;
+      if (!service) return;
+
+      setLoadingSuggestions(true);
+      setPlacesError(null);
+
+      try {
+        service.getPlacePredictions(
+          {
+            input: searchValue,
+            types: ["(cities)"],
+            language: "vi",
+          },
+          (predictions: any, status: any) => {
+            setLoadingSuggestions(false);
+
+            try {
+              const okStatus =
+                (typeof google !== "undefined" &&
+                  google.maps &&
+                  google.maps.places &&
+                  google.maps.places.PlacesServiceStatus &&
+                  google.maps.places.PlacesServiceStatus.OK) ||
+                "OK";
+
+              if (status !== okStatus || !predictions || predictions.length === 0) {
+                setSuggestions([]);
+                return;
+              }
+
+              const mapped: PlaceSuggestion[] = predictions.map((p: any) => {
+                const mainText = p.structured_formatting?.main_text || p.description || "";
+                const secondaryText = p.structured_formatting?.secondary_text || "";
+                return {
+                  placeId: p.place_id,
+                  mainText,
+                  secondaryText,
+                  description: p.description || `${mainText}${secondaryText ? ", " + secondaryText : ""}`,
+                };
+              });
+
+              setSuggestions(mapped);
+            } catch (e) {
+              console.error("Error processing predictions:", e);
+              setSuggestions([]);
+            }
+          }
+        );
+      } catch (error) {
+        console.error("Error calling AutocompleteService:", error);
+        setLoadingSuggestions(false);
+        setPlacesError("PREDICT_FAILED");
+        setSuggestions([]);
+      }
+    }, 350);
+
+    return () => clearTimeout(handler);
+  }, [searchValue, visible]);
+
+  const handlePlaceSelect = (suggestion: PlaceSuggestion) => {
+    const service = placesServiceRef.current;
+    if (!service || !suggestion.placeId) {
+      // Fallback to text only
+      onSelect(suggestion.description);
+      onClose();
+      return;
+    }
+
+    setLoadingSuggestions(true);
+    setPlacesError(null);
+
+    try {
+      service.getDetails(
+        {
+          placeId: suggestion.placeId,
+          fields: ["geometry", "formatted_address", "name", "address_components"],
+        },
+        (place: any, status: any) => {
+          setLoadingSuggestions(false);
+
+          try {
+            const okStatus =
+              (typeof google !== "undefined" &&
+                google.maps &&
+                google.maps.places &&
+                google.maps.places.PlacesServiceStatus &&
+                google.maps.places.PlacesServiceStatus.OK) ||
+              "OK";
+
+            if (status !== okStatus || !place) {
+              console.warn("Places details failed, fallback to description");
+              onSelect(suggestion.description);
+              onClose();
+              return;
+            }
+
+            const location = place.geometry?.location;
+            const components = place.address_components || [];
+
+            const getComponent = (types: string[]) => {
+              const comp = components.find((c: any) =>
+                types.every((t) => c.types.includes(t))
+              );
+              return comp ? comp.long_name : "";
+            };
+
+            const city =
+              getComponent(["locality", "political"]) ||
+              getComponent(["administrative_area_level_1", "political"]) ||
+              getComponent(["administrative_area_level_2", "political"]);
+
+            const country = getComponent(["country", "political"]);
+
+            let displayName =
+              (city && country ? `${city}, ${country}` : place.formatted_address) ||
+              place.name ||
+              suggestion.description;
+
+            if (!displayName && location) {
+              displayName = `Vị trí (${location.lat().toFixed(4)}, ${location
+                .lng()
+                .toFixed(4)})`;
+            }
+
+            if (displayName) {
+              setSearchValue(displayName);
+            }
+
+            if (location) {
+              const lat = location.lat();
+              const lng = location.lng();
+              const encoded = `nearby:${lat},${lng}|${displayName || `${lat.toFixed(
+                4
+              )},${lng.toFixed(4)}`}`;
+              onSelect(encoded);
+            } else if (displayName) {
+              onSelect(displayName);
+            } else {
+              onSelect(suggestion.description);
+            }
+
+            onClose();
+          } catch (e) {
+            console.error("Error processing place details:", e);
+            onSelect(suggestion.description);
+            onClose();
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error calling PlacesService.getDetails:", error);
+      setLoadingSuggestions(false);
+      onSelect(suggestion.description);
+      onClose();
     }
   };
 
@@ -194,12 +490,21 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           allowClear
+          ref={searchInputRef}
         />
+        {placesError && (
+          <Text type="secondary" style={{ fontSize: 12, marginTop: 4, display: "block" }}>
+            Không thể tải Google Places, bạn vẫn có thể chọn từ danh sách gợi ý bên dưới.
+          </Text>
+        )}
       </div>
       <div className={styles.locationList}>
-        {filteredDestinations.map((dest, index) => (
+        {/* Nearby item always on top */}
+        {suggestedDestinations
+          .filter((dest) => dest.value === "nearby")
+          .map((dest, index) => (
           <div
-            key={index}
+            key={`nearby-${index}`}
             className={styles.locationItem}
             onClick={() => {
               if (dest.value === "nearby") {
@@ -225,6 +530,63 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
             </div>
           </div>
         ))}
+
+        {/* Google Places suggestions */}
+        {loadingSuggestions && (
+          <div className={styles.locationItem}>
+            <div className={styles.locationIcon}>
+              <Spin size="small" />
+            </div>
+            <div className={styles.locationContent}>
+              <Text type="secondary" className={styles.locationItemDesc}>
+                Đang gợi ý địa điểm...
+              </Text>
+            </div>
+          </div>
+        )}
+
+        {!loadingSuggestions && suggestions.length > 0 && suggestions.map((sugg) => (
+          <div
+            key={sugg.placeId}
+            className={styles.locationItem}
+            onClick={() => handlePlaceSelect(sugg)}
+          >
+            <div className={styles.locationIcon}>
+              <EnvironmentOutlined />
+            </div>
+            <div className={styles.locationContent}>
+              <Text strong className={styles.locationItemTitle}>{sugg.mainText}</Text>
+              <Text type="secondary" className={styles.locationItemDesc}>
+                {sugg.secondaryText || sugg.description}
+              </Text>
+            </div>
+          </div>
+        ))}
+
+        {/* Fallback static destinations (excluding nearby which is already rendered) */}
+        {!loadingSuggestions && suggestions.length === 0 &&
+          filteredDestinations
+            .filter((dest) => dest.value !== "nearby")
+            .map((dest, index) => (
+              <div
+                key={`static-${index}`}
+                className={styles.locationItem}
+                onClick={() => {
+                  onSelect(dest.title);
+                  onClose();
+                }}
+              >
+                <div className={styles.locationIcon}>
+                  {dest.icon}
+                </div>
+                <div className={styles.locationContent}>
+                  <Text strong className={styles.locationItemTitle}>{dest.title}</Text>
+                  <Text type="secondary" className={styles.locationItemDesc}>
+                    {dest.description}
+                  </Text>
+                </div>
+              </div>
+            ))}
       </div>
     </div>
   );

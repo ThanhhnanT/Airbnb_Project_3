@@ -148,8 +148,20 @@ export class AuthController {
       if (!_id || !email) {
         throw new BadRequestException('Thông tin người dùng không đầy đủ');
       }
+      // Đăng nhập admin: đổi access_token thành admin_token trong response
+      const result: any = await this.authService.signIn(_id, email);
 
-      return await this.authService.signIn(_id, email);
+      // Nếu không có access_token thì trả về kết quả gốc
+      if (!result || !result.access_token) {
+        return result;
+      }
+
+      const { access_token, ...rest } = result;
+
+      return {
+        ...rest,
+        admin_token: access_token,
+      };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
