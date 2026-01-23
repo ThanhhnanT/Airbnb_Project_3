@@ -95,12 +95,12 @@
 }
 
 .searchBarContainerCollapsed .searchItemLabel {
-  display: none;
+  font-size: var(--font-size-xs);
+  margin-top: 0;
 }
 
 .searchBarContainerCollapsed .searchItemValue {
-  font-size: var(--font-size-xs);
-  margin-top: 0;
+  display: none;
 }
 
 .searchItemValue {

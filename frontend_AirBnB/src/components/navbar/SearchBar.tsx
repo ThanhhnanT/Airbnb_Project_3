@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { Button, Divider, Typography, Space, message } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { CalendarOutlined, EnvironmentOutlined, SearchOutlined, TeamOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import LocationDropdown from "../search/LocationDropdown";
 import DatePickerModal from "../search/DatePickerModal";
@@ -16,8 +16,17 @@ const { Text } = Typography;
 
 interface SearchBarProps {
   isExpanded?: boolean;
-  isCollapsed?: boolean;
   onExpandChange?: (expanded: boolean) => void;
+}
+interface SearchParams {
+  city?: string;
+  country?: string;
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
+  check_in?: string;
+  check_out?: string;
+  guests?: number;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChange }) => {
@@ -63,7 +72,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
 
   const formatDateRange = (): string => {
     if (!selectedDates || !selectedDates[0] || !selectedDates[1]) {
-      return "Thêm ngày";
+      return "Chọn ngày";
     }
     return `${formatDate(selectedDates[0])} - ${formatDate(selectedDates[1])}`;
   };
@@ -78,6 +87,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
     if (guests.pets > 0) parts.push(`${guests.pets} ${guests.pets === 1 ? "thú cưng" : "thú cưng"}`);
     return parts.join(", ");
   };
+
+  function toQueryParams(params: SearchParams): Record<string, string> { 
+    const query: Record<string, string> = {}; 
+    Object.entries(params).forEach(([key, value]) => { 
+      if (value !== undefined && value !== null) { 
+        query[key] = String(value); 
+      } 
+    }); 
+    return query; 
+}
 
   const handleSearch = async () => {
     try {
@@ -133,7 +152,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
       const totalGuests = guests.adults + guests.children;
 
       // Prepare search params
-      const searchParams: any = {};
+      const searchParams: SearchParams = {};
 
       if (latitude && longitude) {
         searchParams.latitude = latitude;
@@ -157,7 +176,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
 
       if (result && result.data) {
         // Navigate to search results page with query params
-        const queryString = new URLSearchParams(searchParams).toString();
+        const queryString = new URLSearchParams(toQueryParams(searchParams)).toString();
         router.push(`/search?${queryString}`);
       } else {
         message.error('Không tìm thấy kết quả phù hợp');
@@ -202,9 +221,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
             setDateOpen(false);
             setGuestOpen(false);
           }}
+          title={"Tìm kiếm điểm đến"}
         >
-          <Text className={styles.searchItemLabel}>Địa điểm</Text>
-          <Text className={styles.searchItemValue}>
+          <EnvironmentOutlined />
+          <Text className={styles.searchItemLabel}> Địa điểm</Text>
+          <Text className={styles.searchItemValue} title={displayLocation || selectedLocation || "Tìm kiếm điểm đến"}>
             {displayLocation || selectedLocation || "Tìm kiếm điểm đến"}
           </Text>
         </div>
@@ -253,9 +274,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
             setLocationOpen(false);
             setGuestOpen(false);
           }}
+          title={formatDateRange()}
         >
-          <Text className={styles.searchItemLabel}>Thời gian</Text>
-          <Text className={styles.searchItemValue}>
+          <CalendarOutlined />
+          <Text className={styles.searchItemLabel}> Thời gian</Text>
+          <Text className={styles.searchItemValue} title={formatDateRange()}>
             {formatDateRange()}
           </Text>
         </div>
@@ -283,9 +306,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
             setLocationOpen(false);
             setDateOpen(false);
           }}
+          title="Xác nhận số khách"
         >
-          <Text className={styles.searchItemLabel}>Khách</Text>
-          <Text className={styles.searchItemValue}>
+          <TeamOutlined />
+          <Text className={styles.searchItemLabel}> Khách</Text>
+          <Text className={styles.searchItemValue} title={formatGuests()}>
             {formatGuests()}
           </Text>
         </div>
