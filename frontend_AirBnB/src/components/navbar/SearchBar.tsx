@@ -20,7 +20,7 @@ interface SearchBarProps {
   onExpandChange?: (expanded: boolean) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed = false, onExpandChange }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChange }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
@@ -177,11 +177,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed =
     }
   };
 
-  const shouldCollapse = isCollapsed && !isExpanded;
-
   return (
     <div className={styles.searchWrapper}>
-      <div className={`${styles.navTabs} ${shouldCollapse ? styles.navTabsCollapsed : ""}`}>
+      <div className={`${styles.navTabs} ${!isExpanded ? styles.navTabsCollapsed : ""}`}>
         <Text strong className={styles.navTabItem}>Nơi lưu trú</Text>
         <Text className={styles.navTabItem}>Trải nghiệm</Text>
         <Text className={styles.navTabItem}>Dịch vụ</Text>
@@ -191,7 +189,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, isCollapsed =
       <div
         ref={containerRef}
         className={`${styles.searchBarContainer} ${
-          shouldCollapse ? styles.searchBarContainerCollapsed : styles.searchBarContainerExpanded
+          !isExpanded ? styles.searchBarContainerCollapsed : styles.searchBarContainerExpanded
         }`}
         onClick={handleSearchBarClick}
         style={{ position: "relative", zIndex: 1, overflow: "visible" }}

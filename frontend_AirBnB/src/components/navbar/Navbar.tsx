@@ -21,7 +21,6 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [login, setLogin] = useState(false);
   const [verify, setVerify] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   
   const isHomePage = pathname === '/';
@@ -32,7 +31,7 @@ export default function Navbar() {
     } else {
       setLogin(false);
     }
-  }, [Cookies.get('access_token')]);
+  }, []);
 
   // Scroll detection
   const lastScrollYRef = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
@@ -58,22 +57,14 @@ export default function Navbar() {
       if (isHomePage) {
         // On home page, use hysteresis based on scroll direction
         if (scrollingDown && scrollY > scrollDownThreshold) {
-          setIsScrolled(true);
-          lastToggleAtRef.current = Date.now();
-          // If expanded and scrolling, collapse it
-          setIsExpanded((prev) => {
-            if (prev) {
-              return false;
-            }
-            return prev;
-          });
+          setIsExpanded(false);
         } else if (!scrollingDown && scrollY < scrollUpThreshold) {
-          setIsScrolled(false);
-          lastToggleAtRef.current = Date.now();
+          setIsExpanded(true);          
         }
+        lastToggleAtRef.current = Date.now();
       } else {
         // On other pages, always show scrolled state
-        setIsScrolled(true);
+        setIsExpanded(false);
       }
       
       lastScrollYRef.current = scrollY;
@@ -81,21 +72,15 @@ export default function Navbar() {
 
     // Set initial state based on page
     if (!isHomePage) {
-      setIsScrolled(true);
+      setIsExpanded(false);
     } else {
       // Check initial scroll position on home page
       lastScrollYRef.current = window.scrollY;
-      handleScroll();
+      handleScroll();      
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      return () => window.removeEventListener('scroll', handleScroll);
     }
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomePage]);
-
-  // Reset expanded state when pathname changes
-  useEffect(() => {
-    setIsExpanded(false);
-  }, [pathname]);
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     if (login) {
@@ -152,11 +137,8 @@ export default function Navbar() {
     setIsExpanded(expanded);
   };
 
-  // Determine if navbar should be collapsed
-  const isCollapsed = isScrolled && !isExpanded;
-
   return (
-    <div className={`${styles.navbarContainer} ${isCollapsed ? styles.navbarContainerCollapsed : ''} ${isExpanded ? styles.navbarContainerExpanded : ''}`}>
+    <div className={`${styles.navbarContainer} ${isExpanded ? styles.navbarContainerExpanded : styles.navbarContainerCollapsed}`}>
       <VerifyEmailModal 
         open={verify} 
         onClose={() => setVerify(false)}
@@ -181,7 +163,6 @@ export default function Navbar() {
       <div className={styles.searchContainer}>
         <SearchBar 
           isExpanded={isExpanded}
-          isCollapsed={isCollapsed}
           onExpandChange={handleExpandChange}
         />
       </div>
