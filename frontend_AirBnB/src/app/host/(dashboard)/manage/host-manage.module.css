@@ -218,6 +218,7 @@
 .content {
   padding: 32px;
   background: #f6f7f8;
+  min-height: calc(100vh - 64px);
 }
 
 .pageHeader {
