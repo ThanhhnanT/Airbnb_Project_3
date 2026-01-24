@@ -1,0 +1,268 @@
+.filtersSidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+  padding-right: 12px;
+  height: 100%;
+}
+
+.filtersHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.filtersTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.clearButton:hover {
+  color: var(--color-primary);
+}
+
+.filterCard {
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--color-background);
+}
+
+.filterCardTitle {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Price Filter Styles */
+.priceContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sliderContainer {
+  padding: 8px 0;
+}
+
+.slider {
+  padding: 0;
+}
+
+:global(.slider .ant-slider) {
+  margin-bottom: 0;
+}
+
+:global(.slider .ant-slider-track) {
+  background-color: var(--color-primary);
+}
+
+:global(.slider .ant-slider-handle) {
+  border-color: var(--color-primary);
+  background-color: var(--color-card);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+:global(.slider .ant-slider-handle:focus) {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.priceInputs {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.priceInputGroup {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 6px;
+}
+
+.priceLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.priceInput {
+  width: 100%;
+}
+
+:global(.priceInput .ant-input-number-input) {
+  font-size: 14px;
+}
+
+.priceSeparator {
+  margin-bottom: 4px;
+  color: var(--color-text-secondary);
+}
+
+/* Checkbox Group Styles */
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+:global(.checkboxLabel .ant-checkbox) {
+  border-color: var(--color-border-light);
+}
+
+:global(.checkboxLabel .ant-checkbox-checked .ant-checkbox-inner) {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Counter Styles */
+.counterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.counterItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.counterLabel {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.counterButton {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 50%;
+  background: var(--color-card);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.counterButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.counterValue {
+  font-size: 14px;
+  color: var(--color-text);
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Apply Button */
+.applyButton {
+  margin-top: 8px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.applyButton:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .filtersSidebar {
+    width: 240px;
+    gap: 20px;
+  }
+
+  .filterCard {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .filtersSidebar {
+    width: 220px;
+    gap: 20px;
+  }
+
+  .filterCard {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .filtersSidebar {
+    width: 100%;
+    flex-shrink: 1;
+    padding: 0;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--color-border-light);
+    max-height: auto;
+  }
+
+  .filtersHeader {
+    padding: 12px 0;
+    border: none;
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .filterCard {
+    padding: 12px;
+  }
+
+  .applyButton {
+    display: none;
+  }
+}

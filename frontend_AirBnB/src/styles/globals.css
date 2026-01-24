@@ -27,6 +27,7 @@ body {
   --color-background: #FFFFFF;
   --color-background-secondary: #F7F7F7;
   --color-background-tertiary: #F5F5F5;
+  --color-card: #FFFFFF;
   
   --color-border: #DDDDDD;
   --color-border-light: #EBEBEB;
@@ -156,5 +157,48 @@ body {
 
 .custom-user-dropdown .ant-dropdown-menu-item:hover span {
   color: var(--color-primary);
+}
+
+/* Ant Design InputNumber Overrides */
+.ant-input-number {
+  border-radius: var(--border-radius-sm);
+}
+
+.ant-input-number:hover {
+  border-color: var(--color-primary);
+}
+
+.ant-input-number-focused {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-lighter);
+}
+
+/* Ant Design Button Overrides */
+.ant-btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.ant-btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.ant-btn-primary:active {
+  background-color: var(--color-primary-active);
+  border-color: var(--color-primary-active);
+}
+
+/* Ant Design Slider Overrides */
+.ant-slider-track {
+  background-color: var(--color-primary);
+}
+
+.ant-slider-handle {
+  border-color: var(--color-primary);
+}
+
+.ant-slider-handle:focus {
+  box-shadow: 0 0 0 5px var(--color-primary-lighter);
 }
 

@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState, Suspense, useRef } from "react";
-import { useSearchParams } from "next/navigation";
-import { Spin, Empty, Pagination, message, Button } from "antd";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Spin, Empty, Pagination, message, Button, Typography } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
-import ListingCard from "@/components/search/ListingCard";
+import ListingGridCard from "@/components/search/ListingGridCard";
 import MapView from "@/components/search/MapView";
+import SearchFilters from "@/components/search/SearchFilters";
 import { searchListings, SearchParams } from "@/service/search";
 import styles from "@/styles/search-page.module.css";
+
+const { Text, Title } = Typography;
 
 interface Listing {
   _id: string;
@@ -47,6 +50,7 @@ interface SearchResponse {
 
 function SearchContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedListingId, setSelectedListingId] = useState<string | undefined>();
@@ -59,6 +63,13 @@ function SearchContent() {
     total: 0,
     totalPages: 0,
   });
+  
+  // Filter states
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
+  const [accommodationType, setAccommodationType] = useState<string[]>([]);
+  const [bedrooms, setBedrooms] = useState(0);
+  const [beds, setBeds] = useState(0);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -243,6 +254,28 @@ function SearchContent() {
     }
   };
 
+  const handleClearFilters = () => {
+    setMinPrice(0);
+    setMaxPrice(1000);
+    setAccommodationType([]);
+    setBedrooms(0);
+    setBeds(0);
+  };
+
+  const handleApplyFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (minPrice > 0) params.set("min_price", minPrice.toString());
+    else params.delete("min_price");
+    
+    if (maxPrice < 1000) params.set("max_price", maxPrice.toString());
+    else params.delete("max_price");
+    
+    params.set("page", "1");
+    
+    window.location.href = `/search?${params.toString()}`;
+  };
+
   const getSearchSummary = () => {
     const parts: string[] = [];
     if (searchParams.get("city")) {
@@ -264,26 +297,26 @@ function SearchContent() {
 
   return (
     <div className={styles.searchPageContainer}>
-      <div className={styles.searchContent}>
-        <div className={styles.searchHeader}>
-          <div className={styles.headerTop}>
-            <div>
-              <h1 className={styles.searchTitle}>
-                {!loading && pagination.total > 0 
-                  ? `Hơn ${pagination.total.toLocaleString()} chỗ ở`
-                  : "Kết quả tìm kiếm"}
-              </h1>
-              <p className={styles.searchSummary}>{getSearchSummary()}</p>
-            </div>
-            <Button icon={<FilterOutlined />}>Bộ lọc</Button>
+      {/* Header */}
+      <header className={styles.searchHeader}>
+        <div className={styles.headerContent}>
+          <div>
+            <Title level={1} className={styles.searchTitle}>
+              {!loading && pagination.total > 0 
+                ? `Chỗ ở tại ${searchParams.get("city") || "tất cả vị trí"}`
+                : "Kết quả tìm kiếm"}
+            </Title>
+            <Text type="secondary" className={styles.searchSummary}>
+              {!loading && pagination.total > 0 
+                ? `Hơn ${pagination.total.toLocaleString()}+ chỗ ở`
+                : getSearchSummary()}
+            </Text>
           </div>
-          {!loading && pagination.total > 0 && (
-            <div className={styles.priceBanner}>
-              <span>Giá đã bao gồm mọi khoản phí</span>
-            </div>
-          )}
         </div>
+      </header>
 
+      {/* Main Content */}
+      <main className={styles.searchContent}>
         {loading ? (
           <div className={styles.loadingContainer}>
             <Spin size="large" />
@@ -297,10 +330,38 @@ function SearchContent() {
             />
           </div>
         ) : (
-          <div className={styles.searchResultsContainer}>
-            {/* Left Panel - Listings */}
-            <div className={styles.listingsPanel} ref={listingsContainerRef}>
-              <div className={styles.listingsGrid}>
+          <div className={styles.resultsWrapper}>
+            {/* Left Panel - Filters & Listings */}
+            <div className={styles.leftPanel}>
+              {/* Filters Sidebar */}
+              <SearchFilters
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                onPriceChange={(min, max) => {
+                  setMinPrice(min);
+                  setMaxPrice(max);
+                }}
+                accommodationType={accommodationType}
+                onAccommodationTypeChange={setAccommodationType}
+                bedrooms={bedrooms}
+                onBedroomsChange={setBedrooms}
+                beds={beds}
+                onBedsChange={setBeds}
+                onClearFilters={handleClearFilters}
+                onApplyFilters={handleApplyFilters}
+              />
+
+              {/* Listings Grid */}
+              <div className={styles.listingsContainer} ref={listingsContainerRef}>
+                {/* Filter Chips */}
+                <div className={styles.filterChips}>
+                  <div className={styles.chipsGrid}>
+                    {/* Add filter chip buttons here if needed */}
+                  </div>
+                </div>
+
+                {/* Listings Grid */}
+                <div className={styles.listingsGrid}>
                 {listings.map((listing) => (
                   <div
                     key={listing._id}
@@ -310,26 +371,28 @@ function SearchContent() {
                     }`}
                     onClick={() => handleListingClick(listing._id)}
                   >
-                    <ListingCard listing={listing} />
+                    <ListingGridCard listing={listing} />
                   </div>
                 ))}
-              </div>
-
-              {pagination.totalPages > 1 && (
-                <div className={styles.paginationContainer}>
-                  <Pagination
-                    current={pagination.page}
-                    total={pagination.total}
-                    pageSize={pagination.limit}
-                    onChange={handlePageChange}
-                    showSizeChanger={false}
-                    showQuickJumper
-                    showTotal={(total, range) =>
-                      `${range[0]}-${range[1]} của ${total} chỗ ở`
-                    }
-                  />
                 </div>
-              )}
+
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className={styles.paginationContainer}>
+                    <Pagination
+                      current={pagination.page}
+                      total={pagination.total}
+                      pageSize={pagination.limit}
+                      onChange={handlePageChange}
+                      showSizeChanger={false}
+                      showQuickJumper
+                      showTotal={(total, range) =>
+                        `${range[0]}-${range[1]} của ${total} chỗ ở`
+                      }
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Right Panel - Map */}
@@ -345,7 +408,7 @@ function SearchContent() {
             )}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
