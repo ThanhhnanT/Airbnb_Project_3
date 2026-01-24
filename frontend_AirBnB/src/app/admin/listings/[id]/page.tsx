@@ -32,6 +32,7 @@ import {
 } from "@ant-design/icons";
 import { getAccess, patchAccess, deleteData } from "@/helper/api";
 import ListingAnalytics from "@/components/admin/ListingAnalytics";
+import ListingMapComponent from "@/components/admin/ListingMap";
 
 const { Title, Text } = Typography;
 
@@ -332,8 +333,8 @@ function AdminListingDetailPageContent() {
                       )}
                     </Descriptions>
 
-                    <div style={{ marginTop: 16, padding: "16px", backgroundColor: "#f5f5f5", borderRadius: "4px", textAlign: "center", color: "#999" }}>
-                      Bản đồ đang được phát triển
+                    <div style={{ marginTop: 16 }}>
+                      <ListingMapComponent latitude={listing.latitude} longitude={listing.longitude} />
                     </div>
                   </Card>
 
