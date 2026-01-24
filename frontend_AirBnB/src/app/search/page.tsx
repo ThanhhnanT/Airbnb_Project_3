@@ -230,6 +230,34 @@ function SearchContent() {
     fetchSearchResults();
   }, [searchParams]);
 
+  // Update URL when price filters change (with debounce)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const currentMinPrice = searchParams.get("min_price");
+      const currentMaxPrice = searchParams.get("max_price");
+      
+      const minPriceChanged = minPrice > 0 && currentMinPrice !== minPrice.toString();
+      const maxPriceChanged = maxPrice < 1000 && currentMaxPrice !== maxPrice.toString();
+      
+      if (minPriceChanged || maxPriceChanged) {
+        const params = new URLSearchParams(searchParams.toString());
+        
+        if (minPrice > 0) params.set("min_price", minPrice.toString());
+        else params.delete("min_price");
+        
+        if (maxPrice < 1000) params.set("max_price", maxPrice.toString());
+        else params.delete("max_price");
+        
+        params.set("page", "1"); // Reset to page 1 when filter changes
+        
+        // Use router.push for client-side navigation
+        router.push('/search?' + params.toString());
+      }
+    }, 500); // Debounce: 500ms delay
+
+    return () => clearTimeout(timer);
+  }, [minPrice, maxPrice, searchParams, router]);
+
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
@@ -260,32 +288,7 @@ function SearchContent() {
     setAccommodationType([]);
     setBedrooms(0);
     setBeds(0);
-    // Reset to first page with cleared filters
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("min_price");
-    params.delete("max_price");
-    params.set("page", "1");
-    window.location.href = `/search?${params.toString()}`;
   };
-
-  // Auto-apply filters when they change
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      
-      if (minPrice > 0) params.set("min_price", minPrice.toString());
-      else params.delete("min_price");
-      
-      if (maxPrice < 1000) params.set("max_price", maxPrice.toString());
-      else params.delete("max_price");
-      
-      params.set("page", "1");
-      
-      window.location.href = `/search?${params.toString()}`;
-    }, 500); // Debounce filters by 500ms to avoid too many requests
-
-    return () => clearTimeout(timer);
-  }, [minPrice, maxPrice]);
 
   const getSearchSummary = () => {
     const parts: string[] = [];
