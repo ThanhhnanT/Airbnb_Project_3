@@ -388,37 +388,53 @@ function SearchContent() {
                   </div>
                 </div>
 
-                {/* Listings Grid */}
-                <div className={styles.listingsGrid}>
-                {listings.map((listing) => (
-                  <div
-                    key={listing._id}
-                    id={`listing-${listing._id}`}
-                    className={`${styles.listingCardWrapper} ${
-                      selectedListingId === listing._id ? styles.selectedListing : ""
-                    }`}
-                    onClick={() => handleListingClick(listing._id)}
-                  >
-                    <ListingGridCard listing={listing} />
-                  </div>
-                ))}
-                </div>
-
-                {/* Pagination */}
-                {pagination.totalPages > 1 && (
-                  <div className={styles.paginationContainer}>
-                    <Pagination
-                      current={pagination.page}
-                      total={pagination.total}
-                      pageSize={pagination.limit}
-                      onChange={handlePageChange}
-                      showSizeChanger={false}
-                      showQuickJumper
-                      showTotal={(total, range) =>
-                        `${range[0]}-${range[1]} của ${total} chỗ ở`
-                      }
+                {/* Show empty state when no listings match filters */}
+                {listings.length === 0 ? (
+                  <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                    <Empty
+                      description="Không có phòng phù hợp"
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      style={{ marginTop: 20 }}
                     />
+                    <p style={{ marginTop: 16, color: '#666', fontSize: '14px' }}>
+                      Vui lòng thử thay đổi bộ lọc hoặc tìm kiếm khác
+                    </p>
                   </div>
+                ) : (
+                  <>
+                    {/* Listings Grid */}
+                    <div className={styles.listingsGrid}>
+                      {listings.map((listing) => (
+                        <div
+                          key={listing._id}
+                          id={`listing-${listing._id}`}
+                          className={`${styles.listingCardWrapper} ${
+                            selectedListingId === listing._id ? styles.selectedListing : ""
+                          }`}
+                          onClick={() => handleListingClick(listing._id)}
+                        >
+                          <ListingGridCard listing={listing} />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {pagination.totalPages > 1 && (
+                      <div className={styles.paginationContainer}>
+                        <Pagination
+                          current={pagination.page}
+                          total={pagination.total}
+                          pageSize={pagination.limit}
+                          onChange={handlePageChange}
+                          showSizeChanger={false}
+                          showQuickJumper
+                          showTotal={(total, range) =>
+                            `${range[0]}-${range[1]} của ${total} chỗ ở`
+                          }
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
