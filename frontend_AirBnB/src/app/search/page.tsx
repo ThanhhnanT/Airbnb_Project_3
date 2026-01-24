@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useRef, useCallback } from "react";
+import { useEffect, useState, Suspense, useRef, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin, Empty, Pagination, message, Button, Typography } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
@@ -238,19 +238,27 @@ function SearchContent() {
     fetchSearchResults();
   }, [searchParams]);
 
-  // Check if listing has booking conflict with selected dates
-  const isListingAvailable = useCallback((listing: Listing): boolean => {
-    // If no dates selected, listing is available
+  // Get dates from search params (memoized to avoid dependency churn)
+  const selectedDates = useMemo(() => {
     const checkInStr = searchParams.get("check_in");
     const checkOutStr = searchParams.get("check_out");
     
     if (!checkInStr || !checkOutStr) {
-      return true;
+      return null;
     }
 
-    // Parse dates
-    const checkIn = new Date(checkInStr);
-    const checkOut = new Date(checkOutStr);
+    return {
+      checkIn: new Date(checkInStr),
+      checkOut: new Date(checkOutStr),
+    };
+  }, [searchParams]);
+
+  // Check if listing has booking conflict with selected dates
+  const isListingAvailable = useCallback((listing: Listing): boolean => {
+    // If no dates selected, listing is available
+    if (!selectedDates) {
+      return true;
+    }
 
     // Check if listing has any confirmed/pending bookings that overlap
     if (listing.bookings && listing.bookings.length > 0) {
@@ -265,12 +273,12 @@ function SearchContent() {
 
         // Check if date ranges overlap
         // Overlap occurs if: checkIn < bookingCheckOut AND checkOut > bookingCheckIn
-        return checkIn < bookingCheckOut && checkOut > bookingCheckIn;
+        return selectedDates.checkIn < bookingCheckOut && selectedDates.checkOut > bookingCheckIn;
       });
     }
 
     return true;
-  }, [searchParams]);
+  }, [selectedDates]);
 
   // Apply filters function (memoized to avoid dependency issues)
   const applyFilters = useCallback((source: Listing[]) => {
