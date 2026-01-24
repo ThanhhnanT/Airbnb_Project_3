@@ -119,17 +119,29 @@ def answer_question(req: ChatbotRequest):
     
     # Check if question is Airbnb-related
     if not is_airbnb_related(req.question):
+        print(f"Question out of scope: {req.question}")
         out_of_scope_response = {
-            "answer": "Xin lỗi! 😊 Câu hỏi của bạn ngoài phạm vi của tôi. Tôi chỉ hỗ trợ các câu hỏi liên quan đến Airbnb.\n\nCó thể bạn cần giúp về:\n• Đặt phòng hoặc tìm kiếm\n• Thanh toán hoặc hoàn tiền\n• Quản lý danh sách (cho chủ nhà)\n• Chính sách hoặc điều khoản\n• Hỗ trợ khách hàng\n\nVui lòng liên hệ **Chăm sóc khách hàng Airbnb** để được hỗ trợ tốt hơn:\n📧 Email: support@airbnb.com\n📞 Hotline: 1-844-234-2500\n🌐 Website: help.airbnb.com",
+            "answer": "Xin lỗi! 😊 Câu hỏi của bạn ngoài phạm vi của tôi. Tôi chỉ hỗ trợ các câu hỏi liên quan đến Airbnb.\n\nVui lòng liên hệ **Chăm sóc khách hàng Airbnb** để được hỗ trợ tốt hơn:\n📧 Email: support@airbnb.com\n📞 Hotline: 1-844-234-2500\n🌐 Website: help.airbnb.com",
             "sources": [],
             "category": "out_of_scope",
             "user_type": req.user_type,
-            "related_questions": [
-                "Làm thế nào để tìm kiếm phòng?",
-                "Làm thế nào để đặt phòng?",
-                "Làm thế nào để hủy đặt phòng?"
-            ]
+            "related_questions": []
         }
+        
+        # Save out-of-scope query to history
+        try:
+            chat_record = ChatHistory(
+                user_type=req.user_type.lower(),
+                question=req.question,
+                answer=out_of_scope_response["answer"],
+                category="out_of_scope",
+                sources=[],
+                confidence={"model": "filter", "timestamp": str(__import__("datetime").datetime.now())}
+            )
+            chat_record.save()
+        except Exception as e:
+            print(f"Error saving chat history: {e}")
+        
         return out_of_scope_response
     
     try:
