@@ -2,7 +2,7 @@
 example_code/
 
 # AI Travel - unnecessary files
-# ai-travel/chroma_db/
+ai-travel/chroma_db/
 # ai-travel/data/
 ai-travel/test.py
 

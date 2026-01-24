@@ -12,8 +12,54 @@ import json
 import re
 from src.database.ChatHistory import ChatHistory
 import glob
+from rapidfuzz import process
 
 config = dotenv_values(".env")
+
+# Domain keywords for Airbnb chatbot
+AIRBNB_KEYWORDS = [
+    # Guest related
+    "booking", "search", "listing", "price", "payment", "cancel", "refund",
+    "review", "rating", "message", "host", "check-in", "checkout", "guest",
+    "reserve", "accommodation", "stay", "room", "apartment", "house",
+    "amenities", "photo", "description", "availability", "dates",
+    
+    # Host related
+    "list", "listing creation", "host", "earning", "payout", "income",
+    "guest management", "house rules", "damage", "cleaning", "maintenance",
+    "calendar", "manage", "superhost", "pricing", "discount",
+    
+    # General
+    "account", "profile", "password", "verification", "identity",
+    "security", "terms", "policy", "help", "support", "contact",
+    "dispute", "complaint", "issue", "problem",
+    
+    # Vietnamese keywords
+    "đặt phòng", "tìm kiếm", "giá", "thanh toán", "hủy", "hoàn tiền",
+    "đánh giá", "chủ nhà", "khách", "danh sách", "quản lý", "tài khoản",
+    "mật khẩu", "xác minh", "hỗ trợ", "chính sách", "airbnb"
+]
+
+def is_airbnb_related(question: str, threshold: float = 60) -> bool:
+    """
+    Check if question is related to Airbnb domain.
+    Returns True if question matches Airbnb keywords, False otherwise.
+    """
+    question_lower = question.lower().strip()
+    
+    # Try fuzzy matching with Airbnb keywords
+    matches = process.extract(question_lower, AIRBNB_KEYWORDS, limit=3, score_cutoff=threshold)
+    
+    # Check if question contains any Airbnb keywords
+    for keyword in AIRBNB_KEYWORDS:
+        if keyword.lower() in question_lower:
+            return True
+    
+    # If fuzzy matching found matches, it's related
+    if matches:
+        return True
+    
+    return False
 
 def initialize_chatbot_vector_store():
     """Initialize or load the chatbot vector store from FAQ JSON files"""
@@ -65,6 +111,21 @@ def answer_question(req: ChatbotRequest):
         Dictionary with answer, sources, and metadata
     """
     print(f"Processing chatbot request: {req}")
+    
+    # Check if question is Airbnb-related
+    if not is_airbnb_related(req.question):
+        out_of_scope_response = {
+            "answer": "Xin lỗi! 😊 Câu hỏi của bạn ngoài phạm vi của tôi. Tôi chỉ hỗ trợ các câu hỏi liên quan đến Airbnb.\n\nCó thể bạn cần giúp về:\n• Đặt phòng hoặc tìm kiếm\n• Thanh toán hoặc hoàn tiền\n• Quản lý danh sách (cho chủ nhà)\n• Chính sách hoặc điều khoản\n• Hỗ trợ khách hàng\n\nVui lòng liên hệ **Chăm sóc khách hàng Airbnb** để được hỗ trợ tốt hơn:\n📧 Email: support@airbnb.com\n📞 Hotline: 1-844-234-2500\n🌐 Website: help.airbnb.com",
+            "sources": [],
+            "category": "out_of_scope",
+            "user_type": req.user_type,
+            "related_questions": [
+                "Làm thế nào để tìm kiếm phòng?",
+                "Làm thế nào để đặt phòng?",
+                "Làm thế nào để hủy đặt phòng?"
+            ]
+        }
+        return out_of_scope_response
     
     try:
         # Initialize embeddings and vector store

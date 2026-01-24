@@ -1,12 +1,15 @@
 from sentence_transformers import SentenceTransformer
 from dotenv import dotenv_values
 import sys
+import os
 
 config = dotenv_values(".env")
 
 class CustomEmbeddings:
     def __init__(self, model_name: str):
-        self.model = SentenceTransformer(model_name)
+        # Use CPU to avoid CUDA errors
+        os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+        self.model = SentenceTransformer(model_name, device='cpu')
 
     def embed_documents(self, texts):
         return self.model.encode(texts, convert_to_numpy=True).tolist()
