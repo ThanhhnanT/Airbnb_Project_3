@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useRef } from "react";
+import { useEffect, useState, Suspense, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin, Empty, Pagination, message, Button, Typography } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
@@ -232,10 +232,13 @@ function SearchContent() {
     fetchSearchResults();
   }, [searchParams]);
 
-  // Client-side filtering when filter values change
-  useEffect(() => {
-    // Filter listings based on current filter state
-    let filtered = allListings.filter((listing) => {
+  // Apply filters function (memoized to avoid dependency issues)
+  const applyFilters = useCallback((source: Listing[]) => {
+    if (source.length === 0) {
+      return [];
+    }
+
+    return source.filter((listing) => {
       // Price filter
       if (listing.price_base < minPrice || listing.price_base > maxPrice) {
         return false;
@@ -260,9 +263,13 @@ function SearchContent() {
 
       return true;
     });
+  }, [minPrice, maxPrice, accommodationType, bedrooms, beds]);
 
+  // Re-filter when allListings changes
+  useEffect(() => {
+    const filtered = applyFilters(allListings);
     setListings(filtered);
-  }, [minPrice, maxPrice, accommodationType, bedrooms, beds, allListings]);
+  }, [allListings, applyFilters]);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
