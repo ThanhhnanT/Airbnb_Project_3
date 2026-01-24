@@ -21,7 +21,6 @@ import {
 import { getAccess } from "@/helper/api";
 import StatCard from "@/components/host/dashboard/StatCard";
 import RevenueChart from "@/components/host/dashboard/RevenueChart";
-import OccupancyChart from "@/components/host/dashboard/OccupancyChart";
 import RecentReviews from "@/components/host/dashboard/RecentReviews";
 import TopListings from "@/components/host/dashboard/TopListings";
 import styles from "./dashboard.module.css";
@@ -119,7 +118,8 @@ export default function HostDashboardPage() {
     if (currency === "VND") {
       return `${(value / 1000000).toFixed(1)}M₫`;
     }
-    return `$${(value / 1000).toFixed(1)}K`;
+    // For USD, don't use K suffix
+    return `$${value.toFixed(2)}`;
   };
 
   const getEarningsTrend = () => {
@@ -188,17 +188,10 @@ export default function HostDashboardPage() {
 
       {/* Charts and Detailed Info */}
       <Row gutter={[16, 16]} className={styles.section}>
-        <Col xs={24} lg={16}>
+        <Col xs={24}>
           <RevenueChart
             data={stats.earnings.monthly}
             currency={stats.topListings[0]?.currency || "USD"}
-          />
-        </Col>
-        <Col xs={24} lg={8}>
-          <OccupancyChart
-            occupancyRate={stats.occupancy.average}
-            bookedDays={stats.occupancy.bookedDays}
-            totalDays={stats.occupancy.totalDays}
           />
         </Col>
       </Row>

@@ -33,9 +33,12 @@ export class ListingsController {
 
   @Get('host/dashboard-stats')
   @ApiOperation({ summary: 'Lấy thống kê dashboard cho host' })
-  getHostDashboardStats(@Req() req: any) {
+  async getHostDashboardStats(@Req() req: any) {
     const userId = req.user?.id || req.user?.user_id;
-    return this.listingsStatsService.getHostDashboardStats(userId);
+    console.log('[Controller] getHostDashboardStats called for userId:', userId);
+    const result = await this.listingsStatsService.getHostDashboardStats(userId);
+    console.log('[Controller] Dashboard stats result:', JSON.stringify(result, null, 2));
+    return result;
   }
 
   @Get('host/my-listings')
@@ -43,6 +46,13 @@ export class ListingsController {
   getHostListings(@Req() req: any) {
     const userId = req.user?.id || req.user?.user_id;
     return this.listingsService.findHostListings(userId);
+  }
+
+  @Get('host/:id/analytics')
+  @ApiOperation({ summary: 'Lấy thống kê & phân tích cho listing của host' })
+  async getHostListingAnalytics(@Param('id') id: string, @Req() req: any) {
+    const userId = req.user?.id || req.user?.user_id;
+    return this.listingsService.getHostListingAnalytics(id, userId);
   }
 
   @Public()

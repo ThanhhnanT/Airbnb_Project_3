@@ -27,6 +27,11 @@
   margin-bottom: 24px;
 }
 
+/* Equal height cards for reviews and listings */
+.section :global(.ant-col) :global(.ant-card) {
+  height: 100%;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .dashboardHeader {

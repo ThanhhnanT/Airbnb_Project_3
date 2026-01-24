@@ -67,9 +67,11 @@ export class ListingsStatsService {
 
   async getHostDashboardStats(hostId: string): Promise<DashboardStats> {
     const hostObjectId = new Types.ObjectId(hostId);
+    console.log('[Dashboard Stats] Fetching stats for hostId:', hostId);
 
     // Get listings stats
     const listingsStats = await this.getListingsStats(hostObjectId);
+    console.log('[Dashboard Stats] Listings stats:', listingsStats);
 
     // Get earnings stats
     const earningsStats = await this.getEarningsStats(hostObjectId);
@@ -99,14 +101,26 @@ export class ListingsStatsService {
   private async getListingsStats(
     hostId: Types.ObjectId,
   ): Promise<DashboardStats['listings']> {
+    const hostIdStr = hostId.toString();
     const [total, active, inactive] = await Promise.all([
-      this.listingModel.countDocuments({ host_id: hostId }),
+      this.listingModel.countDocuments({ 
+        $or: [
+          { host_id: hostId },
+          { host_id: hostIdStr }
+        ]
+      }),
       this.listingModel.countDocuments({
-        host_id: hostId,
+        $or: [
+          { host_id: hostId },
+          { host_id: hostIdStr }
+        ],
         status: 'active',
       }),
       this.listingModel.countDocuments({
-        host_id: hostId,
+        $or: [
+          { host_id: hostId },
+          { host_id: hostIdStr }
+        ],
         status: 'inactive',
       }),
     ]);
@@ -118,7 +132,13 @@ export class ListingsStatsService {
     hostId: Types.ObjectId,
   ): Promise<DashboardStats['earnings']> {
     // Get all bookings for this host
-    const hostListings = await this.listingModel.find({ host_id: hostId }).lean();
+    const hostIdStr = hostId.toString();
+    const hostListings = await this.listingModel.find({ 
+      $or: [
+        { host_id: hostId },
+        { host_id: hostIdStr }
+      ]
+    }).lean();
     const listingIds = hostListings.map((l) => l._id);
 
     // Get all completed/confirmed bookings with their total prices
@@ -132,22 +152,29 @@ export class ListingsStatsService {
     // Calculate total earnings
     const total = bookings.reduce((sum, booking) => sum + (booking.total_price || 0), 0);
 
-    // Calculate monthly breakdown for last 12 months
+    // Calculate monthly breakdown for last 12 months (including current month)
     const monthlyData: Record<string, number> = {};
     const now = new Date();
 
     for (let i = 11; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthKey = date.toISOString().slice(0, 7); // YYYY-MM
+      const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const monthKey = `${year}-${month}`; // YYYY-MM
       monthlyData[monthKey] = 0;
     }
 
     // Sum up bookings by month
     bookings.forEach((booking: any) => {
       const bookingDate = new Date(booking.createdAt);
-      const monthKey = bookingDate.toISOString().slice(0, 7);
+      const year = bookingDate.getUTCFullYear();
+      const month = String(bookingDate.getUTCMonth() + 1).padStart(2, '0');
+      const monthKey = `${year}-${month}`;
       if (monthlyData.hasOwnProperty(monthKey)) {
         monthlyData[monthKey] += booking.total_price || 0;
+      } else {
+        // Log bookings that don't fall into the 12-month range
+        console.log(`[Earnings] Booking ${booking._id} date ${monthKey} not in range`);
       }
     });
 
@@ -155,6 +182,8 @@ export class ListingsStatsService {
       month,
       revenue,
     }));
+
+    console.log(`[Earnings] Total: ${total}, Monthly data:`, monthlyData);
 
     // Calculate trend
     const lastThreeMonths = monthly.slice(-3);
@@ -174,7 +203,13 @@ export class ListingsStatsService {
     hostId: Types.ObjectId,
   ): Promise<DashboardStats['bookings']> {
     // Get all listings for this host
-    const hostListings = await this.listingModel.find({ host_id: hostId }).lean();
+    const hostIdStr = hostId.toString();
+    const hostListings = await this.listingModel.find({ 
+      $or: [
+        { host_id: hostId },
+        { host_id: hostIdStr }
+      ]
+    }).lean();
     const listingIds = hostListings.map((l) => l._id);
 
     // Get total bookings
@@ -209,8 +244,22 @@ export class ListingsStatsService {
     hostId: Types.ObjectId,
   ): Promise<DashboardStats['occupancy']> {
     // Get all listings for this host
-    const hostListings = await this.listingModel.find({ host_id: hostId }).lean();
+    const hostIdStr = hostId.toString();
+    const hostListings = await this.listingModel.find({ 
+      $or: [
+        { host_id: hostId },
+        { host_id: hostIdStr }
+      ]
+    }).lean();
     const listingIds = hostListings.map((l) => l._id);
+
+    if (listingIds.length === 0) {
+      return {
+        average: 0,
+        totalDays: 0,
+        bookedDays: 0,
+      };
+    }
 
     // Get calendar data for last 90 days
     const ninetyDaysAgo = new Date();
@@ -223,15 +272,54 @@ export class ListingsStatsService {
       })
       .lean();
 
-    const totalDays = calendarData.length;
-    const bookedDays = calendarData.filter((c) => c.status === 'booked').length;
+    // If we have calendar data, use it
+    if (calendarData.length > 0) {
+      const totalDays = calendarData.length;
+      const bookedDays = calendarData.filter((c) => c.status === 'booked').length;
+      const average = Math.round((bookedDays / totalDays) * 100);
+      return {
+        average,
+        totalDays,
+        bookedDays,
+      };
+    }
 
-    const average = totalDays > 0 ? Math.round((bookedDays / totalDays) * 100) : 0;
+    // Fallback: Calculate occupancy from bookings
+    const bookings = await this.bookingModel
+      .find({
+        listing_id: { $in: listingIds },
+        status: { $in: ['completed', 'confirmed'] },
+        createdAt: { $gte: ninetyDaysAgo },
+      })
+      .lean();
+
+    if (bookings.length === 0) {
+      return {
+        average: 0,
+        totalDays: 0,
+        bookedDays: 0,
+      };
+    }
+
+    // Count total nights booked
+    const totalNightsBooked = bookings.reduce((sum, b: any) => {
+      if (b.check_in && b.check_out) {
+        const checkIn = new Date(b.check_in);
+        const checkOut = new Date(b.check_out);
+        const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+        return sum + Math.max(nights, 0);
+      }
+      return sum;
+    }, 0);
+
+    // Estimate total nights capacity (90 days * number of listings)
+    const totalCapacityNights = 90 * listingIds.length;
+    const average = totalCapacityNights > 0 ? Math.round((totalNightsBooked / totalCapacityNights) * 100) : 0;
 
     return {
       average,
-      totalDays,
-      bookedDays,
+      totalDays: totalCapacityNights,
+      bookedDays: totalNightsBooked,
     };
   }
 
@@ -239,7 +327,13 @@ export class ListingsStatsService {
     hostId: Types.ObjectId,
   ): Promise<DashboardStats['reviews']> {
     // Get all listings for this host
-    const hostListings = await this.listingModel.find({ host_id: hostId }).lean();
+    const hostIdStr = hostId.toString();
+    const hostListings = await this.listingModel.find({ 
+      $or: [
+        { host_id: hostId },
+        { host_id: hostIdStr }
+      ]
+    }).lean();
     const listingIds = hostListings.map((l) => l._id);
 
     // Get all reviews for these listings
@@ -276,8 +370,15 @@ export class ListingsStatsService {
 
   private async getTopListings(hostId: Types.ObjectId): Promise<DashboardStats['topListings']> {
     // Get all active listings for this host
+    const hostIdStr = hostId.toString();
     const hostListings = await this.listingModel
-      .find({ host_id: hostId, status: 'active' })
+      .find({ 
+        $or: [
+          { host_id: hostId },
+          { host_id: hostIdStr }
+        ],
+        status: 'active'
+      })
       .lean();
 
     if (hostListings.length === 0) {
@@ -309,9 +410,33 @@ export class ListingsStatsService {
           })
           .lean();
 
-        const totalDays = calendarData.length;
-        const bookedDays = calendarData.filter((c) => c.status === 'booked').length;
-        const occupancyRate = totalDays > 0 ? Math.round((bookedDays / totalDays) * 100) : 0;
+        let occupancyRate = 0;
+
+        // If we have calendar data, use it
+        if (calendarData.length > 0) {
+          const totalDays = calendarData.length;
+          const bookedDays = calendarData.filter((c) => c.status === 'booked').length;
+          occupancyRate = Math.round((bookedDays / totalDays) * 100);
+        } else {
+          // Fallback: Calculate from bookings
+          const listingBookings = bookings.filter(b => {
+            const checkIn = new Date(b.check_in || 0);
+            return checkIn >= ninetyDaysAgo;
+          });
+
+          if (listingBookings.length > 0) {
+            const totalNightsBooked = listingBookings.reduce((sum, b: any) => {
+              if (b.check_in && b.check_out) {
+                const checkIn = new Date(b.check_in);
+                const checkOut = new Date(b.check_out);
+                const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+                return sum + Math.max(nights, 0);
+              }
+              return sum;
+            }, 0);
+            occupancyRate = Math.round((totalNightsBooked / 90) * 100);
+          }
+        }
 
         return {
           _id: listing._id.toString(),

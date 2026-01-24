@@ -21,7 +21,8 @@ const formatCurrency = (value: number, currency: string = "USD") => {
   if (currency === "VND") {
     return `${(value / 1000000).toFixed(1)}M₫`;
   }
-  return `$${(value / 1000).toFixed(1)}K`;
+  // For USD, don't use K suffix
+  return `$${value.toFixed(2)}`;
 };
 
 export default function RevenueChart({
@@ -39,11 +40,14 @@ export default function RevenueChart({
     );
   }
 
+  // Check if all data is zero
+  const hasZeroData = data && data.length > 0 && data.every((d) => d.revenue === 0);
+
   if (!data || data.length === 0) {
     return (
       <Card className={styles.chartCard}>
         <Title level={4} style={{ marginBottom: 0 }}>
-          Doanh Thu
+          Doanh Thu Theo Tháng
         </Title>
         <Empty
           style={{ marginTop: 40 }}

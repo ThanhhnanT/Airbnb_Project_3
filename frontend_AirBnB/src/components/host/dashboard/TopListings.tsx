@@ -33,7 +33,8 @@ export default function TopListings({
     if (currency === "VND") {
       return `${(price / 1000000).toFixed(1)}M₫`;
     }
-    return `$${(price / 1000).toFixed(1)}K`;
+    // For USD, don't use K suffix
+    return `$${price.toFixed(2)}`;
   };
 
   const getOccupancyColor = (rate: number) => {

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { SearchListingDto } from './dto/search-listing.dto';
@@ -525,10 +525,15 @@ export class ListingsService {
         })
         .filter(Boolean) as Types.ObjectId[];
 
+      // Build query to handle both ObjectId and string formats for host_id
       const orConditions: any[] = [
         { host_id: userObjectId },
-        // Trường hợp host_id đang lưu kiểu string trong DB
-        { host_id: userId },
+        // Use $expr to convert host_id to string and compare with userId string
+        {
+          $expr: {
+            $eq: [{ $toString: '$host_id' }, userId],
+          },
+        },
       ];
 
       if (listIds.length > 0) {
@@ -656,6 +661,34 @@ export class ListingsService {
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error getting listing analytics: ${error.message}`);
+    }
+  }
+
+  async getHostListingAnalytics(listingId: string, hostId: string) {
+    try {
+      const listingObjectId = new Types.ObjectId(listingId);
+      const hostObjectId = new Types.ObjectId(hostId);
+
+      // Verify that the listing belongs to this host
+      const listing = await this.listingModel.findById(listingObjectId).exec();
+      if (!listing) {
+        throw new NotFoundException(`Listing with ID ${listingId} not found`);
+      }
+
+      // Check if listing belongs to the host
+      const listingHostId = listing.host_id.toString();
+      const requestingUserId = hostObjectId.toString();
+      if (listingHostId !== requestingUserId && listing.host_id.toString() !== hostId) {
+        throw new ForbiddenException('You do not have permission to view this listing analytics');
+      }
+
+      // Return the same analytics as getListingAnalytics
+      return this.getListingAnalytics(listingId);
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
         throw error;
       }
       throw new InternalServerErrorException(`Error getting listing analytics: ${error.message}`);
