@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, Row, Col, Input, Select, Slider, DatePicker, Button, Space, Form, Divider } from "antd";
-import { SearchOutlined, ClearOutlined, RefreshOutlined } from "@ant-design/icons";
+import { SearchOutlined, ClearOutlined, ReloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 
 interface ListingFiltersProps {
@@ -187,7 +187,7 @@ export default function ListingFilters({
           <Col>
             <Button
               type="text"
-              icon={<RefreshOutlined />}
+              icon={<ReloadOutlined />}
               onClick={handleReset}
               size="large"
             >
