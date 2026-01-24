@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useRef, useCallback } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin, Empty, Pagination, message, Button, Typography } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
@@ -51,7 +51,8 @@ interface SearchResponse {
 function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [listings, setListings] = useState<Listing[]>([]);
+  const [allListings, setAllListings] = useState<Listing[]>([]); // Store all original results from API
+  const [listings, setListings] = useState<Listing[]>([]); // Filtered listings for display
   const [loading, setLoading] = useState(true);
   const [selectedListingId, setSelectedListingId] = useState<string | undefined>();
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
@@ -173,7 +174,8 @@ function SearchContent() {
         console.log('Valid listings count:', validListings.length);
         console.log('Listings with coordinates:', validListings.filter((l: any) => l.latitude && l.longitude).length);
         
-        setListings(validListings);
+        setAllListings(validListings); // Store original listings
+        setListings(validListings); // Set filtered listings (same as original initially)
         
         // Set map center from first listing or search params
         if (validListings.length > 0) {
@@ -230,33 +232,37 @@ function SearchContent() {
     fetchSearchResults();
   }, [searchParams]);
 
-  // Update URL when price filters change (with debounce)
+  // Client-side filtering when filter values change
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const currentMinPrice = searchParams.get("min_price");
-      const currentMaxPrice = searchParams.get("max_price");
-      
-      const minPriceChanged = minPrice > 0 && currentMinPrice !== minPrice.toString();
-      const maxPriceChanged = maxPrice < 1000 && currentMaxPrice !== maxPrice.toString();
-      
-      if (minPriceChanged || maxPriceChanged) {
-        const params = new URLSearchParams(searchParams.toString());
-        
-        if (minPrice > 0) params.set("min_price", minPrice.toString());
-        else params.delete("min_price");
-        
-        if (maxPrice < 1000) params.set("max_price", maxPrice.toString());
-        else params.delete("max_price");
-        
-        params.set("page", "1"); // Reset to page 1 when filter changes
-        
-        // Use router.push for client-side navigation
-        router.push('/search?' + params.toString());
+    // Filter listings based on current filter state
+    let filtered = allListings.filter((listing) => {
+      // Price filter
+      if (listing.price_base < minPrice || listing.price_base > maxPrice) {
+        return false;
       }
-    }, 500); // Debounce: 500ms delay
 
-    return () => clearTimeout(timer);
-  }, [minPrice, maxPrice, searchParams, router]);
+      // Accommodation type filter (if any selected)
+      if (accommodationType.length > 0) {
+        // Note: This requires accommodation_type in listing data from API
+        // For now, we'll skip this if data is not available
+        // You can implement this once the API provides accommodation type
+      }
+
+      // Bedrooms filter (if specified)
+      if (bedrooms > 0 && (!listing.bedrooms || listing.bedrooms < bedrooms)) {
+        return false;
+      }
+
+      // Beds filter (if specified)
+      if (beds > 0 && (!listing.beds || listing.beds < beds)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    setListings(filtered);
+  }, [minPrice, maxPrice, accommodationType, bedrooms, beds, allListings]);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -288,6 +294,8 @@ function SearchContent() {
     setAccommodationType([]);
     setBedrooms(0);
     setBeds(0);
+    // Reset listings to all (filter useEffect will handle this)
+    setListings(allListings);
   };
 
   const getSearchSummary = () => {
