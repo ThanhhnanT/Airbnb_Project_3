@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import LocationDropdown from "../search/LocationDropdown";
 import DatePickerModal from "../search/DatePickerModal";
 import GuestSelector, { GuestCounts } from "../search/GuestSelector";
-import { searchListings } from "@/service/search";
+import { searchListings, SearchParams } from "@/service/search";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import styles from "@/styles/search.module.css";
@@ -17,16 +17,6 @@ const { Text } = Typography;
 interface SearchBarProps {
   isExpanded?: boolean;
   onExpandChange?: (expanded: boolean) => void;
-}
-interface SearchParams {
-  city?: string;
-  country?: string;
-  latitude?: number;
-  longitude?: number;
-  radius?: number;
-  check_in?: string;
-  check_out?: string;
-  guests?: number;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChange }) => {
@@ -39,6 +29,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [displayLocation, setDisplayLocation] = useState<string>("");
   const [selectedDates, setSelectedDates] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  const [flexibleDays, setFlexibleDays] = useState<number>(0);
   const [guests, setGuests] = useState<GuestCounts>({
     adults: 0,
     children: 0,
@@ -72,9 +63,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
 
   const formatDateRange = (): string => {
     if (!selectedDates || !selectedDates[0] || !selectedDates[1]) {
+      if (flexibleDays > 0) {
+        return `± ${flexibleDays} ngày`;
+      }
       return "Chọn ngày";
     }
-    return `${formatDate(selectedDates[0])} - ${formatDate(selectedDates[1])}`;
+    return `${formatDate(selectedDates[0])} - ${formatDate(selectedDates[1])}${flexibleDays > 0 ? ` ± ${flexibleDays} ngày` : ""}`;
   };
 
   const formatGuests = (): string => {
@@ -274,7 +268,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
             setLocationOpen(false);
             setGuestOpen(false);
           }}
-          title={formatDateRange()}
+          title={"Chọn thời gian"}
         >
           <CalendarOutlined />
           <Text className={styles.searchItemLabel}> Thời gian</Text>
@@ -288,10 +282,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ isExpanded = false, onExpandChang
             <DatePickerModal
               visible={dateOpen}
               onClose={() => setDateOpen(false)}
-              onSelect={(dates) => {
+              onSelect={(dates, flexibleDays) => {
                 setSelectedDates(dates);
+                setFlexibleDays(flexibleDays || 0);
                 setDateOpen(false);
               }}
+              initialDates={selectedDates}
             />
           </>
         )}

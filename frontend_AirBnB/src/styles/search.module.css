@@ -258,6 +258,7 @@
   padding: 16px;
   display: block !important;
   visibility: visible !important;
+  cursor: default;
 }
 
 @media (max-width: 768px) {
@@ -408,6 +409,7 @@
   z-index: 10000;
   display: block !important;
   visibility: visible !important;
+  cursor: default;
 }
 
 @media (max-width: 1024px) {
@@ -527,6 +529,7 @@
   max-height: 500px;
   overflow-y: auto;
   overflow-x: hidden;
+  cursor: default;
 }
 
 @media (max-width: 1024px) {

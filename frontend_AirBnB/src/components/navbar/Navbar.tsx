@@ -58,10 +58,12 @@ export default function Navbar() {
         // On home page, use hysteresis based on scroll direction
         if (scrollingDown && scrollY > scrollDownThreshold) {
           setIsExpanded(false);
+          lastToggleAtRef.current = Date.now();
         } else if (!scrollingDown && scrollY < scrollUpThreshold) {
           setIsExpanded(true);          
+          lastToggleAtRef.current = Date.now();
         }
-        lastToggleAtRef.current = Date.now();
+        
       } else {
         // On other pages, always show scrolled state
         setIsExpanded(false);

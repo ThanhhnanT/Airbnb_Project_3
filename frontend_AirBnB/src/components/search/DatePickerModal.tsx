@@ -6,6 +6,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import styles from "@/styles/search.module.css";
+import { start } from "repl";
 
 const { Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -34,25 +35,71 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<string>("day");
   const [selectedDates, setSelectedDates] = useState<[Dayjs | null, Dayjs | null] | null>(initialDates || null);
+  const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(null);
   const [flexibleDays, setFlexibleDays] = useState<number>(0);
 
   // Update selectedDates when initialDates change
   useEffect(() => {
-    if (initialDates) {
-      setSelectedDates(initialDates);
+    if (!initialDates?.[0] || !initialDates?.[1]) return;
+    const today = dayjs().startOf("day");
+    let startDate = initialDates[0];
+    const endDate = initialDates[1];    
+
+    if (startDate.isBefore(today)) startDate = today;
+    
+    if (endDate.isBefore(startDate)) {
+      setSelectedDates(null);
+      return;
     }
+
+    setSelectedDates([startDate, endDate]);
+    
+    if (
+      startDate.isSame(startDate.startOf("month"), "day") &&
+      endDate.isSame(endDate.endOf("month"), "day")
+    ){
+      setActiveTab("month");
+      setSelectedMonth(startDate);
+    }
+
   }, [initialDates]);
+
+const normalizeMonthToDateRange = (month: Dayjs) : [Dayjs, Dayjs] => {
+  const today = dayjs().startOf("day");
+  const startOfMonth = month.startOf("month");
+  const endOfMonth = month.endOf("month");
+
+  const checkIn = startOfMonth.isBefore(today)
+    ? today
+    : startOfMonth;
+
+  return [checkIn, endOfMonth];
+};
 
 
   const handleDateChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
     setSelectedDates(dates);
   };
 
+  const handleMonthChange = (month: Dayjs | null) => {
+    setSelectedMonth(month);
+  }
+
   const handleConfirm = () => {
     if (activeTab === "day" && selectedDates && selectedDates[0] && selectedDates[1]) {
       onSelect(selectedDates, flexibleDays);
       onClose();
-    } else if (activeTab === "month" || activeTab === "flexible") {
+      return;
+    }
+
+    if (activeTab === "month" && selectedMonth) {
+      const [checkIn, checkOut] = normalizeMonthToDateRange(selectedMonth);
+      onSelect([checkIn, checkOut], flexibleDays);
+      onClose();
+      return;
+    }
+
+    if (activeTab === "flexible") {
       onSelect(null, flexibleDays);
       onClose();
     }
@@ -61,6 +108,21 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
   const handleFlexibleSelect = (days: number) => {
     setFlexibleDays(days);
   };
+
+  const FlexibleDateSection = (
+    <Space wrap className={styles.flexibleButtons}>
+      {flexibleOptions.map((option) => (
+        <Button
+          key={option.value}
+          type={flexibleDays === option.value ? "primary" : "default"}
+          className={styles.flexibleButton}
+          onClick={() => handleFlexibleSelect(option.value)}
+        >
+          {option.label}
+        </Button>
+      ))}
+    </Space>
+  );
 
   const tabItems = [
     {
@@ -80,18 +142,7 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
           />
           <div className={styles.flexibleOptions}>
             <Text className={styles.flexibleLabel}>Linh hoạt về ngày:</Text>
-            <Space wrap className={styles.flexibleButtons}>
-              {flexibleOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  type={flexibleDays === option.value ? "primary" : "default"}
-                  className={styles.flexibleButton}
-                  onClick={() => handleFlexibleSelect(option.value)}
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </Space>
+            {FlexibleDateSection}
           </div>
         </div>
       ),
@@ -102,11 +153,18 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
       children: (
         <div className={styles.datePickerContent}>
           <DatePicker
+            value={selectedMonth}
+            onChange={handleMonthChange}
             picker="month"
             format="MM/YYYY"
+            disabledDate={(current) => current && current.endOf("month").isBefore(dayjs().startOf("month"))}
             className={styles.monthPicker}
             placeholder="Chọn tháng"
           />
+          <div className={styles.flexibleOptions}>
+            <Text className={styles.flexibleLabel}>Linh hoạt về ngày:</Text>
+            {FlexibleDateSection}
+          </div>
         </div>
       ),
     },
@@ -115,19 +173,8 @@ const DatePickerModal: React.FC<DatePickerModalProps> = ({
       label: "Linh hoạt",
       children: (
         <div className={styles.datePickerContent}>
-          <Text>Chọn khoảng thời gian linh hoạt</Text>
-          <Space wrap className={styles.flexibleButtons}>
-            {flexibleOptions.map((option) => (
-              <Button
-                key={option.value}
-                type={flexibleDays === option.value ? "primary" : "default"}
-                className={styles.flexibleButton}
-                onClick={() => handleFlexibleSelect(option.value)}
-              >
-                {option.label}
-              </Button>
-            ))}
-          </Space>
+          <Text className={styles.flexibleLabel}>Chọn khoảng thời gian linh hoạt: </Text>
+            {FlexibleDateSection}
         </div>
       ),
     },

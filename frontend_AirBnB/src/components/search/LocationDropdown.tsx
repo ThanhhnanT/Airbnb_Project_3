@@ -87,11 +87,11 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   const searchInputRef = useRef<InputRef | null>(null);
-  const autocompleteServiceRef = useRef<any | null>(null);
-  const placesServiceRef = useRef<any | null>(null);
+  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
+  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(null);
 
   // Helper: load Google Maps JS with Places library
-  const loadGoogleMapsPlaces = async (): Promise<any | null> => {
+  const loadGoogleMapsPlaces = async (): Promise<typeof google | null> => {
     if (typeof window === "undefined") return null;
 
     // If already loaded with Places, reuse
@@ -282,7 +282,10 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
             types: ["(cities)"],
             language: "vi",
           },
-          (predictions: any, status: any) => {
+          (
+            predictions: google.maps.places.AutocompletePrediction[] | null, 
+            status: google.maps.places.PlacesServiceStatus
+          ) => {
             setLoadingSuggestions(false);
 
             try {
@@ -299,7 +302,7 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
                 return;
               }
 
-              const mapped: PlaceSuggestion[] = predictions.map((p: any) => {
+              const mapped: PlaceSuggestion[] = predictions.map((p) => {
                 const mainText = p.structured_formatting?.main_text || p.description || "";
                 const secondaryText = p.structured_formatting?.secondary_text || "";
                 return {
@@ -346,7 +349,10 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
           placeId: suggestion.placeId,
           fields: ["geometry", "formatted_address", "name", "address_components"],
         },
-        (place: any, status: any) => {
+        (
+          place: google.maps.places.PlaceResult | null, 
+          status: google.maps.places.PlacesServiceStatus
+        ) => {
           setLoadingSuggestions(false);
 
           try {
@@ -366,10 +372,10 @@ const LocationDropdown: React.FC<LocationDropdownProps> = ({
             }
 
             const location = place.geometry?.location;
-            const components = place.address_components || [];
+            const components: google.maps.GeocoderAddressComponent[] = place.address_components || [];
 
             const getComponent = (types: string[]) => {
-              const comp = components.find((c: any) =>
+              const comp = components.find((c) =>
                 types.every((t) => c.types.includes(t))
               );
               return comp ? comp.long_name : "";
