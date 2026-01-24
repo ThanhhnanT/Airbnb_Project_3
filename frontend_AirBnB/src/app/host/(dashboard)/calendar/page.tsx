@@ -9,11 +9,20 @@ import styles from "./calendar.module.css";
 
 const { Title, Text } = Typography;
 
+interface Listing {
+  _id: string;
+  title: string;
+}
+
+interface Guest {
+  _id: string;
+  name: string;
+}
+
 interface Booking {
   _id: string;
-  listing_id: string;
-  listing_title: string;
-  guest_name: string;
+  listing_id: string | Listing;
+  guest_id: string | Guest;
   check_in: string;
   check_out: string;
   total_price: number;
@@ -33,7 +42,7 @@ export default function CalendarPage() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const data = await getAccess("bookings/host/all");
+      const data = await getAccess("bookings/host/my-bookings");
       setBookings(data || []);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -169,33 +178,43 @@ export default function CalendarPage() {
                 <div className={styles.selectedDate}>
                   <Text strong>Ngày: {selectedDate.format("DD/MM/YYYY")}</Text>
                 </div>
-                {selectedBookings.map((booking) => (
-                  <Card
-                    key={booking._id}
-                    className={styles.bookingCard}
-                    size="small"
-                  >
-                    <div className={styles.bookingRow}>
-                      <div className={styles.bookingInfo}>
-                        <Text strong className={styles.listingName}>
-                          {booking.listing_title}
-                        </Text>
-                        <div className={styles.bookingDetails}>
-                          <span>👤 {booking.guest_name}</span>
-                          <span>💰 {booking.currency} {booking.total_price.toFixed(2)}</span>
+                {selectedBookings.map((booking) => {
+                  const listingTitle = typeof booking.listing_id === "object" && booking.listing_id?.title 
+                    ? booking.listing_id.title 
+                    : "Không xác định";
+                  
+                  const guestName = typeof booking.guest_id === "object" && booking.guest_id?.name
+                    ? booking.guest_id.name
+                    : "Không xác định";
+
+                  return (
+                    <Card
+                      key={booking._id}
+                      className={styles.bookingCard}
+                      size="small"
+                    >
+                      <div className={styles.bookingRow}>
+                        <div className={styles.bookingInfo}>
+                          <Text strong className={styles.listingName}>
+                            {listingTitle}
+                          </Text>
+                          <div className={styles.bookingDetails}>
+                            <span>👤 {guestName}</span>
+                            <span>💰 {booking.currency} {booking.total_price.toFixed(2)}</span>
+                          </div>
+                          <div className={styles.dateRange}>
+                            📅 {dayjs(booking.check_in).format("DD/MM")} → {dayjs(booking.check_out).format("DD/MM/YYYY")}
+                          </div>
                         </div>
-                        <div className={styles.dateRange}>
-                          📅 {dayjs(booking.check_in).format("DD/MM")} → {dayjs(booking.check_out).format("DD/MM/YYYY")}
+                        <div className={styles.bookingStatus}>
+                          <Tag color={booking.status === "completed" ? "green" : "blue"}>
+                            {booking.status === "completed" ? "Hoàn Tất" : "Đã Xác Nhận"}
+                          </Tag>
                         </div>
                       </div>
-                      <div className={styles.bookingStatus}>
-                        <Tag color={booking.status === "completed" ? "green" : "blue"}>
-                          {booking.status === "completed" ? "Hoàn Tất" : "Đã Xác Nhận"}
-                        </Tag>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  );
+                })}
               </Space>
             )}
           </Card>
