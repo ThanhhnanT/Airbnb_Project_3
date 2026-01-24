@@ -62,7 +62,7 @@ export default function ListingFilters({
   };
 
   return (
-    <Card style={{ marginBottom: 16 }}>
+    <Card style={{ marginBottom: 16, width: "100%" }}>
       <Form
         form={form}
         layout="vertical"
@@ -72,9 +72,9 @@ export default function ListingFilters({
           ratingRange: DEFAULT_RATING_RANGE,
         }}
       >
-        {/* Row 1: Search, Status, City, Date Range */}
-        <Row gutter={[16, 0]} style={{ marginBottom: 16 }}>
-          <Col xs={24} sm={24} md={12} lg={6}>
+        {/* Row 1: Search, Status, City */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} lg={8}>
             <Form.Item label="Tìm kiếm" name="searchText" style={{ marginBottom: 0 }}>
               <Input
                 placeholder="Tiêu đề hoặc thành phố..."
@@ -85,7 +85,7 @@ export default function ListingFilters({
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={12} md={6} lg={4}>
+          <Col xs={24} sm={12} lg={4}>
             <Form.Item label="Trạng thái" name="status" style={{ marginBottom: 0 }}>
               <Select
                 options={STATUS_OPTIONS}
@@ -94,7 +94,7 @@ export default function ListingFilters({
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={12} md={6} lg={5}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item label="Thành phố" name="city" style={{ marginBottom: 0 }}>
               <Select
                 placeholder="Chọn thành phố"
@@ -105,7 +105,7 @@ export default function ListingFilters({
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={24} md={24} lg={9}>
+          <Col xs={24} sm={12} lg={6}>
             <Form.Item label="Ngày tạo" name="dateRange" style={{ marginBottom: 0 }}>
               <DatePicker.RangePicker
                 style={{ width: "100%" }}
@@ -116,7 +116,7 @@ export default function ListingFilters({
         </Row>
 
         {/* Row 2: Price Range & Rating */}
-        <Row gutter={[16, 0]} style={{ marginBottom: 16 }}>
+        <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
           <Col xs={24} lg={12}>
             <Form.Item
               label="Khoảng giá (USD)"
@@ -159,7 +159,7 @@ export default function ListingFilters({
         </Row>
 
         {/* Reset Button */}
-        <Row justify="end">
+        <Row justify="end" style={{ marginTop: 16 }}>
           <Button
             icon={<ClearOutlined />}
             onClick={handleReset}

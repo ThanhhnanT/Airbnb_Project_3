@@ -167,10 +167,11 @@
 .content {
   padding: 24px;
   min-height: calc(100vh - 72px);
-  height: calc(100vh - 72px);
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: auto;
+  width: 100%;
 }
 
 .overlay {
