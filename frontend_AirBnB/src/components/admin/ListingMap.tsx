@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { Spin } from "antd";
 
 interface ListingMapProps {
   latitude?: number;
@@ -10,8 +9,12 @@ interface ListingMapProps {
   apiKey: string;
 }
 
+const mapContainerStyle = {
+  width: "100%",
+  height: "300px",
+};
+
 export default function ListingMapComponent({ latitude, longitude, apiKey }: ListingMapProps) {
-  const [mapLoaded, setMapLoaded] = useState(false);
   const defaultCenter = useMemo(() => ({ lat: latitude || 40.7128, lng: longitude || -74.006 }), [latitude, longitude]);
 
   if (!latitude || !longitude) {
@@ -51,35 +54,10 @@ export default function ListingMapComponent({ latitude, longitude, apiKey }: Lis
   }
 
   return (
-    <LoadScript googleMapsApiKey={apiKey} onLoad={() => setMapLoaded(true)}>
-      <div style={{ position: "relative", width: "100%", height: "300px" }}>
-        {!mapLoaded && (
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#f5f5f5",
-              zIndex: 1,
-            }}
-          >
-            <Spin />
-          </div>
-        )}
-        <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-          center={defaultCenter}
-          zoom={15}
-          onLoad={() => setMapLoaded(true)}
-        >
-          <Marker position={{ lat: latitude, lng: longitude }} />
-        </GoogleMap>
-      </div>
+    <LoadScript googleMapsApiKey={apiKey}>
+      <GoogleMap mapContainerStyle={mapContainerStyle} center={defaultCenter} zoom={15}>
+        <Marker position={{ lat: latitude, lng: longitude }} />
+      </GoogleMap>
     </LoadScript>
   );
 }
