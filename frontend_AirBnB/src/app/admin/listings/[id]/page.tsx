@@ -249,32 +249,6 @@ function AdminListingDetailPageContent() {
                 </Button>
               </>
             )}
-            {!editMode && (
-              <Button icon={<EditOutlined />} onClick={() => setEditMode(true)}>
-                Chỉnh sửa
-              </Button>
-            )}
-            {editMode && (
-              <>
-                <Button
-                  type="primary"
-                  icon={<SaveOutlined />}
-                  onClick={handleSaveEdit}
-                  loading={loading}
-                >
-                  Lưu
-                </Button>
-                <Button
-                  icon={<StopOutlined />}
-                  onClick={() => {
-                    setEditMode(false);
-                    fetchListingDetails();
-                  }}
-                >
-                  Hủy
-                </Button>
-              </>
-            )}
             <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
               Xóa
             </Button>
@@ -429,100 +403,6 @@ function AdminListingDetailPageContent() {
               ),
             },
             {
-              key: "edit",
-              label: "Chỉnh Sửa",
-              children: editMode ? (
-                <Card>
-                  <Form form={form} layout="vertical">
-                    <Form.Item
-                      label="Tiêu đề"
-                      name="title"
-                      rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}
-                    >
-                      <Input />
-                    </Form.Item>
-
-                    <Form.Item
-                      label="Mô tả"
-                      name="description"
-                    >
-                      <Input.TextArea rows={4} />
-                    </Form.Item>
-
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                      <Form.Item
-                        label="Giá mỗi đêm (USD)"
-                        name="price_base"
-                        rules={[{ required: true, message: "Vui lòng nhập giá" }]}
-                      >
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Phí dọn dẹp (USD)"
-                        name="cleaning_fee"
-                      >
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Phí khách thêm (USD)"
-                        name="extra_guest_fee"
-                      >
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Số khách tối đa"
-                        name="guests"
-                        rules={[{ required: true }]}
-                      >
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Phòng ngủ"
-                        name="bedrooms"
-                      >
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Giường"
-                        name="beds"
-                      >
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Phòng tắm"
-                        name="bathrooms"
-                      >
-                        <InputNumber style={{ width: "100%" }} />
-                      </Form.Item>
-
-                      <Form.Item
-                        label="Chính sách hủy"
-                        name="cancellation_policy"
-                      >
-                        <Select
-                          options={[
-                            { label: "Linh hoạt", value: "flexible" },
-                            { label: "Trung bình", value: "moderate" },
-                            { label: "Nghiêm ngặt", value: "strict" },
-                          ]}
-                        />
-                      </Form.Item>
-                    </div>
-                  </Form>
-                </Card>
-              ) : (
-                <Card>
-                  <p>Nhấp "Chỉnh sửa" để bắt đầu chỉnh sửa thông tin listing.</p>
-                </Card>
-              ),
-            },
-            {
               key: "analytics",
               label: "Thống Kê",
               children: (
@@ -530,17 +410,6 @@ function AdminListingDetailPageContent() {
                   data={analyticsData} 
                   loading={analyticsLoading}
                 />
-              ),
-            },
-            {
-              key: "availability",
-              label: "Tính Khả Dụng",
-              children: (
-                <Card>
-                  <Button onClick={() => router.push(`/admin/listings/${listingId}/availability`)}>
-                    Quản lý lịch
-                  </Button>
-                </Card>
               ),
             },
           ]}
