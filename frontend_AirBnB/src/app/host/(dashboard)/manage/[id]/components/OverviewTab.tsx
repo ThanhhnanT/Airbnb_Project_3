@@ -1,10 +1,65 @@
 "use client";
 
-import { Card, Row, Col, Typography, Tag, Divider, Empty } from "antd";
+import { Card, Row, Col, Typography, Tag, Divider, Empty, Space, Tooltip } from "antd";
+import {
+  WifiOutlined,
+  DesktopOutlined,
+  HomeOutlined,
+  SettingOutlined,
+  CarOutlined,
+  DollarOutlined,
+  CloudOutlined,
+  LaptopOutlined,
+  GlobalOutlined,
+  FireOutlined,
+  TableOutlined,
+  TrophyOutlined,
+  BankOutlined,
+} from "@ant-design/icons";
 import { Listing } from "../types";
 import styles from "../listing-detail.module.css";
 
 const { Title, Text, Paragraph } = Typography;
+
+const amenityIcons: Record<string, React.ReactNode> = {
+  wifi: <WifiOutlined />,
+  tv: <DesktopOutlined />,
+  kitchen: <HomeOutlined />,
+  washer: <SettingOutlined />,
+  free_parking: <CarOutlined />,
+  paid_parking: <DollarOutlined />,
+  air_conditioning: <CloudOutlined />,
+  workspace: <LaptopOutlined />,
+  pool: <GlobalOutlined />,
+  hot_tub: <FireOutlined />,
+  patio: <HomeOutlined />,
+  bbq: <FireOutlined />,
+  outdoor_dining: <TableOutlined />,
+  fire_pit: <FireOutlined />,
+  pool_table: <TrophyOutlined />,
+  fireplace: <FireOutlined />,
+  piano: <BankOutlined />,
+};
+
+const amenityLabels: Record<string, string> = {
+  wifi: "Wi-fi",
+  tv: "TV",
+  kitchen: "Bếp",
+  washer: "Máy giặt",
+  free_parking: "Chỗ đỗ xe miễn phí",
+  paid_parking: "Chỗ đỗ xe có thu phí",
+  air_conditioning: "Điều hòa nhiệt độ",
+  workspace: "Không gian làm việc",
+  pool: "Bể bơi",
+  hot_tub: "Bồn tắm nước nóng",
+  patio: "Sân",
+  bbq: "Lò nướng BBQ",
+  outdoor_dining: "Khu vực ăn uống ngoài trời",
+  fire_pit: "Bếp đốt lửa trại",
+  pool_table: "Bàn bi-da",
+  fireplace: "Lò sưởi trong nhà",
+  piano: "Đàn piano",
+};
 
 interface OverviewTabProps {
   listing: Listing;
@@ -191,13 +246,40 @@ export default function OverviewTab({ listing }: OverviewTabProps) {
       {/* Amenities */}
       <Card style={{ marginBottom: 16 }} title="Tiện Ích">
         {listing.amenities && listing.amenities.length > 0 ? (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <Space wrap>
             {listing.amenities.map((amenity, index) => (
-              <Tag key={index} color="blue">
-                {amenity}
-              </Tag>
+              <Tooltip key={index} title={amenityLabels[amenity] || amenity}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "8px 12px",
+                    border: "1px solid #f0f0f0",
+                    borderRadius: "6px",
+                    backgroundColor: "#fafafa",
+                    cursor: "default",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#1890ff";
+                    e.currentTarget.style.backgroundColor = "#e6f7ff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#f0f0f0";
+                    e.currentTarget.style.backgroundColor = "#fafafa";
+                  }}
+                >
+                  <span style={{ fontSize: "16px", color: "#1890ff" }}>
+                    {amenityIcons[amenity] || "✓"}
+                  </span>
+                  <span style={{ fontSize: "14px" }}>
+                    {amenityLabels[amenity] || amenity}
+                  </span>
+                </div>
+              </Tooltip>
             ))}
-          </div>
+          </Space>
         ) : (
           <Text type="secondary">Chưa thêm tiện ích</Text>
         )}
