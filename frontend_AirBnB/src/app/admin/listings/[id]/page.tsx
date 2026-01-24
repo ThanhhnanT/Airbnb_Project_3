@@ -30,8 +30,8 @@ import {
   StopOutlined,
 } from "@ant-design/icons";
 import { getAccess, patchAccess, deleteData } from "@/helper/api";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import ListingAnalytics from "@/components/admin/ListingAnalytics";
+import ListingMapComponent from "@/components/admin/ListingMap";
 
 const { Title, Text } = Typography;
 
@@ -327,34 +327,9 @@ export default function AdminListingDetailPage() {
                       )}
                     </Descriptions>
 
-                    {listing.latitude && listing.longitude && (
-                      <div style={{ marginTop: 16, height: "300px" }}>
-                        {apiKey ? (
-                          <LoadScript googleMapsApiKey={apiKey}>
-                            <GoogleMap
-                              mapContainerStyle={{ width: "100%", height: "100%" }}
-                              center={{ lat: listing.latitude, lng: listing.longitude }}
-                              zoom={15}
-                            >
-                              <Marker position={{ lat: listing.latitude, lng: listing.longitude }} />
-                            </GoogleMap>
-                          </LoadScript>
-                        ) : (
-                          <div style={{ 
-                            display: "flex", 
-                            justifyContent: "center", 
-                            alignItems: "center", 
-                            height: "100%",
-                            backgroundColor: "#f5f5f5",
-                            borderRadius: "4px"
-                          }}>
-                            <span style={{ color: "#999" }}>
-                              Google Maps API key not configured
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    <div style={{ marginTop: 16 }}>
+                      <ListingMapComponent latitude={listing.latitude} longitude={listing.longitude} apiKey={apiKey} />
+                    </div>
                   </Card>
 
                   {/* Property Details */}
@@ -407,7 +382,7 @@ export default function AdminListingDetailPage() {
 
                   {/* Images Gallery */}
                   <Card title={`Ảnh (${allImages.length} ảnh)`} style={{ marginBottom: 16 }}>
-                    {allImages.length >= 5 ? (
+                    {allImages.length > 0 ? (
                       <div>
                         <Image.PreviewGroup>
                           <div
@@ -423,15 +398,23 @@ export default function AdminListingDetailPage() {
                                 src={url}
                                 alt={`Image ${index + 1}`}
                                 style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: 8 }}
+                                preview
                               />
                             ))}
                           </div>
                         </Image.PreviewGroup>
+                        {allImages.length < 5 && (
+                          <div style={{ marginTop: 16, padding: 12, textAlign: "center", background: "#fff3cd", borderRadius: 8 }}>
+                            <Text type="warning">
+                              ⚠️ Listing này chỉ có {allImages.length} ảnh. Yêu cầu tối thiểu 5 ảnh.
+                            </Text>
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      <div style={{ padding: 24, textAlign: "center", background: "#fff3cd", borderRadius: 8 }}>
-                        <Text type="warning">
-                          ⚠️ Listing này chỉ có {allImages.length} ảnh. Yêu cầu tối thiểu 5 ảnh.
+                      <div style={{ padding: 24, textAlign: "center", background: "#f0f0f0", borderRadius: 8 }}>
+                        <Text type="secondary">
+                          Listing này không có ảnh nào
                         </Text>
                       </div>
                     )}
