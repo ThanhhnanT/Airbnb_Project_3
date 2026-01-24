@@ -55,6 +55,7 @@ export default function AdminLayout({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Check auth only once on mount
   useEffect(() => {
     const checkAdminAuth = async () => {
       // Skip auth check for login page
@@ -92,27 +93,55 @@ export default function AdminLayout({
     };
 
     checkAdminAuth();
-  }, [pathname, router]);
+    // Only run on component mount, not on pathname changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCollapse = (state: boolean) => {
     setCollapsed(state);
   };
 
   const breadcrumbs = useMemo(() => {
-    const segments =
-      pathname
-        ?.split("/")
-        .filter(Boolean)
-        .slice(1) || [];
+    // Map path to display names
+    const pathToTitle: Record<string, string> = {
+      "/admin": "Dashboard",
+      "/admin/listings": "Listings",
+      "/admin/listings/create": "Create Listing",
+      "/admin/bookings": "All Bookings",
+      "/admin/bookings/statistics": "Booking Statistics",
+      "/admin/bookings/pending": "Pending Bookings",
+      "/admin/users": "Users",
+      "/admin/payments": "Payments",
+      "/admin/payouts": "Payouts",
+      "/admin/settings": "Settings",
+    };
 
-    const cleaned = segments.map((segment) =>
-      segment.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-    );
+    // Check for exact match first
+    let pageTitle = pathToTitle[pathname];
+    
+    // If no exact match, try to find partial match
+    if (!pageTitle) {
+      for (const [path, title] of Object.entries(pathToTitle)) {
+        if (pathname.startsWith(path) && path !== "/admin") {
+          pageTitle = title;
+          break;
+        }
+      }
+    }
+
+    // Fallback to formatting the last segment
+    if (!pageTitle) {
+      const segments = pathname?.split("/").filter(Boolean).slice(1) || [];
+      const lastSegment = segments[segments.length - 1];
+      pageTitle = lastSegment
+        ? lastSegment.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+        : "Dashboard";
+    }
 
     return [
       { title: "Home" },
       { title: "Admin" },
-      { title: cleaned[cleaned.length - 1] || "Dashboard" },
+      { title: pageTitle },
     ];
   }, [pathname]);
 
@@ -141,7 +170,7 @@ export default function AdminLayout({
   }
 
   return (
-    <Layout className={styles.adminLayout}>
+      <Layout className={styles.adminLayout}>
       <Sider
         collapsible
         collapsed={collapsed}
@@ -154,7 +183,7 @@ export default function AdminLayout({
       >
         <AdminSidebar />
       </Sider>
-      <Layout className={styles.contentLayout}>
+      <Layout className={`${styles.contentLayout} ${collapsed ? styles.collapsed : ""}`}>
         {isMobile && !collapsed && (
           <div
             className={styles.overlay}

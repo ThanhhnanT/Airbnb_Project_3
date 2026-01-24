@@ -7,6 +7,7 @@ import { Listing, ListingSchema } from '../listings/schemas/listing.schema';
 import { Payment, PaymentSchema } from '../payments/schemas/payment.schemas';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { BookingsSchedulerService } from './bookings-scheduler.service';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     forwardRef(() => NotificationsModule),
   ],
   controllers: [BookingsController],
-  providers: [BookingsService],
-  exports: [BookingsService],
+  providers: [BookingsService, BookingsSchedulerService],
+  exports: [BookingsService, BookingsSchedulerService],
 })
 export class BookingsModule {}

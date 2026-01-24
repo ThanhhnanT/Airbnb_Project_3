@@ -329,4 +329,159 @@ export class PaymentsService {
       throw new InternalServerErrorException(`Webhook error: ${error.message}`);
     }
   }
+
+  // Get payment statistics
+  async getPaymentStats(filters?: any): Promise<{
+    total: number;
+    totalAmount: number;
+    paidCount: number;
+    paidAmount: number;
+    pendingCount: number;
+    pendingAmount: number;
+    failedCount: number;
+  }> {
+    try {
+      const query: any = {};
+      
+      if (filters?.status) query.status = filters.status;
+      if (filters?.provider) query.provider = filters.provider;
+      if (filters?.dateRange) {
+        query.createdAt = {
+          $gte: new Date(filters.dateRange[0]),
+          $lte: new Date(filters.dateRange[1]),
+        };
+      }
+
+      const payments = await this.paymentModel.find(query).exec();
+
+      const stats = {
+        total: payments.length,
+        totalAmount: 0,
+        paidCount: 0,
+        paidAmount: 0,
+        pendingCount: 0,
+        pendingAmount: 0,
+        failedCount: 0,
+      };
+
+      payments.forEach((payment) => {
+        stats.totalAmount += payment.amount;
+        if (payment.status === 'paid') {
+          stats.paidCount++;
+          stats.paidAmount += payment.amount;
+        } else if (payment.status === 'pending') {
+          stats.pendingCount++;
+          stats.pendingAmount += payment.amount;
+        } else if (payment.status === 'failed') {
+          stats.failedCount++;
+        }
+      });
+
+      return stats;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting payment stats: ${error.message}`);
+    }
+  }
+
+  // Refund payment
+  async refundPayment(paymentId: string, reason: string, adminId?: string): Promise<PaymentDocument> {
+    try {
+      if (!this.stripe) {
+        throw new InternalServerErrorException('Stripe is not configured');
+      }
+
+      const payment = await this.paymentModel.findById(paymentId).exec();
+      if (!payment) {
+        throw new NotFoundException(`Payment with ID ${paymentId} not found`);
+      }
+
+      if (payment.status === 'refunded') {
+        throw new BadRequestException('Payment is already refunded');
+      }
+
+      if (payment.status !== 'paid') {
+        throw new BadRequestException('Only paid payments can be refunded');
+      }
+
+      // Create refund via Stripe
+      const refund = await this.stripe.refunds.create({
+        payment_intent: payment.provider_payment_id,
+        reason: 'requested_by_customer',
+        metadata: {
+          payment_id: paymentId,
+          reason: reason,
+          admin_id: adminId || 'system',
+        },
+      });
+
+      // Update payment status
+      const updatedPayment = await this.paymentModel
+        .findByIdAndUpdate(
+          paymentId,
+          {
+            status: 'refunded',
+            provider_payment_id: refund.id,
+          },
+          { new: true }
+        )
+        .exec();
+
+      if (!updatedPayment) {
+        throw new NotFoundException(`Payment with ID ${paymentId} not found`);
+      }
+
+      // Send notification
+      try {
+        this.notificationsGateway.sendToAdmin('refund_completed', {
+          payment_id: paymentId,
+          amount: payment.amount,
+          currency: payment.currency,
+          reason: reason,
+        });
+      } catch (notifError) {
+        console.error('Error sending refund notification:', notifError);
+      }
+
+      return updatedPayment;
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error refunding payment: ${error.message}`);
+    }
+  }
+
+  // Export payments to CSV
+  async exportPaymentsCSV(filters?: any): Promise<string> {
+    try {
+      const query: any = {};
+      
+      if (filters?.status) query.status = filters.status;
+      if (filters?.provider) query.provider = filters.provider;
+      if (filters?.dateRange) {
+        query.createdAt = {
+          $gte: new Date(filters.dateRange[0]),
+          $lte: new Date(filters.dateRange[1]),
+        };
+      }
+
+      const payments = await this.paymentModel
+        .find(query)
+        .populate('booking_id', 'check_in check_out total_price')
+        .populate('user_id', 'name email')
+        .exec();
+
+      // Generate CSV
+      let csv = 'User Name,Email,Amount,Currency,Provider,Status,Created Date\n';
+      
+      payments.forEach((payment: any) => {
+        const createdDate = new Date(payment.createdAt).toLocaleDateString('vi-VN');
+        csv += `"${(payment.user_id as any)?.name || ''}","${(payment.user_id as any)?.email || ''}",${payment.amount},"${payment.currency}","${payment.provider}","${payment.status}","${createdDate}"\n`;
+      });
+
+      return csv;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error exporting payments: ${error.message}`);
+    }
+  }
 }

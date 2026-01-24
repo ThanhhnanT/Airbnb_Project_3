@@ -23,22 +23,7 @@ export class UsersController {
     return this.usersService.findAll(query, +page);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
-
-  // Stripe Connect endpoints
+  // Stripe Connect endpoints - must be before :id route
   @Post('stripe-connect/create')
   @ApiOperation({ summary: 'Tạo Stripe Connect account cho host' })
   async createStripeConnectAccount(
@@ -68,6 +53,33 @@ export class UsersController {
   async verifyStripeAccount(@Req() req: any) {
     const userId = req.user?.id || req.user?.user_id;
     return this.usersService.verifyStripeAccount(userId);
+  }
+
+  @Get(':id/analytics')
+  @ApiOperation({ summary: 'Lấy thống kê của user (cho hosts)' })
+  async getUserAnalytics(@Param('id') id: string) {
+    return this.usersService.getUserAnalytics(id);
+  }
+
+  @Patch(':id/stripe-sync')
+  @ApiOperation({ summary: 'Cập nhật trạng thái Stripe từ Stripe API' })
+  async syncStripeStatus(@Param('id') id: string) {
+    return this.usersService.getStripeAccountStatus(id);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOneById(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(+id);
   }
 
 }

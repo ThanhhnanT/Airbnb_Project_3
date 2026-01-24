@@ -5,6 +5,34 @@
   flex-direction: column;
 }
 
+.searchHeader {
+  padding: 24px 40px;
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-card);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerContent {
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.searchTitle {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--color-text);
+}
+
+.searchSummary {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
 .searchContent {
   flex: 1;
   display: flex;
@@ -12,85 +40,77 @@
   overflow: hidden;
 }
 
-.searchHeader {
-  padding: 24px 40px;
-  border-bottom: 1px solid var(--color-border-light);
-  background: var(--color-background);
-  flex-shrink: 0;
-}
-
-.headerTop {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.priceBanner {
-  margin-top: 16px;
-  padding: 12px 16px;
-  background: var(--color-primary-lighter);
-  border-radius: var(--border-radius-sm);
-  display: inline-block;
-}
-
-.priceBanner span {
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  font-weight: var(--font-weight-medium);
-}
-
-.searchResultsContainer {
+.resultsWrapper {
   display: flex;
   flex: 1;
   overflow: hidden;
-  position: relative;
+  gap: 24px;
+  padding: 24px 40px;
 }
 
-.listingsPanel {
+.leftPanel {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  gap: 24px;
+}
+
+.listingsContainer {
   flex: 1;
   overflow-y: auto;
-  padding: 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
   min-width: 0;
 }
 
+.filterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.chipsGrid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.listingsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding-bottom: 24px;
+}
+
 .mapPanel {
-  width: 50%;
+  width: 35%;
   flex-shrink: 0;
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: 64px;
+  height: calc(100vh - 64px - 48px);
   border-left: 1px solid var(--color-border-light);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .listingCardWrapper {
   cursor: pointer;
   transition: all var(--transition-fast);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .listingCardWrapper:hover {
   transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .selectedListing {
   outline: 2px solid var(--color-primary);
-  outline-offset: 4px;
-  border-radius: var(--border-radius-lg);
-  background: var(--color-primary-lighter);
-}
-
-.searchTitle {
-  font-size: var(--font-size-xxl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text);
-  margin: 0 0 8px 0;
-}
-
-.searchSummary {
-  font-size: var(--font-size-md);
-  color: var(--color-text-secondary);
-  margin: 0 0 8px 0;
+  outline-offset: 2px;
 }
 
 .resultCount {
@@ -120,12 +140,6 @@
   align-items: center;
 }
 
-.listingsGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  margin-bottom: 48px;
-}
 
 .paginationContainer {
   display: flex;
@@ -135,29 +149,72 @@
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-  .listingsPanel {
+@media (max-width: 1400px) {
+  .listingsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mapPanel {
+    width: 40%;
+  }
+}
+
+@media (max-width: 1200px) {
+  .resultsWrapper {
     padding: 20px 24px;
+    gap: 20px;
+  }
+
+  .searchHeader {
+    padding: 20px 24px;
+  }
+
+  .listingsGrid {
+    gap: 20px;
+  }
+
+  .mapPanel {
+    width: 40%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .listingsGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .mapPanel {
     width: 45%;
   }
 
-  .searchHeader {
-    padding: 20px 24px;
+  .resultsWrapper {
+    padding: 16px 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .searchResultsContainer {
+  .leftPanel {
     flex-direction: column;
+    gap: 16px;
   }
 
-  .listingsPanel {
+  .resultsWrapper {
+    flex-direction: column;
+    gap: 16px;
     padding: 16px 20px;
-    width: 100%;
-    max-height: 60vh;
+  }
+
+  .searchHeader {
+    padding: 16px 20px;
+  }
+
+  .searchTitle {
+    font-size: 24px;
+  }
+
+  .listingsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
 
   .mapPanel {
@@ -168,27 +225,14 @@
     border-top: 1px solid var(--color-border-light);
   }
 
-  .searchHeader {
-    padding: 16px 20px;
-  }
-
-  .searchTitle {
-    font-size: var(--font-size-xl);
-  }
-
-  .headerTop {
-    flex-direction: column;
-    gap: 16px;
+  .listingsContainer {
+    max-height: 60vh;
   }
 }
 
 @media (max-width: 480px) {
-  .listingsPanel {
+  .resultsWrapper {
     padding: 12px 16px;
-  }
-
-  .mapPanel {
-    height: 35vh;
   }
 
   .searchHeader {
@@ -196,7 +240,16 @@
   }
 
   .searchTitle {
-    font-size: var(--font-size-lg);
+    font-size: 20px;
+  }
+
+  .listingsGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .mapPanel {
+    height: 35vh;
   }
 }
 

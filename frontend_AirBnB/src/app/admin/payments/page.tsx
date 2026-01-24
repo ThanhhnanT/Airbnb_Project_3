@@ -1,50 +1,92 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Table, Tag, message, Card, Space, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import { getAccess } from "@/helper/api";
-import type { ColumnsType } from "antd/es/table";
+import { Card, Space, message, Typography, Spin } from "antd";
+import { getAccess, postAccess } from "@/helper/api";
+import { useSocket } from "@/components/providers/SocketProvider";
+import PaymentStats from "./components/PaymentStats";
+import PaymentFilters, { FilterValues } from "./components/PaymentFilters";
+import PaymentTable, { Payment } from "./components/PaymentTable";
+import PaymentDetailModal from "./components/PaymentDetailModal";
+import RefundModal from "./components/RefundModal";
+import DisputeModal from "./components/DisputeModal";
+import PaymentCharts from "@/components/admin/PaymentCharts";
+import styles from "./payments.module.css";
 
-interface Payment {
-  _id: string;
-  booking_id?: {
-    _id: string;
-    check_in?: string;
-    check_out?: string;
-    total_price?: number;
-    currency?: string;
-  };
-  user_id?: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  amount: number;
-  currency: string;
-  provider: string;
-  status: string;
-  createdAt: string;
+interface PaymentStatsData {
+  total: number;
+  totalAmount: number;
+  paidCount: number;
+  paidAmount: number;
+  pendingCount: number;
+  pendingAmount: number;
+  failedCount: number;
 }
 
+interface Dispute {
+  _id: string;
+  status: string;
+  reason: string;
+  createdAt: string;
+  resolved_at?: string;
+}
+
+const { Title } = Typography;
+
 export default function PaymentsPage() {
+  const { socket } = useSocket();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState("");
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [stats, setStats] = useState<PaymentStatsData | null>(null);
+  const [filters, setFilters] = useState<FilterValues>({});
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
   });
 
+  // Modal states
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [refundVisible, setRefundVisible] = useState(false);
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [disputeVisible, setDisputeVisible] = useState(false);
+  const [disputes, setDisputes] = useState<Dispute[]>([]);
+  const [disputeLoading, setDisputeLoading] = useState(false);
+
   useEffect(() => {
     fetchPayments(1, 10);
-  }, []);
+    fetchStats();
+
+    // Listen for real-time updates
+    if (socket) {
+      socket.on("payment_status_changed", () => {
+        fetchPayments(pagination.current, pagination.pageSize);
+        fetchStats();
+      });
+
+      socket.on("refund_completed", () => {
+        fetchPayments(pagination.current, pagination.pageSize);
+        fetchStats();
+        message.success("Hoàn tiền đã hoàn thành!");
+      });
+
+      return () => {
+        socket.off("payment_status_changed");
+        socket.off("refund_completed");
+      };
+    }
+  }, [socket]);
 
   const fetchPayments = async (page: number = 1, limit: number = 10) => {
     try {
       setLoading(true);
-      const result = await getAccess(`admin/payments?page=${page}&limit=${limit}`, {}, true); // Use admin token
+      const result = await getAccess(
+        `admin/payments?page=${page}&limit=${limit}`,
+        {},
+        true
+      );
       setPayments(result?.data || []);
       if (result?.pagination) {
         setPagination({
@@ -55,94 +97,190 @@ export default function PaymentsPage() {
       }
     } catch (error) {
       message.error("Không thể tải danh sách payments");
+      console.error("Fetch payments error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleTableChange = (pagination: any) => {
-    fetchPayments(pagination.current, pagination.pageSize);
+  const fetchStats = async () => {
+    try {
+      setStatsLoading(true);
+      const result = await getAccess("admin/payments/stats", {}, true);
+      setStats(result || null);
+    } catch (error) {
+      console.error("Fetch stats error:", error);
+    } finally {
+      setStatsLoading(false);
+    }
   };
 
-  const filteredPayments = payments.filter(
-    (payment) =>
-      payment.user_id?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-      payment.user_id?.email?.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    // Implement advanced filtering with backend
+    fetchPayments(1, pagination.pageSize);
+  };
 
-  const columns: ColumnsType<Payment> = [
-    {
-      title: "User",
-      key: "user",
-      render: (_, record) => record.user_id?.name || "N/A",
-    },
-    {
-      title: "Email",
-      key: "email",
-      render: (_, record) => record.user_id?.email || "N/A",
-    },
-    {
-      title: "Số tiền",
-      key: "amount",
-      render: (_, record) => `${record.amount} ${record.currency}`,
-    },
-    {
-      title: "Provider",
-      dataIndex: "provider",
-      key: "provider",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => {
-        const colors: any = {
-          pending: "orange",
-          paid: "green",
-          failed: "red",
-        };
-        return <Tag color={colors[status]}>{status}</Tag>;
-      },
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
-    },
-  ];
+  const handleViewDetail = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setDetailVisible(true);
+  };
+
+  const handleRefund = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setRefundVisible(true);
+  };
+
+  const handleConfirmRefund = async (paymentId: string, reason: string) => {
+    try {
+      setRefundLoading(true);
+      await postAccess(
+        `admin/refunds`,
+        {
+          payment_id: paymentId,
+          reason,
+        },
+        true
+      );
+      message.success("Hoàn tiền thành công!");
+      setRefundVisible(false);
+      setDetailVisible(false);
+      fetchPayments(pagination.current, pagination.pageSize);
+      fetchStats();
+    } catch (error) {
+      message.error("Không thể hoàn tiền. Vui lòng thử lại.");
+      console.error("Refund error:", error);
+    } finally {
+      setRefundLoading(false);
+    }
+  };
+
+  const handleViewDispute = async (payment: Payment) => {
+    setSelectedPayment(payment);
+    try {
+      const result = await getAccess(
+        `disputes?payment_id=${payment._id}`,
+        {},
+        true
+      );
+      setDisputes(result || []);
+    } catch (error) {
+      console.error("Fetch disputes error:", error);
+      setDisputes([]);
+    }
+    setDisputeVisible(true);
+  };
+
+  const handleCreateDispute = async (paymentId: string, reason: string) => {
+    try {
+      setDisputeLoading(true);
+      await postAccess(
+        `disputes`,
+        {
+          payment_id: paymentId,
+          reason,
+        },
+        true
+      );
+      // Refresh disputes list
+      const result = await getAccess(
+        `disputes?payment_id=${paymentId}`,
+        {},
+        true
+      );
+      setDisputes(result || []);
+      message.success("Tạo tranh chấp thành công!");
+    } catch (error) {
+      message.error("Không thể tạo tranh chấp. Vui lòng thử lại.");
+      console.error("Create dispute error:", error);
+    } finally {
+      setDisputeLoading(false);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      const result = await getAccess("admin/payments/export", {}, true);
+      // Handle CSV download
+      if (result) {
+        const url = window.URL.createObjectURL(new Blob([result]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "payments.csv");
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+      }
+    } catch (error) {
+      message.error("Không thể xuất dữ liệu. Vui lòng thử lại.");
+      console.error("Export error:", error);
+    }
+  };
+
+  const handleTableChange = (newPagination: any) => {
+    fetchPayments(newPagination.current, newPagination.pageSize);
+  };
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Card 
-        style={{ height: "100%", display: "flex", flexDirection: "column" }}
-        bodyStyle={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}
-      >
-        <Space style={{ marginBottom: 16, width: "100%" }} direction="vertical">
-          <Input
-            placeholder="Tìm kiếm theo tên hoặc email..."
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            style={{ maxWidth: 400 }}
-          />
-        </Space>
-        <Table
-          columns={columns}
-          dataSource={filteredPayments}
-          rowKey="_id"
+    <div className={styles.paymentContainer}>
+      <Title level={2} className={styles.pageTitle}>
+        Quản lý Thanh toán
+      </Title>
+
+      <Spin spinning={statsLoading}>
+        <PaymentStats stats={stats} loading={statsLoading} />
+      </Spin>
+
+      <PaymentCharts data={stats} loading={statsLoading} />
+
+      <PaymentFilters onFilterChange={handleFilterChange} />
+
+      <Card className={styles.tableCard}>
+        <PaymentTable
+          data={payments}
           loading={loading}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            showSizeChanger: true,
-            showTotal: (total) => `Tổng ${total} payments`,
-          }}
+          pagination={pagination}
+          onViewDetail={handleViewDetail}
+          onRefund={handleRefund}
+          onExportCSV={handleExportCSV}
           onChange={handleTableChange}
-          scroll={{ y: "calc(100vh - 300px)" }}
         />
       </Card>
+
+      {/* Modals */}
+      <PaymentDetailModal
+        visible={detailVisible}
+        payment={selectedPayment}
+        onClose={() => {
+          setDetailVisible(false);
+          setSelectedPayment(null);
+        }}
+        onRefund={handleRefund}
+        loading={refundLoading}
+      />
+
+      <RefundModal
+        visible={refundVisible}
+        payment={selectedPayment}
+        onClose={() => {
+          setRefundVisible(false);
+          setSelectedPayment(null);
+        }}
+        onConfirm={handleConfirmRefund}
+        loading={refundLoading}
+      />
+
+      <DisputeModal
+        visible={disputeVisible}
+        payment={selectedPayment}
+        disputes={disputes}
+        onClose={() => {
+          setDisputeVisible(false);
+          setSelectedPayment(null);
+        }}
+        onCreateDispute={handleCreateDispute}
+        loading={disputeLoading}
+      />
     </div>
   );
 }

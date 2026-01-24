@@ -88,7 +88,7 @@ export default function Navbar() {
     if (login) {
       switch (key) {
         case '1':
-          messageApi.info('Danh sách yêu thích của bạn');
+          router.push('/favorites');
           break;
         case '2':
           router.push('/trips');
@@ -111,6 +111,7 @@ export default function Navbar() {
     } else {
       switch(key) {
         case '1':
+          setOpen(true);
           break;
         case '2':
           break;

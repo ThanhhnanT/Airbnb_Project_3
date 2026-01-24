@@ -30,6 +30,7 @@ import {
 import { getUserProfile, updateUserProfile } from "@/service/user";
 import { useMessageApi } from "@/components/providers/Message";
 import Cookies from "js-cookie";
+import AvatarUpload from "@/components/profile/AvatarUpload";
 import styles from "./profile.module.css";
 
 const { Content } = Layout;
@@ -53,6 +54,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [form] = Form.useForm();
   const [isSaving, setIsSaving] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!Cookies.get("access_token")) {
@@ -67,10 +69,12 @@ export default function ProfilePage() {
       setLoading(true);
       const profile = await getUserProfile();
       setUser(profile);
+      setAvatarUrl(profile.avatar_url || undefined);
       // Set form values when profile is loaded
       form.setFieldsValue({
         name: profile.name,
         phone: profile.phone || "",
+        bio: profile.bio || "",
       });
     } catch (error: any) {
       messageApi.error("Không thể tải thông tin hồ sơ");
@@ -86,14 +90,66 @@ export default function ProfilePage() {
       if (!user?._id) return;
 
       setIsSaving(true);
-      await updateUserProfile(user._id, values);
+      
+      // Prepare update data
+      const updateData: any = {
+        name: values.name,
+        phone: values.phone || "",
+        bio: values.bio || "",
+      };
+      
+      // Include avatar_url if it was updated (avatar is saved automatically on upload,
+      // but include it here in case user wants to save other fields together)
+      if (avatarUrl && avatarUrl !== user.avatar_url) {
+        updateData.avatar_url = avatarUrl;
+      }
+      
+      await updateUserProfile(user._id, updateData);
       messageApi.success("Cập nhật thông tin thành công");
-      fetchProfile();
+      await fetchProfile();
+      
+      // Dispatch event to notify other components (like navbar) to refresh
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('profile-updated'));
+      }
     } catch (error: any) {
       messageApi.error("Không thể cập nhật thông tin");
       console.error(error);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleAvatarUploadSuccess = async (newAvatarUrl: string) => {
+    setAvatarUrl(newAvatarUrl);
+    // Update user state immediately for better UX
+    if (user) {
+      setUser({ ...user, avatar_url: newAvatarUrl });
+    }
+    
+    // Automatically save avatar_url to database
+    try {
+      if (!user?._id) {
+        console.error("Cannot save avatar: user ID not found");
+        return;
+      }
+      
+      console.log("Saving avatar_url to database:", newAvatarUrl);
+      const result = await updateUserProfile(user._id, {
+        avatar_url: newAvatarUrl,
+      });
+      console.log("Avatar saved successfully:", result);
+      
+      // Refresh profile to ensure we have the latest data
+      await fetchProfile();
+      
+      // Dispatch event to notify other components (like navbar) to refresh
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('profile-updated'));
+      }
+    } catch (error: any) {
+      console.error("Error saving avatar:", error);
+      messageApi.error("Không thể lưu ảnh đại diện. Vui lòng thử lại.");
     }
   };
 
@@ -190,6 +246,12 @@ export default function ProfilePage() {
               Thông tin tài khoản
             </Title>
 
+            {/* Avatar Upload */}
+            <AvatarUpload
+              currentAvatarUrl={user.avatar_url}
+              onUploadSuccess={handleAvatarUploadSuccess}
+            />
+
             <div className={styles.infoList}>
               {/* Legal Name */}
               <div className={styles.infoItem}>
@@ -246,6 +308,32 @@ export default function ProfilePage() {
                       <Input 
                         placeholder="Nhập số điện thoại"
                         className={styles.inputField}
+                      />
+                    </Form.Item>
+                  </div>
+                </div>
+              </div>
+
+              <Divider className={styles.itemDivider} />
+
+              {/* Bio */}
+              <div className={styles.infoItem}>
+                <div className={styles.infoLeft}>
+                  <div className={styles.infoIcon}>
+                    <UserOutlined />
+                  </div>
+                  <div className={styles.infoContent}>
+                    <Text strong className={styles.infoLabel}>
+                      Giới thiệu bản thân
+                    </Text>
+                    <Form.Item name="bio" className={styles.formItem}>
+                      <Input.TextArea
+                        placeholder="Nhập giới thiệu về bản thân"
+                        className={styles.inputField}
+                        rows={4}
+                        maxLength={500}
+                        showCount
+                        style={{ borderRadius: '8px' }}
                       />
                     </Form.Item>
                   </div>

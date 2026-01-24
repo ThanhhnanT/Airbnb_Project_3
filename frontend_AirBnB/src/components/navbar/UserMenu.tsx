@@ -28,24 +28,50 @@ interface UserMenuProps {
 const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuthModal }) => {
   const router = useRouter();
   const [userRole, setUserRole] = useState<'guest' | 'host' | 'admin' | null>(null);
+  const [userProfile, setUserProfile] = useState<{ avatar_url?: string; name?: string } | null>(null);
 
   useEffect(() => {
-    const fetchUserRole = async () => {
+    const fetchUserData = async () => {
       if (isLoggedIn) {
         try {
           const user = await getUserProfile();
           setUserRole(user?.role?.type || 'guest');
+          setUserProfile({
+            avatar_url: user?.avatar_url,
+            name: user?.name,
+          });
         } catch (error) {
-          console.error('Error fetching user role:', error);
+          console.error('Error fetching user data:', error);
           setUserRole('guest');
+          setUserProfile(null);
         }
       } else {
         setUserRole(null);
+        setUserProfile(null);
       }
     };
 
-    fetchUserRole();
+    fetchUserData();
+    
+    // Listen for profile update events
+    const handleProfileUpdate = () => {
+      fetchUserData();
+    };
+    
+    window.addEventListener('profile-updated', handleProfileUpdate);
+    
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdate);
+    };
   }, [isLoggedIn]);
+
+  // Get first letter of name for avatar fallback
+  const getAvatarInitial = () => {
+    if (userProfile?.name) {
+      return userProfile.name.charAt(0).toUpperCase();
+    }
+    return 'U';
+  };
 
   const handleBecomeHostClick = () => {
     if (!isLoggedIn) {
@@ -180,6 +206,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
             <Avatar 
               className={styles.avatar}
               size={40}
+              src={userProfile?.avatar_url}
+              icon={!userProfile?.avatar_url ? <UserOutlined /> : undefined}
               style={{ 
                 display: 'flex',
                 alignItems: 'center',
@@ -188,7 +216,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
                 fontWeight: 600
               }}
             >
-              T
+              {!userProfile?.avatar_url && getAvatarInitial()}
             </Avatar>
           </div>
         ) : (

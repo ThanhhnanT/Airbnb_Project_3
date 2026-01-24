@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useState, Suspense, useRef } from "react";
-import { useSearchParams } from "next/navigation";
-import { Spin, Empty, Pagination, message, Button } from "antd";
+import React, { useEffect, useState, Suspense, useRef, useCallback, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Spin, Empty, Pagination, message, Button, Typography } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
-import ListingCard from "@/components/search/ListingCard";
+import ListingGridCard from "@/components/search/ListingGridCard";
 import MapView from "@/components/search/MapView";
+import SearchFilters from "@/components/search/SearchFilters";
+
+// Memoize MapView to prevent re-mount on navigation
+const MemoizedMapView = React.memo(MapView);
 import { searchListings, SearchParams } from "@/service/search";
 import styles from "@/styles/search-page.module.css";
+
+const { Text, Title } = Typography;
 
 interface Listing {
   _id: string;
@@ -31,6 +37,12 @@ interface Listing {
   avg_rating: number;
   review_count: number;
   amenities?: string[];
+  bookings?: Array<{
+    _id: string;
+    check_in: string;
+    check_out: string;
+    status: "pending" | "confirmed" | "completed" | "cancelled";
+  }>;
 }
 
 interface SearchResponse {
@@ -47,7 +59,9 @@ interface SearchResponse {
 
 function SearchContent() {
   const searchParams = useSearchParams();
-  const [listings, setListings] = useState<Listing[]>([]);
+  const router = useRouter();
+  const [allListings, setAllListings] = useState<Listing[]>([]); // Store all original results from API
+  const [listings, setListings] = useState<Listing[]>([]); // Filtered listings for display
   const [loading, setLoading] = useState(true);
   const [selectedListingId, setSelectedListingId] = useState<string | undefined>();
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | undefined>();
@@ -59,6 +73,13 @@ function SearchContent() {
     total: 0,
     totalPages: 0,
   });
+  
+  // Filter states
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
+  const [accommodationType, setAccommodationType] = useState<string[]>([]);
+  const [bedrooms, setBedrooms] = useState(0);
+  const [beds, setBeds] = useState(0);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -162,7 +183,8 @@ function SearchContent() {
         console.log('Valid listings count:', validListings.length);
         console.log('Listings with coordinates:', validListings.filter((l: any) => l.latitude && l.longitude).length);
         
-        setListings(validListings);
+        setAllListings(validListings); // Store original listings
+        setListings(validListings); // Set filtered listings (same as original initially)
         
         // Set map center from first listing or search params
         if (validListings.length > 0) {
@@ -219,6 +241,85 @@ function SearchContent() {
     fetchSearchResults();
   }, [searchParams]);
 
+  // Get dates from search params (memoized to avoid dependency churn)
+  const selectedDates = useMemo(() => {
+    const checkInStr = searchParams.get("check_in");
+    const checkOutStr = searchParams.get("check_out");
+    
+    if (!checkInStr || !checkOutStr) {
+      return null;
+    }
+
+    return {
+      checkIn: new Date(checkInStr),
+      checkOut: new Date(checkOutStr),
+    };
+  }, [searchParams]);
+
+  // Check if listing has booking conflict with selected dates
+  const isListingAvailable = useCallback((listing: Listing): boolean => {
+    // If no dates selected, listing is available
+    if (!selectedDates) {
+      return true;
+    }
+
+    // Check if listing has any confirmed/pending bookings that overlap
+    if (listing.bookings && listing.bookings.length > 0) {
+      return !listing.bookings.some((booking) => {
+        // Skip cancelled bookings
+        if (booking.status === "cancelled") {
+          return false;
+        }
+
+        const bookingCheckIn = new Date(booking.check_in);
+        const bookingCheckOut = new Date(booking.check_out);
+
+        // Check if date ranges overlap
+        // Overlap occurs if: checkIn < bookingCheckOut AND checkOut > bookingCheckIn
+        return selectedDates.checkIn < bookingCheckOut && selectedDates.checkOut > bookingCheckIn;
+      });
+    }
+
+    return true;
+  }, [selectedDates]);
+
+  // Apply filters function (memoized to avoid dependency issues)
+  const applyFilters = useCallback((source: Listing[]) => {
+    if (source.length === 0) {
+      return [];
+    }
+
+    return source.filter((listing) => {
+      // Check booking availability for selected dates
+      if (!isListingAvailable(listing)) {
+        return false;
+      }
+
+      // Price filter
+      if (listing.price_base < minPrice || listing.price_base > maxPrice) {
+        return false;
+      }
+
+      // Bedrooms filter (if specified)
+      if (bedrooms > 0 && (!listing.bedrooms || listing.bedrooms < bedrooms)) {
+        return false;
+      }
+
+      // Beds filter (if specified)
+      if (beds > 0 && (!listing.beds || listing.beds < beds)) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [minPrice, maxPrice, bedrooms, beds, isListingAvailable]);
+
+  // Re-filter when allListings changes
+  useEffect(() => {
+    const filtered = applyFilters(allListings);
+    setListings(filtered);
+  }, [allListings, applyFilters]);
+
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
@@ -243,6 +344,16 @@ function SearchContent() {
     }
   };
 
+  const handleClearFilters = () => {
+    setMinPrice(0);
+    setMaxPrice(1000);
+    setAccommodationType([]);
+    setBedrooms(0);
+    setBeds(0);
+    // Reset listings to all (filter useEffect will handle this)
+    setListings(allListings);
+  };
+
   const getSearchSummary = () => {
     const parts: string[] = [];
     if (searchParams.get("city")) {
@@ -264,78 +375,116 @@ function SearchContent() {
 
   return (
     <div className={styles.searchPageContainer}>
-      <div className={styles.searchContent}>
-        <div className={styles.searchHeader}>
-          <div className={styles.headerTop}>
-            <div>
-              <h1 className={styles.searchTitle}>
-                {!loading && pagination.total > 0 
-                  ? `Hơn ${pagination.total.toLocaleString()} chỗ ở`
-                  : "Kết quả tìm kiếm"}
-              </h1>
-              <p className={styles.searchSummary}>{getSearchSummary()}</p>
-            </div>
-            <Button icon={<FilterOutlined />}>Bộ lọc</Button>
+      {/* Header */}
+      <header className={styles.searchHeader}>
+        <div className={styles.headerContent}>
+          <div>
+            <Title level={1} className={styles.searchTitle}>
+              {!loading && pagination.total > 0 
+                ? `Chỗ ở tại ${searchParams.get("city") || "tất cả vị trí"}`
+                : "Kết quả tìm kiếm"}
+            </Title>
+            <Text type="secondary" className={styles.searchSummary}>
+              {!loading && pagination.total > 0 
+                ? `Hơn ${pagination.total.toLocaleString()}+ chỗ ở`
+                : getSearchSummary()}
+            </Text>
           </div>
-          {!loading && pagination.total > 0 && (
-            <div className={styles.priceBanner}>
-              <span>Giá đã bao gồm mọi khoản phí</span>
-            </div>
-          )}
         </div>
+      </header>
 
+      {/* Main Content */}
+      <main className={styles.searchContent}>
         {loading ? (
           <div className={styles.loadingContainer}>
             <Spin size="large" />
             <p>Đang tìm kiếm...</p>
           </div>
-        ) : listings.length === 0 ? (
-          <div className={styles.emptyContainer}>
-            <Empty
-              description="Không tìm thấy chỗ ở phù hợp"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
-          </div>
         ) : (
-          <div className={styles.searchResultsContainer}>
-            {/* Left Panel - Listings */}
-            <div className={styles.listingsPanel} ref={listingsContainerRef}>
-              <div className={styles.listingsGrid}>
-                {listings.map((listing) => (
-                  <div
-                    key={listing._id}
-                    id={`listing-${listing._id}`}
-                    className={`${styles.listingCardWrapper} ${
-                      selectedListingId === listing._id ? styles.selectedListing : ""
-                    }`}
-                    onClick={() => handleListingClick(listing._id)}
-                  >
-                    <ListingCard listing={listing} />
-                  </div>
-                ))}
-              </div>
+          <div className={styles.resultsWrapper}>
+            {/* Left Panel - Filters & Listings */}
+            <div className={styles.leftPanel}>
+              {/* Filters Sidebar */}
+              <SearchFilters
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+                onPriceChange={(min, max) => {
+                  setMinPrice(min);
+                  setMaxPrice(max);
+                }}
+                accommodationType={accommodationType}
+                onAccommodationTypeChange={setAccommodationType}
+                bedrooms={bedrooms}
+                onBedroomsChange={setBedrooms}
+                beds={beds}
+                onBedsChange={setBeds}
+                onClearFilters={handleClearFilters}
+              />
 
-              {pagination.totalPages > 1 && (
-                <div className={styles.paginationContainer}>
-                  <Pagination
-                    current={pagination.page}
-                    total={pagination.total}
-                    pageSize={pagination.limit}
-                    onChange={handlePageChange}
-                    showSizeChanger={false}
-                    showQuickJumper
-                    showTotal={(total, range) =>
-                      `${range[0]}-${range[1]} của ${total} chỗ ở`
-                    }
-                  />
+              {/* Listings Grid */}
+              <div className={styles.listingsContainer} ref={listingsContainerRef}>
+                {/* Filter Chips */}
+                <div className={styles.filterChips}>
+                  <div className={styles.chipsGrid}>
+                    {/* Add filter chip buttons here if needed */}
+                  </div>
                 </div>
-              )}
+
+                {/* Show empty state when no listings match filters */}
+                {listings.length === 0 ? (
+                  <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+                    <Empty
+                      description="Không có phòng phù hợp"
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      style={{ marginTop: 20 }}
+                    />
+                    <p style={{ marginTop: 16, color: '#666', fontSize: '14px' }}>
+                      Vui lòng thử thay đổi bộ lọc hoặc tìm kiếm khác
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Listings Grid */}
+                    <div className={styles.listingsGrid}>
+                      {listings.map((listing) => (
+                        <div
+                          key={listing._id}
+                          id={`listing-${listing._id}`}
+                          className={`${styles.listingCardWrapper} ${
+                            selectedListingId === listing._id ? styles.selectedListing : ""
+                          }`}
+                          onClick={() => handleListingClick(listing._id)}
+                        >
+                          <ListingGridCard listing={listing} />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pagination */}
+                    {pagination.totalPages > 1 && (
+                      <div className={styles.paginationContainer}>
+                        <Pagination
+                          current={pagination.page}
+                          total={pagination.total}
+                          pageSize={pagination.limit}
+                          onChange={handlePageChange}
+                          showSizeChanger={false}
+                          showQuickJumper
+                          showTotal={(total, range) =>
+                            `${range[0]}-${range[1]} của ${total} chỗ ở`
+                          }
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Right Panel - Map */}
             {showMap && (
               <div className={styles.mapPanel}>
-                <MapView
+                <MemoizedMapView
                   listings={listings}
                   center={mapCenter}
                   onMarkerClick={handleMarkerClick}
@@ -345,7 +494,7 @@ function SearchContent() {
             )}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

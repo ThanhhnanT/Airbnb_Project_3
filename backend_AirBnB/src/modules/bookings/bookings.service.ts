@@ -418,7 +418,18 @@ export class BookingsService {
           
           // Filter by booking status if provided
           if (status) {
-            if (bookingWithPayment.status === status) {
+            if (status === 'completed') {
+              const checkOutTime = new Date(bookingWithPayment.check_out).getTime();
+              const isAfterCheckout = !isNaN(checkOutTime) && Date.now() > checkOutTime;
+              const isCompleted =
+                bookingWithPayment.status === 'completed' ||
+                (bookingWithPayment.status === 'confirmed' && isAfterCheckout);
+              if (isCompleted) {
+                // Do not mutate DB; only normalize for UI
+                bookingWithPayment.status = 'completed';
+                bookings.push(bookingWithPayment);
+              }
+            } else if (bookingWithPayment.status === status) {
               bookings.push(bookingWithPayment);
             }
           } else {

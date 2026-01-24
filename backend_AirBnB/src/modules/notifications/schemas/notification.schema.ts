@@ -16,6 +16,12 @@ export class Notification {
 
   @Prop({ type: Boolean, default: false })
   is_read: boolean;
+
+  @Prop({ type: String, nullable: true })
+  link_action?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Booking', nullable: true })
+  booking_id?: Types.ObjectId;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

@@ -1,451 +1,363 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Card, Space, message, Typography, Button, Row, Col, Alert, Spin } from "antd";
 import {
-  Table,
-  Tag,
-  message,
-  Card,
-  Space,
-  Input,
-  Button,
-  Modal,
-  Form,
-  Typography,
-  Statistic,
-  Row,
-  Col,
-} from "antd";
-import {
-  SearchOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined,
+  CalendarOutlined,
+  FileExcelOutlined,
+  BarsOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
 import { getAccess, postAccess } from "@/helper/api";
 import { useMessageApi } from "@/components/providers/Message";
 import { useSocket } from "@/components/providers/SocketProvider";
-import type { ColumnsType } from "antd/es/table";
+import PayoutStats from "./components/PayoutStats";
+import PayoutFilters, { FilterValues } from "./components/PayoutFilters";
+import PayoutTable, { Payout } from "./components/PayoutTable";
+import PayoutDetailModal from "./components/PayoutDetailModal";
+import SchedulePayoutModal from "./components/SchedulePayoutModal";
+import BatchMarkPaidModal from "./components/BatchMarkPaidModal";
+import ComplianceReportModal from "./components/ComplianceReportModal";
+import PayoutChart from "./components/PayoutChart";
+import styles from "./payouts.module.css";
 
-const { TextArea } = Input;
-const { Title, Text } = Typography;
-
-interface Payout {
-  _id: string;
-  host_id: {
-    _id: string;
-    name: string;
-    email: string;
-  };
-  booking_id: {
-    _id: string;
-    check_in?: string;
-    check_out?: string;
-  };
-  payment_id: {
-    _id: string;
-    amount: number;
-    currency: string;
-  };
-  amount: number;
-  platform_fee: number;
-  currency: string;
-  status: "pending" | "paid" | "failed";
-  bank_account_id?: {
-    _id: string;
-    bank_name: string;
-    account_number: string;
-    account_holder_name: string;
-  };
-  admin_note?: string;
-  processed_by?: {
-    _id: string;
-    name: string;
-  };
-  processed_at?: string;
-  createdAt: string;
+interface PayoutStatsData {
+  total: number;
+  pending: number;
+  paid: number;
+  failed: number;
+  totalAmount: number;
+  pendingAmount: number;
+  paidAmount: number;
 }
+
+const { Title } = Typography;
 
 export default function AdminPayoutsPage() {
   const messageApi = useMessageApi();
   const { socket } = useSocket();
-  const [form] = Form.useForm();
   const [payouts, setPayouts] = useState<Payout[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
-  const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null);
-  const [markPaidModalVisible, setMarkPaidModalVisible] = useState(false);
-  const [markPaidLoading, setMarkPaidLoading] = useState(false);
-  const [stats, setStats] = useState({
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [stats, setStats] = useState<PayoutStatsData | null>(null);
+  const [filters, setFilters] = useState<FilterValues>({});
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
     total: 0,
-    pending: 0,
-    paid: 0,
-    totalAmount: 0,
-    pendingAmount: 0,
-    paidAmount: 0,
   });
 
+  // Modal states
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null);
+  const [scheduleVisible, setScheduleVisible] = useState(false);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+  const [batchVisible, setBatchVisible] = useState(false);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [complianceVisible, setComplianceVisible] = useState(false);
+  const [complianceLoading, setComplianceLoading] = useState(false);
+
+  // Batch selection
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
   useEffect(() => {
-    fetchPayouts();
-  }, [statusFilter]);
+    fetchPayouts(1, 10);
+    fetchStats();
 
-  // Listen for new payout notifications via Socket.IO
-  useEffect(() => {
-    if (!socket) return;
+    if (socket) {
+      socket.on("payout_pending", () => {
+        messageApi.info("Có payout mới cần xử lý");
+        fetchPayouts(pagination.current, pagination.pageSize);
+        fetchStats();
+      });
 
-    socket.on("payout_pending", (data: any) => {
-      messageApi.info(`Có payout mới cần xử lý: ${data.amount} ${data.currency}`);
-      fetchPayouts(); // Refresh the list
-    });
+      socket.on("payout_status_changed", () => {
+        fetchPayouts(pagination.current, pagination.pageSize);
+        fetchStats();
+      });
 
-    return () => {
-      socket.off("payout_pending");
-    };
-  }, [socket, messageApi]);
+      return () => {
+        socket.off("payout_pending");
+        socket.off("payout_status_changed");
+      };
+    }
+  }, [socket]);
 
-  const fetchPayouts = async () => {
+  const fetchPayouts = async (page: number = 1, limit: number = 10) => {
     try {
       setLoading(true);
-      const url = statusFilter
-        ? `payouts?status=${statusFilter}`
-        : "payouts";
-      const result = await getAccess(url, {}, true); // Use admin token
-      setPayouts(result || []);
-      
-      // Calculate stats
-      const allPayouts = result || [];
-      const statsData = {
-        total: allPayouts.length,
-        pending: allPayouts.filter((p: Payout) => p.status === "pending").length,
-        paid: allPayouts.filter((p: Payout) => p.status === "paid").length,
-        totalAmount: allPayouts.reduce((sum: number, p: Payout) => sum + p.amount, 0),
-        pendingAmount: allPayouts
-          .filter((p: Payout) => p.status === "pending")
-          .reduce((sum: number, p: Payout) => sum + p.amount, 0),
-        paidAmount: allPayouts
-          .filter((p: Payout) => p.status === "paid")
-          .reduce((sum: number, p: Payout) => sum + p.amount, 0),
-      };
-      setStats(statsData);
+      const result = await getAccess(
+        `admin/payouts?page=${page}&limit=${limit}`,
+        {},
+        true
+      );
+      setPayouts(result?.data || []);
+      if (result?.pagination) {
+        setPagination({
+          current: result.pagination.page,
+          pageSize: result.pagination.limit,
+          total: result.pagination.total,
+        });
+      }
+      setSelectedRowKeys([]);
     } catch (error) {
       messageApi.error("Không thể tải danh sách payouts");
+      console.error("Fetch payouts error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMarkAsPaid = async (values: { note?: string }) => {
-    if (!selectedPayout) return;
-
+  const fetchStats = async () => {
     try {
-      setMarkPaidLoading(true);
-      await postAccess(`payouts/${selectedPayout._id}/mark-paid`, {
-        note: values.note || "",
-      }, true); // Use admin token
-      messageApi.success("Đánh dấu payout đã được chuyển tiền thành công!");
-      setMarkPaidModalVisible(false);
-      form.resetFields();
-      setSelectedPayout(null);
-      await fetchPayouts();
-    } catch (error: any) {
-      console.error("Error marking payout as paid:", error);
-      messageApi.error(
-        error?.response?.data?.message || "Không thể đánh dấu payout đã được chuyển tiền"
-      );
+      setStatsLoading(true);
+      const result = await getAccess("admin/payouts/stats", {}, true);
+      setStats(result || null);
+    } catch (error) {
+      console.error("Fetch stats error:", error);
     } finally {
-      setMarkPaidLoading(false);
+      setStatsLoading(false);
     }
   };
 
-  const openMarkPaidModal = (payout: Payout) => {
-    setSelectedPayout(payout);
-    setMarkPaidModalVisible(true);
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    fetchPayouts(1, pagination.pageSize);
   };
 
-  const filteredPayouts = payouts.filter(
-    (payout) =>
-      payout.host_id?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-      payout.host_id?.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-      payout.bank_account_id?.account_number?.includes(searchText)
+  const handleViewDetail = (payout: Payout) => {
+    setSelectedPayout(payout);
+    setDetailVisible(true);
+  };
+
+  const handleMarkAsPaid = (payout: Payout) => {
+    setSelectedPayout(payout);
+    setBatchVisible(true);
+    setSelectedRowKeys([payout._id]);
+  };
+
+  const handleSchedule = (payout: Payout) => {
+    setSelectedPayout(payout);
+    setScheduleVisible(true);
+  };
+
+  const handleConfirmSchedule = async (
+    payoutId: string,
+    scheduledAt: string,
+    sendNotification: boolean
+  ) => {
+    try {
+      setScheduleLoading(true);
+      await postAccess(
+        `admin/payouts/schedule`,
+        {
+          payout_id: payoutId,
+          scheduled_at: scheduledAt,
+          send_notification: sendNotification,
+        },
+        true
+      );
+      message.success("Lên lịch payout thành công!");
+      setScheduleVisible(false);
+      setSelectedPayout(null);
+      fetchPayouts(pagination.current, pagination.pageSize);
+      fetchStats();
+    } catch (error) {
+      message.error("Không thể lên lịch payout. Vui lòng thử lại.");
+      console.error("Schedule error:", error);
+    } finally {
+      setScheduleLoading(false);
+    }
+  };
+
+  const handleBatchMarkAsPaid = async (payoutIds: string[], note: string) => {
+    try {
+      setBatchLoading(true);
+      await postAccess(
+        `admin/payouts/batch-mark-paid`,
+        {
+          payout_ids: payoutIds,
+          admin_note: note,
+        },
+        true
+      );
+      message.success(`Đánh dấu ${payoutIds.length} payout đã chuyển thành công!`);
+      setBatchVisible(false);
+      setSelectedRowKeys([]);
+      fetchPayouts(pagination.current, pagination.pageSize);
+      fetchStats();
+    } catch (error) {
+      message.error("Không thể xử lý batch. Vui lòng thử lại.");
+      console.error("Batch mark error:", error);
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
+  const handleGenerateReport = async (filters: {
+    startDate: string;
+    endDate: string;
+    status?: string;
+  }) => {
+    try {
+      setComplianceLoading(true);
+      const result = await getAccess(
+        `admin/payouts/compliance-report?startDate=${filters.startDate}&endDate=${filters.endDate}${
+          filters.status ? `&status=${filters.status}` : ""
+        }`,
+        {},
+        true
+      );
+
+      if (result) {
+        const url = window.URL.createObjectURL(new Blob([result]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `compliance-report-${new Date().toISOString().split("T")[0]}.csv`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode?.removeChild(link);
+        message.success("Báo cáo đã được tải xuống!");
+      }
+      setComplianceVisible(false);
+    } catch (error) {
+      message.error("Không thể tạo báo cáo. Vui lòng thử lại.");
+      console.error("Generate report error:", error);
+    } finally {
+      setComplianceLoading(false);
+    }
+  };
+
+  const handleTableChange = (newPagination: any) => {
+    fetchPayouts(newPagination.current, newPagination.pageSize);
+  };
+
+  const selectedPayouts = payouts.filter((p) =>
+    selectedRowKeys.includes(p._id)
   );
 
-  const columns: ColumnsType<Payout> = [
-    {
-      title: "Host",
-      key: "host",
-      render: (_, record) => (
-        <div>
-          <div>{record.host_id?.name || "N/A"}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {record.host_id?.email || ""}
-          </Text>
-        </div>
-      ),
-    },
-    {
-      title: "Số tiền",
-      key: "amount",
-      render: (_, record) => (
-        <div>
-          <Text strong>{record.amount} {record.currency}</Text>
-          <div style={{ fontSize: 12, color: "#999" }}>
-            Phí: {record.platform_fee} {record.currency}
-          </div>
-        </div>
-      ),
-      sorter: (a, b) => a.amount - b.amount,
-    },
-    {
-      title: "Thông tin ngân hàng",
-      key: "bank",
-      render: (_, record) => {
-        if (!record.bank_account_id) {
-          return <Text type="danger">Chưa có thông tin</Text>;
-        }
-        return (
-          <div>
-            <div>{record.bank_account_id.bank_name}</div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {record.bank_account_id.account_number}
-            </Text>
-            <div style={{ fontSize: 12 }}>
-              {record.bank_account_id.account_holder_name}
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => {
-        const colors: any = {
-          pending: "orange",
-          paid: "green",
-          failed: "red",
-        };
-        const icons: any = {
-          pending: <ClockCircleOutlined />,
-          paid: <CheckCircleOutlined />,
-          failed: <ClockCircleOutlined />,
-        };
-        return (
-          <Tag color={colors[status]} icon={icons[status]}>
-            {status === "pending" ? "Chờ xử lý" : status === "paid" ? "Đã chuyển" : "Thất bại"}
-          </Tag>
-        );
-      },
-      filters: [
-        { text: "Chờ xử lý", value: "pending" },
-        { text: "Đã chuyển", value: "paid" },
-        { text: "Thất bại", value: "failed" },
-      ],
-      onFilter: (value, record) => record.status === value,
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleDateString("vi-VN"),
-      sorter: (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    },
-    {
-      title: "Hành động",
-      key: "action",
-      render: (_, record) => {
-        if (record.status === "pending") {
-          return (
-            <Button
-              type="primary"
-              icon={<CheckCircleOutlined />}
-              onClick={() => openMarkPaidModal(record)}
-            >
-              Đánh dấu đã chuyển
-            </Button>
-          );
-        }
-        if (record.status === "paid") {
-          return (
-            <div>
-              <Text type="success">Đã xử lý</Text>
-              {record.processed_at && (
-                <div style={{ fontSize: 12, color: "#999" }}>
-                  {new Date(record.processed_at).toLocaleDateString("vi-VN")}
-                </div>
-              )}
-            </div>
-          );
-        }
-        return null;
-      },
-    },
-  ];
-
   return (
-    <div style={{ padding: 24 }}>
-      <Space direction="vertical" size="large" style={{ width: "100%" }}>
-        <Title level={2}>Quản lý Payouts</Title>
+    <div className={styles.payoutContainer}>
+      <Title level={2} className={styles.pageTitle}>
+        Quản lý Payouts
+      </Title>
 
-        {/* Statistics */}
-        <Row gutter={16}>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="Tổng số Payouts"
-                value={stats.total}
-                prefix={<DollarOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="Chờ xử lý"
-                value={stats.pending}
-                prefix={<ClockCircleOutlined />}
-                valueStyle={{ color: "#faad14" }}
-              />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="Đã chuyển"
-                value={stats.paid}
-                prefix={<CheckCircleOutlined />}
-                valueStyle={{ color: "#52c41a" }}
-              />
-            </Card>
-          </Col>
-          <Col span={6}>
-            <Card>
-              <Statistic
-                title="Tổng tiền chờ xử lý"
-                value={stats.pendingAmount}
-                suffix="VND"
-                prefix={<DollarOutlined />}
-                valueStyle={{ color: "#faad14" }}
-              />
-            </Card>
-          </Col>
-        </Row>
+      <Spin spinning={statsLoading}>
+        <PayoutStats stats={stats} loading={statsLoading} />
+      </Spin>
 
-        {/* Filters */}
-        <Card>
-          <Space style={{ marginBottom: 16, width: "100%" }} direction="vertical">
+      <PayoutChart data={stats} loading={statsLoading} />
+
+      <PayoutFilters onFilterChange={handleFilterChange} />
+
+      {/* Batch Action Bar */}
+      {selectedRowKeys.length > 0 && (
+        <Alert
+          message={`Đã chọn ${selectedRowKeys.length} payout`}
+          description={
             <Space>
-              <Input
-                placeholder="Tìm kiếm theo host, email hoặc số tài khoản..."
-                prefix={<SearchOutlined />}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                style={{ width: 400 }}
-              />
               <Button
-                onClick={() => setStatusFilter(undefined)}
-                type={statusFilter === undefined ? "primary" : "default"}
+                type="primary"
+                size="small"
+                icon={<CheckCircleOutlined />}
+                onClick={() => setBatchVisible(true)}
               >
-                Tất cả
+                Đánh dấu đã chuyển ({selectedRowKeys.length})
               </Button>
               <Button
-                onClick={() => setStatusFilter("pending")}
-                type={statusFilter === "pending" ? "primary" : "default"}
+                size="small"
+                icon={<CalendarOutlined />}
+                onClick={() => {
+                  if (selectedPayouts.length === 1) {
+                    setSelectedPayout(selectedPayouts[0]);
+                    setScheduleVisible(true);
+                  } else {
+                    message.info("Vui lòng chọn 1 payout để lên lịch");
+                  }
+                }}
               >
-                Chờ xử lý
-              </Button>
-              <Button
-                onClick={() => setStatusFilter("paid")}
-                type={statusFilter === "paid" ? "primary" : "default"}
-              >
-                Đã chuyển
+                Lên lịch
               </Button>
             </Space>
-          </Space>
+          }
+          showIcon
+          closable
+          onClose={() => setSelectedRowKeys([])}
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-          <Table
-            columns={columns}
-            dataSource={filteredPayouts}
-            rowKey="_id"
-            loading={loading}
-            scroll={{ x: 1200 }}
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total) => `Tổng ${total} payouts`,
-            }}
-          />
-        </Card>
-      </Space>
+      {/* Action Bar */}
+      <Row gutter={8} style={{ marginBottom: 16 }} className={styles.actionBar}>
+        <Col>
+          <Button
+            type="default"
+            icon={<FileExcelOutlined />}
+            onClick={() => setComplianceVisible(true)}
+          >
+            Báo cáo Tuân thủ
+          </Button>
+        </Col>
+      </Row>
 
-      {/* Mark as Paid Modal */}
-      <Modal
-        title="Đánh dấu payout đã được chuyển tiền"
-        open={markPaidModalVisible}
-        onCancel={() => {
-          setMarkPaidModalVisible(false);
-          form.resetFields();
+      <Card className={styles.tableCard}>
+        <PayoutTable
+          data={payouts}
+          loading={loading}
+          selectedRowKeys={selectedRowKeys}
+          pagination={pagination}
+          onViewDetail={handleViewDetail}
+          onMarkAsPaid={handleMarkAsPaid}
+          onSchedule={handleSchedule}
+          onSelectChange={setSelectedRowKeys}
+          onChange={handleTableChange}
+        />
+      </Card>
+
+      {/* Modals */}
+      <PayoutDetailModal
+        visible={detailVisible}
+        payout={selectedPayout}
+        onClose={() => {
+          setDetailVisible(false);
           setSelectedPayout(null);
         }}
-        footer={null}
-      >
-        {selectedPayout && (
-          <div>
-            <Space direction="vertical" style={{ width: "100%", marginBottom: 16 }}>
-              <div>
-                <Text strong>Host:</Text> {selectedPayout.host_id?.name}
-              </div>
-              <div>
-                <Text strong>Số tiền:</Text> {selectedPayout.amount} {selectedPayout.currency}
-              </div>
-              {selectedPayout.bank_account_id && (
-                <div>
-                  <Text strong>Ngân hàng:</Text> {selectedPayout.bank_account_id.bank_name}
-                  <br />
-                  <Text strong>Số tài khoản:</Text> {selectedPayout.bank_account_id.account_number}
-                  <br />
-                  <Text strong>Chủ tài khoản:</Text> {selectedPayout.bank_account_id.account_holder_name}
-                </div>
-              )}
-            </Space>
+        onMarkAsPaid={handleMarkAsPaid}
+        onSchedule={handleSchedule}
+      />
 
-            <Form form={form} onFinish={handleMarkAsPaid} layout="vertical">
-              <Form.Item
-                label="Ghi chú (tùy chọn)"
-                name="note"
-              >
-                <TextArea
-                  rows={4}
-                  placeholder="Nhập ghi chú về việc chuyển tiền..."
-                />
-              </Form.Item>
+      <SchedulePayoutModal
+        visible={scheduleVisible}
+        payout={selectedPayout}
+        onClose={() => {
+          setScheduleVisible(false);
+          setSelectedPayout(null);
+        }}
+        onConfirm={handleConfirmSchedule}
+        loading={scheduleLoading}
+      />
 
-              <Form.Item>
-                <Space>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={markPaidLoading}
-                    icon={<CheckCircleOutlined />}
-                  >
-                    Xác nhận đã chuyển tiền
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setMarkPaidModalVisible(false);
-                      form.resetFields();
-                      setSelectedPayout(null);
-                    }}
-                  >
-                    Hủy
-                  </Button>
-                </Space>
-              </Form.Item>
-            </Form>
-          </div>
-        )}
-      </Modal>
+      <BatchMarkPaidModal
+        visible={batchVisible}
+        payouts={selectedPayouts}
+        onClose={() => {
+          setBatchVisible(false);
+          setSelectedRowKeys([]);
+        }}
+        onConfirm={handleBatchMarkAsPaid}
+        loading={batchLoading}
+      />
+
+      <ComplianceReportModal
+        visible={complianceVisible}
+        onClose={() => setComplianceVisible(false)}
+        onGenerate={handleGenerateReport}
+        loading={complianceLoading}
+      />
     </div>
   );
 }

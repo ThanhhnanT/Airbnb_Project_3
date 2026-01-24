@@ -138,11 +138,12 @@ const getTokenHeader = (useAdminToken?: boolean) => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const getAccess = async (path: string, params: object = {}) => {
+export const getAccess = async (path: string, params: object = {}, useAdminToken?: boolean) => {
   try {
-    const tokenHeader = getTokenHeader();
+    const tokenHeader = getTokenHeader(useAdminToken);
     console.log("[API] getAccess - path:", path);
     console.log("[API] getAccess - params:", params);
+    console.log("[API] getAccess - useAdminToken:", useAdminToken);
     console.log("[API] getAccess - tokenHeader:", tokenHeader ? "Token present" : "No token");
     console.log("[API] getAccess - full URL:", API_DOMAIN + path);
     
@@ -157,9 +158,12 @@ export const getAccess = async (path: string, params: object = {}) => {
     
     return result.data;
   } catch (e: any) {
-    console.error("[API] getAccess - Error:", e);
-    console.error("[API] getAccess - Error response:", e?.response?.data);
-    console.error("[API] getAccess - Error status:", e?.response?.status);
+    // Don't log 404 errors as they are expected for optional endpoints
+    if (e?.response?.status !== 404) {
+      console.error("[API] getAccess - Error:", e);
+      console.error("[API] getAccess - Error response:", e?.response?.data);
+      console.error("[API] getAccess - Error status:", e?.response?.status);
+    }
     throw e; // Re-throw để frontend có thể handle
   }
 };

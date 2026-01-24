@@ -13,12 +13,13 @@ const { Text } = Typography;
 
 interface Notification {
   id: string;
-  type: "payout_pending" | "payout_paid" | "bank_account_required" | "payment_new" | "booking_new";
+  type: "payout_pending" | "payout_paid" | "bank_account_required" | "payment_new" | "booking_new" | "checkout_completed";
   title: string;
   message: string;
   timestamp: Date;
   read: boolean;
   data?: any;
+  link_action?: string;
 }
 
 export default function NotificationBell() {
@@ -118,9 +119,9 @@ export default function NotificationBell() {
       });
     }
 
-    // Host notifications: bank_account_required
+    // Host notifications: bank_account_required, checkout_completed
     if (userRole === 'host') {
-      console.log('[NotificationBell] Registering host listener: bank_account_required');
+      console.log('[NotificationBell] Registering host listeners: bank_account_required, checkout_completed');
       
       // Listen for bank_account_required notifications (for host only)
       socket.on("bank_account_required", (data: any) => {
@@ -133,6 +134,23 @@ export default function NotificationBell() {
           timestamp: new Date(),
           read: false,
           data: data,
+        };
+        setNotifications((prev) => [newNotification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+      });
+
+      // Listen for checkout_completed notifications (for host)
+      socket.on("checkout_completed", (data: any) => {
+        console.log('[NotificationBell] Received checkout_completed notification:', data);
+        const newNotification: Notification = {
+          id: `checkout_${data.booking_id}_${Date.now()}`,
+          type: "checkout_completed",
+          title: "Chuyến đi hoàn thành",
+          message: data.message || "Chuyến đi của khách đã hoàn thành, vui lòng để lại đánh giá",
+          timestamp: new Date(),
+          read: false,
+          data: data,
+          link_action: data.link_action || `/reviews/write/${data.booking_id}`,
         };
         setNotifications((prev) => [newNotification, ...prev]);
         setUnreadCount((prev) => prev + 1);
@@ -151,6 +169,7 @@ export default function NotificationBell() {
       socket.off("payment_new");
       socket.off("booking_new");
       socket.off("bank_account_required");
+      socket.off("checkout_completed");
     };
   }, [socket, connected, userRole]);
 
@@ -163,8 +182,12 @@ export default function NotificationBell() {
     );
     setUnreadCount((prev) => Math.max(0, prev - 1));
 
-    // Navigate based on notification type
-    if (notification.type === "payout_pending" && notification.data?.payout_id) {
+    // Navigate based on link_action if available
+    if (notification.link_action) {
+      router.push(notification.link_action);
+    } 
+    // Fallback to type-based navigation for backward compatibility
+    else if (notification.type === "payout_pending" && notification.data?.payout_id) {
       router.push("/admin/payouts");
     } else if (notification.type === "payment_new" && notification.data?.payment_id) {
       router.push("/admin/payments");
@@ -172,6 +195,8 @@ export default function NotificationBell() {
       router.push("/admin/bookings");
     } else if (notification.type === "bank_account_required" && notification.data?.action_url) {
       router.push(notification.data.action_url);
+    } else if (notification.type === "checkout_completed" && notification.data?.booking_id) {
+      router.push(`/reviews/write/${notification.data.booking_id}`);
     }
   };
 
@@ -275,7 +300,7 @@ export default function NotificationBell() {
         <Button
           type="text"
           shape="circle"
-          icon={<BellOutlined />}
+          icon={<BellOutlined style={{ color: pathname?.startsWith("/admin") ? "#fff" : undefined }} />}
           style={{
             fontSize: 18,
             width: 40,
@@ -283,8 +308,9 @@ export default function NotificationBell() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            border: "1px solid #fff",
+            border: pathname?.startsWith("/admin") ? "1px solid #fff" : undefined,
             backgroundColor: "transparent",
+            color: pathname?.startsWith("/admin") ? "#fff" : undefined,
           }}
         />
       </Badge>

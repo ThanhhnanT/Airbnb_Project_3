@@ -12,6 +12,9 @@ import {
   Empty,
   Spin,
   message,
+  Modal,
+  Rate,
+  Input,
 } from "antd";
 import {
   CalendarOutlined,
@@ -29,6 +32,13 @@ import { useRouter } from "next/navigation";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import dayjs from "dayjs";
+import {
+  createReview,
+  deleteReview,
+  getReviewByBooking,
+  updateReview,
+  type Review,
+} from "@/service/reviews";
 import styles from "./trips.module.css";
 
 const { Title, Text } = Typography;
@@ -79,6 +89,14 @@ export default function TripsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upcoming");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  const [reviewMap, setReviewMap] = useState<Record<string, Review | null>>({});
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [activeBookingForReview, setActiveBookingForReview] = useState<Booking | null>(null);
+  const [activeReviewId, setActiveReviewId] = useState<string | null>(null);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [reviewComment, setReviewComment] = useState<string>("");
 
   useEffect(() => {
     fetchBookings();
@@ -137,10 +155,29 @@ export default function TripsPage() {
           })
         );
         setListingImagesMap(imagesMap);
+
+        // Fetch reviews per booking (best-effort)
+        try {
+          const reviewEntries = await Promise.all(
+            data.map(async (b: Booking) => {
+              const review = await getReviewByBooking(b._id);
+              return [b._id, review] as const;
+            })
+          );
+          const nextMap: Record<string, Review | null> = {};
+          for (const [bookingId, review] of reviewEntries) {
+            nextMap[bookingId] = review;
+          }
+          setReviewMap(nextMap);
+        } catch (e) {
+          // If fetching reviews fails, don't block trips UI
+          setReviewMap({});
+        }
       } else {
         console.warn("[TripsPage] fetchBookings - Unexpected response format:", data);
         setBookings([]);
         setListingImagesMap({});
+        setReviewMap({});
       }
     } catch (error: any) {
       console.error("[TripsPage] fetchBookings - Error fetching bookings:", error);
@@ -164,6 +201,7 @@ export default function TripsPage() {
       }
       setBookings([]);
       setListingImagesMap({});
+      setReviewMap({});
     } finally {
       setLoading(false);
     }
@@ -332,6 +370,76 @@ export default function TripsPage() {
     router.push(`/messages?host=${hostId}`);
   };
 
+  const canReviewBooking = (booking: Booking) => {
+    const paid = booking.payment_id?.status === "paid";
+    const statusOk = booking.status === "confirmed" || booking.status === "completed";
+    const afterCheckout = dayjs().isAfter(dayjs(booking.check_out));
+    return paid && statusOk && afterCheckout;
+  };
+
+  const openReviewModal = (booking: Booking) => {
+    const existing = reviewMap[booking._id];
+    setActiveBookingForReview(booking);
+    setActiveReviewId(existing?._id || null);
+    setReviewRating(existing?.rating ?? 5);
+    setReviewComment(existing?.comment ?? "");
+    setReviewModalOpen(true);
+  };
+
+  const submitReview = async () => {
+    if (!activeBookingForReview) return;
+    if (!canReviewBooking(activeBookingForReview)) {
+      message.warning("Bạn chỉ có thể đánh giá sau ngày check-out và khi đã thanh toán.");
+      return;
+    }
+    try {
+      setReviewSubmitting(true);
+      if (activeReviewId) {
+        const updated = await updateReview(activeReviewId, {
+          rating: reviewRating,
+          comment: reviewComment,
+        });
+        setReviewMap((prev) => ({ ...prev, [activeBookingForReview._id]: updated }));
+        message.success("Đã cập nhật đánh giá");
+      } else {
+        const created = await createReview({
+          booking_id: activeBookingForReview._id,
+          rating: reviewRating,
+          comment: reviewComment,
+        });
+        setReviewMap((prev) => ({ ...prev, [activeBookingForReview._id]: created }));
+        setActiveReviewId(created._id);
+        message.success("Đã gửi đánh giá");
+      }
+      setReviewModalOpen(false);
+    } catch (e: any) {
+      message.error(e?.response?.data?.message || "Không thể gửi đánh giá");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
+  const confirmDeleteReview = (booking: Booking) => {
+    const existing = reviewMap[booking._id];
+    if (!existing) return;
+    Modal.confirm({
+      title: "Xoá đánh giá?",
+      content: "Bạn có chắc muốn xoá đánh giá cho chuyến đi này không?",
+      okText: "Xoá",
+      okButtonProps: { danger: true },
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          await deleteReview(existing._id);
+          setReviewMap((prev) => ({ ...prev, [booking._id]: null }));
+          message.success("Đã xoá đánh giá");
+        } catch (e: any) {
+          message.error(e?.response?.data?.message || "Không thể xoá đánh giá");
+        }
+      },
+    });
+  };
+
   if (loading) {
     return (
       <div style={{ display: "flex", justifyContent: "center", padding: "100px" }}>
@@ -459,6 +567,21 @@ export default function TripsPage() {
                         >
                           Liên hệ chủ nhà
                         </Button>
+                        {canReviewBooking(booking) && (
+                          <>
+                            <Button
+                              icon={<FileTextOutlined />}
+                              onClick={() => openReviewModal(booking)}
+                            >
+                              {reviewMap[booking._id] ? "Sửa đánh giá" : "Viết đánh giá"}
+                            </Button>
+                            {reviewMap[booking._id] && (
+                              <Button danger onClick={() => confirmDeleteReview(booking)}>
+                                Xoá đánh giá
+                              </Button>
+                            )}
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -496,6 +619,38 @@ export default function TripsPage() {
           </Card>
         </div>
       </div>
+
+      <Modal
+        open={reviewModalOpen}
+        title={activeReviewId ? "Sửa đánh giá" : "Viết đánh giá"}
+        onCancel={() => setReviewModalOpen(false)}
+        onOk={submitReview}
+        okText={reviewSubmitting ? "Đang lưu..." : "Lưu"}
+        cancelText="Hủy"
+        confirmLoading={reviewSubmitting}
+        destroyOnHidden
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div>
+            <div style={{ marginBottom: 6, fontWeight: 600 }}>Điểm đánh giá</div>
+            <Rate value={reviewRating} onChange={setReviewRating} />
+          </div>
+          <div>
+            <div style={{ marginBottom: 6, fontWeight: 600 }}>Nhận xét</div>
+            <Input.TextArea
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder="Chia sẻ trải nghiệm của bạn..."
+              autoSize={{ minRows: 3, maxRows: 6 }}
+            />
+          </div>
+          {activeBookingForReview && !canReviewBooking(activeBookingForReview) && (
+            <div style={{ color: "#ff4d4f" }}>
+              Bạn chỉ có thể đánh giá sau ngày check-out và khi đã thanh toán.
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

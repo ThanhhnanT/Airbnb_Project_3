@@ -1,16 +1,20 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Typography, Rate, Space, Tag } from "antd";
+import { Typography, Rate, Space, Tag, message } from "antd";
 import {
   HomeOutlined,
   UserOutlined,
   EnvironmentOutlined,
   LeftOutlined,
   RightOutlined,
+  HeartOutlined,
+  HeartFilled,
 } from "@ant-design/icons";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getListingImages, ListingImage } from "@/service/listings";
+import { checkIsFavorite, toggleFavorite } from "@/service/favorites";
+import Cookies from "js-cookie";
 import styles from "@/styles/listing-card.module.css";
 
 const { Text, Title } = Typography;
@@ -49,8 +53,11 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
+  const isLoggedIn = !!Cookies.get('access_token');
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -91,6 +98,23 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
 
     fetchImages();
   }, [listing._id, listing.cover_image]);
+
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (!isLoggedIn) {
+        setIsFavorite(false);
+        return;
+      }
+      try {
+        const favoriteStatus = await checkIsFavorite(listing._id);
+        setIsFavorite(favoriteStatus);
+      } catch (error) {
+        // Silently fail if user is not authenticated
+        setIsFavorite(false);
+      }
+    };
+    checkFavoriteStatus();
+  }, [listing._id, isLoggedIn]);
 
   // Auto-play carousel when hovered
   useEffect(() => {
@@ -240,14 +264,44 @@ const ListingCard: React.FC<ListingCardProps> = ({ listing }) => {
 
         <div 
           className={styles.favoriteButton}
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            // TODO: Handle favorite toggle
+            if (!isLoggedIn) {
+              message.warning('Vui lòng đăng nhập để thêm vào yêu thích');
+              return;
+            }
+            if (favoriteLoading) return;
+            
+            setFavoriteLoading(true);
+            const previousState = isFavorite; // Store previous state for rollback
+            
+            // Optimistic update
+            setIsFavorite(!isFavorite);
+            
+            try {
+              const result = await toggleFavorite(listing._id);
+              setIsFavorite(result.isFavorite);
+              if (result.isFavorite) {
+                message.success('Đã thêm vào yêu thích');
+              } else {
+                message.success('Đã xóa khỏi yêu thích');
+              }
+            } catch (error: any) {
+              console.error("Error toggling favorite:", error);
+              // Rollback on error
+              setIsFavorite(previousState);
+              const errorMessage = error?.response?.data?.message || error?.message || 'Có lỗi xảy ra';
+              message.error(errorMessage);
+            } finally {
+              setFavoriteLoading(false);
+            }
           }}
         >
-          <svg viewBox="0 0 24 24" className={styles.heartIcon} fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
+          {isFavorite ? (
+            <HeartFilled className={styles.heartIcon} style={{ color: '#ff385c', fill: '#ff385c' }} />
+          ) : (
+            <HeartOutlined className={styles.heartIcon} style={{ color: '#222' }} />
+          )}
         </div>
       </div>
       <div className={styles.cardContent}>

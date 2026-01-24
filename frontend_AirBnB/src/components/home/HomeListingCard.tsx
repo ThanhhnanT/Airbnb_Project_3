@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, Rate, Typography } from "antd";
+import { Card, Rate, Typography, message } from "antd";
 import { HeartOutlined, HeartFilled, HomeOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { getListingFirstImage } from "@/service/listings";
+import { checkIsFavorite, toggleFavorite } from "@/service/favorites";
+import Cookies from "js-cookie";
 import styles from "@/styles/home-listing-card.module.css";
 
 const { Text } = Typography;
@@ -28,6 +30,8 @@ const HomeListingCard: React.FC<HomeListingCardProps> = ({ listing }) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const isLoggedIn = !!Cookies.get('access_token');
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -47,14 +51,62 @@ const HomeListingCard: React.FC<HomeListingCardProps> = ({ listing }) => {
     fetchImage();
   }, [listing._id]);
 
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (!isLoggedIn) {
+        setIsFavorite(false);
+        return;
+      }
+      try {
+        const favoriteStatus = await checkIsFavorite(listing._id);
+        setIsFavorite(favoriteStatus);
+      } catch (error) {
+        // Silently fail if user is not authenticated
+        setIsFavorite(false);
+      }
+    };
+    checkFavoriteStatus();
+  }, [listing._id, isLoggedIn]);
+
   const handleCardClick = () => {
     router.push(`/listings/${listing._id}`);
   };
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    if (!isLoggedIn) {
+      message.warning('Vui lòng đăng nhập để thêm vào yêu thích');
+      return;
+    }
+
+    if (favoriteLoading) {
+      return; // Prevent multiple clicks
+    }
+
+    setFavoriteLoading(true);
+    const previousState = isFavorite; // Store previous state for rollback
+    
+    // Optimistic update
     setIsFavorite(!isFavorite);
-    // TODO: Implement favorite API call
+    
+    try {
+      const result = await toggleFavorite(listing._id);
+      setIsFavorite(result.isFavorite);
+      if (result.isFavorite) {
+        message.success('Đã thêm vào yêu thích');
+      } else {
+        message.success('Đã xóa khỏi yêu thích');
+      }
+    } catch (error: any) {
+      console.error("Error toggling favorite:", error);
+      // Rollback on error
+      setIsFavorite(previousState);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Có lỗi xảy ra';
+      message.error(errorMessage);
+    } finally {
+      setFavoriteLoading(false);
+    }
   };
 
   const formatPrice = (price: number, currency: string) => {
@@ -95,11 +147,12 @@ const HomeListingCard: React.FC<HomeListingCardProps> = ({ listing }) => {
             className={styles.favoriteButton}
             onClick={handleFavoriteClick}
             aria-label="Favorite"
+            disabled={favoriteLoading}
           >
             {isFavorite ? (
-              <HeartFilled className={styles.heartIcon} />
+              <HeartFilled className={styles.heartIcon} style={{ color: '#ff385c', fill: '#ff385c' }} />
             ) : (
-              <HeartOutlined className={styles.heartIcon} />
+              <HeartOutlined className={styles.heartIcon} style={{ color: '#222' }} />
             )}
           </button>
         </div>
