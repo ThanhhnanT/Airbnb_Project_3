@@ -1,6 +1,7 @@
 "use client";
 
-import { Card, Row, Col, Typography, Tag, Divider, Empty, Space, Tooltip } from "antd";
+import { Card, Row, Col, Typography, Tag, Divider, Empty, Space, Tooltip, Button, Input, InputNumber } from "antd";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import {
   WifiOutlined,
   DesktopOutlined,
@@ -63,9 +64,10 @@ const amenityLabels: Record<string, string> = {
 
 interface OverviewTabProps {
   listing: Listing;
+  onEdit?: () => void;
 }
 
-export default function OverviewTab({ listing }: OverviewTabProps) {
+export default function OverviewTab({ listing, onEdit }: OverviewTabProps) {
   if (!listing) {
     return <Empty description="Chưa tải thông tin listing" />;
   }
@@ -182,6 +184,22 @@ export default function OverviewTab({ listing }: OverviewTabProps) {
           </Col>
         </Row>
       </Card>
+
+      {/* Map */}
+      {listing.latitude && listing.longitude && (
+        <Card style={{ marginBottom: 16 }} title="Vị Trí Trên Bản Đồ">
+          <GoogleMap
+            mapContainerStyle={{ width: "100%", height: "400px", borderRadius: "8px" }}
+            center={{ lat: listing.latitude, lng: listing.longitude }}
+            zoom={15}
+          >
+            <Marker position={{ lat: listing.latitude, lng: listing.longitude }} />
+          </GoogleMap>
+          <div style={{ marginTop: 12 }}>
+            <Text type="secondary">Tọa độ: {listing.latitude.toFixed(4)}, {listing.longitude.toFixed(4)}</Text>
+          </div>
+        </Card>
+      )}
 
       {/* Property Details */}
       <Card style={{ marginBottom: 16 }} title="Chi Tiết Phòng">

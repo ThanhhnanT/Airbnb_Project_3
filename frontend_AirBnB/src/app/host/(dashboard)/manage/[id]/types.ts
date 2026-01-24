@@ -46,4 +46,6 @@ export interface Listing {
   avg_rating: number;
   review_count: number;
   images?: ListingImage[];
+  latitude?: number;
+  longitude?: number;
 }

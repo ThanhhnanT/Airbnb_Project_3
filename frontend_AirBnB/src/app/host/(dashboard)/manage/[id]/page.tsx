@@ -55,7 +55,7 @@ export default function ListingDetailPage() {
   };
 
   const handleEdit = () => {
-    router.push(`/host/listings/${listingId}/edit`);
+    message.info("Chức năng chỉnh sửa sẽ được cập nhật trong phiên bản tiếp theo.");
   };
 
   const handleDelete = () => {
