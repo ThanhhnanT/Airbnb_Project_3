@@ -34,6 +34,12 @@ interface Listing {
   avg_rating: number;
   review_count: number;
   amenities?: string[];
+  bookings?: Array<{
+    _id: string;
+    check_in: string;
+    check_out: string;
+    status: "pending" | "confirmed" | "completed" | "cancelled";
+  }>;
 }
 
 interface SearchResponse {
@@ -232,6 +238,40 @@ function SearchContent() {
     fetchSearchResults();
   }, [searchParams]);
 
+  // Check if listing has booking conflict with selected dates
+  const isListingAvailable = useCallback((listing: Listing): boolean => {
+    // If no dates selected, listing is available
+    const checkInStr = searchParams.get("check_in");
+    const checkOutStr = searchParams.get("check_out");
+    
+    if (!checkInStr || !checkOutStr) {
+      return true;
+    }
+
+    // Parse dates
+    const checkIn = new Date(checkInStr);
+    const checkOut = new Date(checkOutStr);
+
+    // Check if listing has any confirmed/pending bookings that overlap
+    if (listing.bookings && listing.bookings.length > 0) {
+      return !listing.bookings.some((booking) => {
+        // Skip cancelled bookings
+        if (booking.status === "cancelled") {
+          return false;
+        }
+
+        const bookingCheckIn = new Date(booking.check_in);
+        const bookingCheckOut = new Date(booking.check_out);
+
+        // Check if date ranges overlap
+        // Overlap occurs if: checkIn < bookingCheckOut AND checkOut > bookingCheckIn
+        return checkIn < bookingCheckOut && checkOut > bookingCheckIn;
+      });
+    }
+
+    return true;
+  }, [searchParams]);
+
   // Apply filters function (memoized to avoid dependency issues)
   const applyFilters = useCallback((source: Listing[]) => {
     if (source.length === 0) {
@@ -239,16 +279,14 @@ function SearchContent() {
     }
 
     return source.filter((listing) => {
-      // Price filter
-      if (listing.price_base < minPrice || listing.price_base > maxPrice) {
+      // Check booking availability for selected dates
+      if (!isListingAvailable(listing)) {
         return false;
       }
 
-      // Accommodation type filter (if any selected)
-      if (accommodationType.length > 0) {
-        // Note: This requires accommodation_type in listing data from API
-        // For now, we'll skip this if data is not available
-        // You can implement this once the API provides accommodation type
+      // Price filter
+      if (listing.price_base < minPrice || listing.price_base > maxPrice) {
+        return false;
       }
 
       // Bedrooms filter (if specified)
@@ -263,7 +301,7 @@ function SearchContent() {
 
       return true;
     });
-  }, [minPrice, maxPrice, accommodationType, bedrooms, beds]);
+  }, [minPrice, maxPrice, bedrooms, beds, isListingAvailable]);
 
   // Re-filter when allListings changes
   useEffect(() => {

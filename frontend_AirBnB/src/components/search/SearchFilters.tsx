@@ -32,11 +32,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   onBedsChange,
   onClearFilters,
 }) => {
-  const accommodationTypes = [
-    { label: "Toàn bộ nhà", value: "entire_house" },
-    { label: "Phòng riêng", value: "private_room" },
-    { label: "Phòng chung", value: "shared_room" },
-  ];
 
   return (
     <aside className={styles.filtersSidebar}>
@@ -97,31 +92,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
         </div>
       </Card>
 
-      {/* Accommodation Type Filter */}
-      <Card className={styles.filterCard}>
-        <Title level={5} className={styles.filterCardTitle}>
-          Loại chỗ ở
-        </Title>
-        <div className={styles.checkboxGroup}>
-          {accommodationTypes.map((type) => (
-            <label key={type.value} className={styles.checkboxLabel}>
-              <Checkbox
-                checked={accommodationType.includes(type.value)}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    onAccommodationTypeChange([...accommodationType, type.value]);
-                  } else {
-                    onAccommodationTypeChange(
-                      accommodationType.filter((t) => t !== type.value)
-                    );
-                  }
-                }}
-              />
-              <span>{type.label}</span>
-            </label>
-          ))}
-        </div>
-      </Card>
 
       {/* Rooms and Beds Filter */}
       <Card className={styles.filterCard}>
