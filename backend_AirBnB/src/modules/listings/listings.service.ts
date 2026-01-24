@@ -706,7 +706,6 @@ export class ListingsService {
       const result = await this.listingModel.updateMany(
         { _id: { $in: objectIds } },
         updateData,
-        { new: true },
       );
 
       return {
