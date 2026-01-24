@@ -141,11 +141,11 @@ export class ListingsStatsService {
     }).lean();
     const listingIds = hostListings.map((l) => l._id);
 
-    // Get all completed/confirmed bookings with their total prices
+    // Get all confirmed bookings with their total prices
     const bookings = await this.bookingModel
       .find({
         listing_id: { $in: listingIds },
-        status: { $in: ['completed', 'confirmed'] },
+        status: 'confirmed',
       })
       .lean();
 
@@ -392,7 +392,7 @@ export class ListingsStatsService {
         const bookings = await this.bookingModel
           .find({
             listing_id: listing._id,
-            status: { $in: ['completed', 'confirmed'] },
+            status: 'confirmed',
           })
           .lean();
 
