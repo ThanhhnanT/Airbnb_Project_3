@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Card, Slider, Checkbox, Button, Space, Typography, InputNumber } from "antd";
+import React, { useEffect } from "react";
+import { Card, Slider, Checkbox, Space, Typography, InputNumber } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import styles from "@/styles/search-filters.module.css";
 
@@ -18,7 +18,6 @@ interface SearchFiltersProps {
   beds: number;
   onBedsChange: (count: number) => void;
   onClearFilters: () => void;
-  onApplyFilters: () => void;
 }
 
 const SearchFilters: React.FC<SearchFiltersProps> = ({
@@ -32,7 +31,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   beds,
   onBedsChange,
   onClearFilters,
-  onApplyFilters,
 }) => {
   const accommodationTypes = [
     { label: "Toàn bộ nhà", value: "entire_house" },
@@ -171,16 +169,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
         </div>
       </Card>
 
-      {/* Apply Button */}
-      <Button
-        type="primary"
-        size="large"
-        block
-        className={styles.applyButton}
-        onClick={onApplyFilters}
-      >
-        Áp dụng bộ lọc
-      </Button>
     </aside>
   );
 };

@@ -157,9 +157,12 @@ export const getAccess = async (path: string, params: object = {}) => {
     
     return result.data;
   } catch (e: any) {
-    console.error("[API] getAccess - Error:", e);
-    console.error("[API] getAccess - Error response:", e?.response?.data);
-    console.error("[API] getAccess - Error status:", e?.response?.status);
+    // Don't log 404 errors as they are expected for optional endpoints
+    if (e?.response?.status !== 404) {
+      console.error("[API] getAccess - Error:", e);
+      console.error("[API] getAccess - Error response:", e?.response?.data);
+      console.error("[API] getAccess - Error status:", e?.response?.status);
+    }
     throw e; // Re-throw để frontend có thể handle
   }
 };

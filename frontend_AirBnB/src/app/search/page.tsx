@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useRef } from "react";
+import { useEffect, useState, Suspense, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin, Empty, Pagination, message, Button, Typography } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
@@ -260,21 +260,32 @@ function SearchContent() {
     setAccommodationType([]);
     setBedrooms(0);
     setBeds(0);
-  };
-
-  const handleApplyFilters = () => {
+    // Reset to first page with cleared filters
     const params = new URLSearchParams(searchParams.toString());
-    
-    if (minPrice > 0) params.set("min_price", minPrice.toString());
-    else params.delete("min_price");
-    
-    if (maxPrice < 1000) params.set("max_price", maxPrice.toString());
-    else params.delete("max_price");
-    
+    params.delete("min_price");
+    params.delete("max_price");
     params.set("page", "1");
-    
     window.location.href = `/search?${params.toString()}`;
   };
+
+  // Auto-apply filters when they change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      
+      if (minPrice > 0) params.set("min_price", minPrice.toString());
+      else params.delete("min_price");
+      
+      if (maxPrice < 1000) params.set("max_price", maxPrice.toString());
+      else params.delete("max_price");
+      
+      params.set("page", "1");
+      
+      window.location.href = `/search?${params.toString()}`;
+    }, 500); // Debounce filters by 500ms to avoid too many requests
+
+    return () => clearTimeout(timer);
+  }, [minPrice, maxPrice]);
 
   const getSearchSummary = () => {
     const parts: string[] = [];
@@ -348,7 +359,6 @@ function SearchContent() {
                 beds={beds}
                 onBedsChange={setBeds}
                 onClearFilters={handleClearFilters}
-                onApplyFilters={handleApplyFilters}
               />
 
               {/* Listings Grid */}

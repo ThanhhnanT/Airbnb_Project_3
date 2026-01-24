@@ -19,7 +19,16 @@ export interface Review {
 }
 
 export const getReviewByBooking = async (bookingId: string): Promise<Review> => {
-  return await getAccess(`reviews/by-booking/${bookingId}`);
+  try {
+    return await getAccess(`reviews/by-booking/${bookingId}`);
+  } catch (error: any) {
+    // 404 means no review exists for this booking - this is expected
+    if (error?.response?.status === 404) {
+      return null as any; // Return null to indicate no review
+    }
+    // Re-throw other errors
+    throw error;
+  }
 };
 
 export const createReview = async (data: {

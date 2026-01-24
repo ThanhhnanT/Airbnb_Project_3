@@ -160,14 +160,8 @@ export default function TripsPage() {
         try {
           const reviewEntries = await Promise.all(
             data.map(async (b: Booking) => {
-              try {
-                const review = await getReviewByBooking(b._id);
-                return [b._id, review] as const;
-              } catch (e: any) {
-                // 404 => no review yet
-                if (e?.response?.status === 404) return [b._id, null] as const;
-                return [b._id, null] as const;
-              }
+              const review = await getReviewByBooking(b._id);
+              return [b._id, review] as const;
             })
           );
           const nextMap: Record<string, Review | null> = {};
@@ -634,7 +628,7 @@ export default function TripsPage() {
         okText={reviewSubmitting ? "Đang lưu..." : "Lưu"}
         cancelText="Hủy"
         confirmLoading={reviewSubmitting}
-        destroyOnClose
+        destroyOnHidden
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div>
