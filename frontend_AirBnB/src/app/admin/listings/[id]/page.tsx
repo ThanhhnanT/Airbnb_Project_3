@@ -95,6 +95,8 @@ export default function AdminListingDetailPage() {
     try {
       setLoading(true);
       const result = await getAccess(`admin/listings/${listingId}`, {}, true);
+      console.log("Listing details response:", result);
+      
       setListing(result.listing);
       setImages(result.images || []);
       
@@ -114,6 +116,7 @@ export default function AdminListingDetailPage() {
         });
       }
     } catch (error) {
+      console.error("Error fetching listing details:", error);
       message.error("Không thể tải thông tin listing");
       router.push("/admin/listings");
     } finally {
