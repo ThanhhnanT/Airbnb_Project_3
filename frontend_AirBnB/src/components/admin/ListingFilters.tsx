@@ -163,37 +163,15 @@ export default function ListingFilters({
         </Row>
 
         {/* Reset Button - Right aligned */}
-        <Row justify="space-between" align="middle" style={{ marginTop: 24 }}>
-          <Col>
-            <Space>
-              <Button
-                type="primary"
-                size="large"
-                style={{ backgroundColor: "#1890ff", borderRadius: "8px" }}
-                onClick={() => {/* Export */}}
-              >
-                Áp dụng bộ lọc
-              </Button>
-              <Button
-                type="default"
-                size="large"
-                style={{ borderRadius: "8px" }}
-                onClick={() => {/* CSV */}}
-              >
-                Xuất CSV
-              </Button>
-            </Space>
-          </Col>
-          <Col>
-            <Button
-              type="text"
-              icon={<ReloadOutlined />}
-              onClick={handleReset}
-              size="large"
-            >
-              Làm mới
-            </Button>
-          </Col>
+        <Row justify="end" style={{ marginTop: 24 }}>
+          <Button
+            type="text"
+            icon={<ReloadOutlined />}
+            onClick={handleReset}
+            size="large"
+          >
+            Làm mới
+          </Button>
         </Row>
       </Form>
 
