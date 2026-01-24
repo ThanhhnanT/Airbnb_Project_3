@@ -580,4 +580,38 @@ export class BookingsService {
       throw new InternalServerErrorException(`Error counting bookings by listing: ${error.message}`);
     }
   }
+
+  async getBookingStatsForHost(hostId: string): Promise<{ listingId: string; totalRevenue: number; count: number }[]> {
+    try {
+      const hostObjectId = new Types.ObjectId(hostId);
+      
+      const result = await this.bookingModel.aggregate([
+        {
+          $match: {
+            host_id: hostObjectId,
+            status: { $in: ['completed', 'confirmed'] },
+          },
+        },
+        {
+          $group: {
+            _id: '$listing_id',
+            totalRevenue: { $sum: '$total_price' },
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            listingId: { $toString: '$_id' },
+            totalRevenue: 1,
+            count: 1,
+            _id: 0,
+          },
+        },
+      ]).exec();
+
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting booking stats by listing: ${error.message}`);
+    }
+  }
 }

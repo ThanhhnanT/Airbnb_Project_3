@@ -50,6 +50,13 @@ export class BookingsController {
     return this.bookingsService.countBookingsByListingForHost(userId);
   }
 
+  @Get('host/stats')
+  @ApiOperation({ summary: 'Lấy thống kê doanh thu theo listing cho host' })
+  getListingStats(@Req() req: any) {
+    const userId = req.user?.id || req.user?.user_id;
+    return this.bookingsService.getBookingStatsForHost(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.bookingsService.findOne(id);

@@ -6,10 +6,10 @@ import { Table, Tag, Space, Typography, Button, Badge, Input, message } from "an
 import type { ColumnsType } from "antd/es/table";
 import { EditOutlined, ExportOutlined, EyeOutlined } from "@ant-design/icons";
 import { getAccess, postAccess } from "@/helper/api";
-import AdvancedFilter, { FilterValues } from "./components/AdvancedFilter";
-import BulkActions from "./components/BulkActions";
-import SummaryStats from "./components/SummaryStats";
-import styles from "./host-manage.module.css";
+import AdvancedFilter, { FilterValues } from "@/app/host/(dashboard)/manage/components/AdvancedFilter";
+import BulkActions from "@/app/host/(dashboard)/manage/components/BulkActions";
+import SummaryStats from "@/app/host/(dashboard)/manage/components/SummaryStats";
+import styles from "@/app/host/(dashboard)/manage/host-manage.module.css";
 
 const { Text, Title } = Typography;
 
@@ -28,6 +28,13 @@ interface Listing {
   review_count?: number;
   createdAt?: string;
   bedrooms?: number;
+  revenue?: number;
+}
+
+interface BookingStats {
+  listingId: string;
+  totalRevenue: number;
+  count: number;
 }
 
 export default function HostManagePage() {
@@ -45,22 +52,30 @@ export default function HostManagePage() {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      const [listingsData, bookingCountsData] = await Promise.all([
+      const [listingsData, bookingStatsData] = await Promise.all([
         getAccess("listings/host/my-listings"),
-        getAccess("bookings/host/listing-counts").catch(() => []),
+        getAccess("bookings/host/stats").catch(() => []),
       ]);
 
-      const bookingCountMap = new Map<string, number>();
-      if (Array.isArray(bookingCountsData)) {
-        bookingCountsData.forEach((item: any) => {
-          bookingCountMap.set(item.listingId, item.count || 0);
+      const bookingStatsMap = new Map<string, BookingStats>();
+      if (Array.isArray(bookingStatsData)) {
+        bookingStatsData.forEach((item: any) => {
+          bookingStatsMap.set(item.listingId, {
+            listingId: item.listingId,
+            totalRevenue: item.totalRevenue || 0,
+            count: item.count || 0,
+          });
         });
       }
 
-      const enrichedListings = (listingsData || []).map((listing: any) => ({
-        ...listing,
-        bookingCount: bookingCountMap.get(listing._id) || 0,
-      }));
+      const enrichedListings = (listingsData || []).map((listing: any) => {
+        const stats = bookingStatsMap.get(listing._id);
+        return {
+          ...listing,
+          bookingCount: stats?.count || 0,
+          revenue: stats?.totalRevenue || 0,
+        };
+      });
 
       setListings(enrichedListings);
     } catch (error: any) {
@@ -145,11 +160,12 @@ export default function HostManagePage() {
       return;
     }
 
-    const headers = ["Tiêu Đề", "Địa Chỉ", "Giá/Đêm", "Trạng Thái", "Booking", "Rating"];
+    const headers = ["Tiêu Đề", "Địa Chỉ", "Giá/Đêm", "Doanh Thu", "Trạng Thái", "Booking", "Rating"];
     const rows = filteredListings.map((l) => [
       l.title,
       formatAddress(l),
       `${l.currency} ${l.price_base.toFixed(2)}`,
+      `${l.currency} ${(l.revenue || 0).toFixed(2)}`,
       l.status,
       l.bookingCount || 0,
       (l.avg_rating || 0).toFixed(1),
@@ -209,6 +225,16 @@ export default function HostManagePage() {
       ),
     },
     {
+      title: "Doanh Thu",
+      key: "revenue",
+      align: "right",
+      render: (_, record) => (
+        <Text strong style={{ color: "#52c41a" }}>
+          {formatPrice(record.revenue || 0, record.currency)}
+        </Text>
+      ),
+    },
+    {
       title: "Đơn đặt",
       key: "bookings",
       align: "center",
@@ -257,7 +283,7 @@ export default function HostManagePage() {
     },
   ];
 
-  const totalRevenue = listings.reduce((sum, l) => sum + l.price_base, 0);
+  const totalRevenue = listings.reduce((sum, l) => sum + (l.revenue || 0), 0);
   const totalBookings = listings.reduce((sum, l) => sum + (l.bookingCount || 0), 0);
   const avgRating = listings.length > 0 ? listings.reduce((sum, l) => sum + (l.avg_rating || 0), 0) / listings.length : 0;
   const activeCount = listings.filter((l) => l.status === "active").length;
