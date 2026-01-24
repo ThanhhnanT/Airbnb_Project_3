@@ -25,7 +25,6 @@ import OccupancyChart from "@/components/host/dashboard/OccupancyChart";
 import RecentReviews from "@/components/host/dashboard/RecentReviews";
 import TopListings from "@/components/host/dashboard/TopListings";
 import QuickActions from "@/components/host/dashboard/QuickActions";
-import styles from "./dashboard.module.css";
 
 const { Title, Text } = Typography;
 
@@ -102,17 +101,15 @@ export default function HostDashboardPage() {
 
   if (loading) {
     return (
-      <div className={styles.dashboardContainer}>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "400px" }}>
-          <Spin size="large" />
-        </div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "400px" }}>
+        <Spin size="large" />
       </div>
     );
   }
 
   if (!stats) {
     return (
-      <div className={styles.dashboardContainer}>
+      <div>
         <Empty description="Không thể tải dữ liệu dashboard" />
       </div>
     );
@@ -132,7 +129,7 @@ export default function HostDashboardPage() {
   };
 
   return (
-    <div className={styles.dashboardContainer}>
+    <>
       {/* Header */}
       <div className={styles.dashboardHeader}>
         <div>
@@ -222,6 +219,6 @@ export default function HostDashboardPage() {
           <TopListings listings={stats.topListings} />
         </Col>
       </Row>
-    </div>
+    </>
   );
 }
