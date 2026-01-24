@@ -141,7 +141,7 @@ export default function AdminLayout({
   }
 
   return (
-    <Layout className={styles.adminLayout}>
+      <Layout className={styles.adminLayout}>
       <Sider
         collapsible
         collapsed={collapsed}
@@ -154,7 +154,7 @@ export default function AdminLayout({
       >
         <AdminSidebar />
       </Sider>
-      <Layout className={styles.contentLayout}>
+      <Layout className={`${styles.contentLayout} ${collapsed ? styles.collapsed : ""}`}>
         {isMobile && !collapsed && (
           <div
             className={styles.overlay}
