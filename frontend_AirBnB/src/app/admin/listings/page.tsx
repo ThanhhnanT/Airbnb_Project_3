@@ -332,53 +332,65 @@ export default function AllListingsPage() {
 
   return (
     <div>
+      {/* Filters Section */}
+      <Card style={{ marginBottom: 0, border: "none", boxShadow: "none" }}>
+        <ListingFilters
+          onFilterChange={setFilters}
+          onReset={() => setFilters({})}
+        />
+      </Card>
+
       {/* Statistics Cards */}
       {stats && (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Row gutter={16} style={{ marginBottom: 24, marginTop: 24 }}>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card style={{ borderRadius: "8px" }}>
               <Statistic
                 title="Tổng Listings"
                 value={stats.totalListings}
-                valueStyle={{ color: "#1890ff" }}
+                valueStyle={{ color: "#1890ff", fontSize: "24px" }}
               />
             </Card>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card style={{ borderRadius: "8px" }}>
               <Statistic
                 title="Đã Duyệt"
                 value={stats.activeListings}
-                valueStyle={{ color: "#52c41a" }}
+                valueStyle={{ color: "#52c41a", fontSize: "24px" }}
               />
             </Card>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card style={{ borderRadius: "8px" }}>
               <Statistic
                 title="Chờ Duyệt"
                 value={stats.pendingListings}
-                valueStyle={{ color: "#faad14" }}
+                valueStyle={{ color: "#faad14", fontSize: "24px" }}
               />
             </Card>
           </Col>
           <Col xs={24} sm={12} md={6}>
-            <Card>
+            <Card style={{ borderRadius: "8px" }}>
               <Statistic
                 title="Doanh Thu"
                 value={`$${stats.totalRevenue.toLocaleString()}`}
-                valueStyle={{ color: "#eb2f96" }}
+                valueStyle={{ color: "#eb2f96", fontSize: "24px" }}
               />
             </Card>
           </Col>
         </Row>
       )}
 
-      {/* Filters */}
-      <ListingFilters
-        onFilterChange={setFilters}
-        onReset={() => setFilters({})}
-      />
+      {/* Danh sách chỗ ở Section Title */}
+      <div style={{ marginBottom: 16 }}>
+        <h3 style={{ color: "#000", fontWeight: 600, fontSize: "16px", marginBottom: 4 }}>
+          Danh sách chỗ ở
+        </h3>
+        <p style={{ color: "#999", fontSize: "14px", margin: 0 }}>
+          Hiển thị 1 - 25 trong tổng cộng {filteredListings.length} chỗ ở
+        </p>
+      </div>
 
       {/* Bulk Actions */}
       {selectedRowKeys.length > 0 && (
@@ -408,25 +420,15 @@ export default function AllListingsPage() {
         </Card>
       )}
 
-      {/* Export & Actions */}
-      <Space style={{ marginBottom: 16, display: "block" }}>
-        <Button
-          icon={<DownloadOutlined />}
-          onClick={handleExportCSV}
-        >
-          Xuất CSV
-        </Button>
-      </Space>
-
       {/* Table */}
-      <Card>
+      <Card style={{ borderRadius: "8px" }}>
         <Table
           columns={columns}
           dataSource={filteredListings}
           rowKey="_id"
           loading={loading}
           rowSelection={rowSelection}
-          pagination={{ pageSize: 10 }}
+          pagination={{ pageSize: 25, showSizeChanger: true, pageSizeOptions: [10, 25, 50, 100] }}
           scroll={{ x: 1200 }}
           rowClassName={(record) => (record.status === "inactive" ? "pending-listing-row" : "")}
         />
