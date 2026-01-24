@@ -585,6 +585,9 @@ export class BookingsService {
     try {
       const hostObjectId = new Types.ObjectId(hostId);
       
+      console.log('[BookingsService] getBookingStatsForHost - hostId:', hostId);
+      console.log('[BookingsService] getBookingStatsForHost - hostObjectId:', hostObjectId);
+      
       const result = await this.bookingModel.aggregate([
         {
           $match: {
@@ -609,8 +612,10 @@ export class BookingsService {
         },
       ]).exec();
 
+      console.log('[BookingsService] getBookingStatsForHost - result:', result);
       return result;
     } catch (error) {
+      console.error('[BookingsService] getBookingStatsForHost - error:', error);
       throw new InternalServerErrorException(`Error getting booking stats by listing: ${error.message}`);
     }
   }

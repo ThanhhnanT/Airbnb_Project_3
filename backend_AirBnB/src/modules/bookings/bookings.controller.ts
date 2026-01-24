@@ -54,6 +54,8 @@ export class BookingsController {
   @ApiOperation({ summary: 'Lấy thống kê doanh thu theo listing cho host' })
   getListingStats(@Req() req: any) {
     const userId = req.user?.id || req.user?.user_id;
+    console.log('[BookingsController] getListingStats - req.user:', JSON.stringify(req.user, null, 2));
+    console.log('[BookingsController] getListingStats - userId:', userId);
     return this.bookingsService.getBookingStatsForHost(userId);
   }
 
