@@ -589,7 +589,7 @@ export class BookingsService {
         {
           $match: {
             host_id: hostObjectId,
-            status: { $in: ['completed', 'confirmed'] },
+            status: 'confirmed',
           },
         },
         {
