@@ -1,0 +1,67 @@
+{
+  "category": "guest",
+  "name": "Hướng dẫn cho Khách hàng",
+  "description": "Hướng dẫn toàn diện cho khách hàng Airbnb về cách tìm kiếm, đặt phòng và quản lý đặt phòng",
+  "faqs": [
+    {
+      "id": "guest_001",
+      "question": "Làm thế nào để tìm kiếm các danh sách trên Airbnb?",
+      "answer": "Để tìm kiếm danh sách: 1. Đi đến trang chủ và nhập điểm đến trong thanh tìm kiếm. 2. Chọn ngày nhận phòng và ngày trả phòng. 3. Chọn số lượng khách. 4. Nhấp vào 'Tìm kiếm' để xem các danh sách có sẵn. Bạn có thể lọc thêm theo giá, tiện nghi, loại bất động sản và đánh giá."
+    },
+    {
+      "id": "guest_002",
+      "question": "Làm thế nào để lọc danh sách theo tiện nghi?",
+      "answer": "Sau khi tìm kiếm, nhấp vào 'Bộ lọc' để mở rộng các tùy chọn lọc. Bạn có thể chọn các tiện nghi như WiFi, Hồ bơi, Bếp, Điều hòa không khí, v.v. Đánh dấu các hộp cho các tiện nghi bạn muốn và nhấp vào 'Áp dụng bộ lọc' để chỉ xem các danh sách có những tính năng đó."
+    },
+    {
+      "id": "guest_003",
+      "question": "Làm thế nào để kiểm tra tính sẵn có và đặt một danh sách?",
+      "answer": "Khi tìm thấy danh sách bạn thích: 1. Nhấp vào thẻ danh sách để xem chi tiết đầy đủ, ảnh và đánh giá. 2. Kiểm tra lịch để xem các ngày có sẵn. 3. Chọn ngày và số lượng khách. 4. Nhấp vào 'Đặt phòng' hoặc 'Đặt ngay'. 5. Xem lại bảng giá chi tiết và tiến hành thanh toán."
+    },
+    {
+      "id": "guest_004",
+      "question": "Airbnb chấp nhận những phương thức thanh toán nào?",
+      "answer": "Airbnb chấp nhận nhiều phương thức thanh toán bao gồm: Thẻ tín dụng (Visa, Mastercard, American Express), Thẻ ghi nợ, PayPal, Apple Pay, Google Pay và Alipay. Trong quá trình thanh toán, bạn sẽ thấy tất cả các tùy chọn thanh toán có sẵn cho vị trí của bạn. Thanh toán của bạn là an toàn và được mã hóa."
+    },
+    {
+      "id": "guest_005",
+      "question": "Tôi có thể hủy đặt phòng của mình không?",
+      "answer": "Có, bạn có thể hủy đặt phòng tùy thuộc vào chính sách hủy của danh sách. Mỗi danh sách có chính sách hủy (Linh hoạt, Vừa phải hoặc Nghiêm ngặt). 1. Đi đến phần 'Chuyến đi' của bạn. 2. Tìm đặt phòng bạn muốn hủy. 3. Nhấp vào 'Hủy đặt phòng'. 4. Làm theo các hướng dẫn. Tiền hoàn lại tùy thuộc vào thời gian hủy so với ngày nhận phòng."
+    },
+    {
+      "id": "guest_006",
+      "question": "Chính sách hủy là gì?",
+      "answer": "Chính sách hủy khác nhau tùy theo danh sách: Linh hoạt - Hủy miễn phí trong vòng 24 giờ trước nhận phòng. Vừa phải - Hủy miễn phí trong vòng 5 ngày trước nhận phòng. Nghiêm ngặt - Hủy miễn phí trong vòng 30 ngày trước nhận phòng. Mỗi chính sách xác định tỷ lệ phần trăm hoàn lại nếu bạn hủy. Kiểm tra chính sách hủy trước khi đặt phòng."
+    },
+    {
+      "id": "guest_007",
+      "question": "Làm thế nào để gửi tin nhắn cho chủ nhà?",
+      "answer": "Để gửi tin nhắn cho chủ nhà: 1. Đi đến trang danh sách và nhấp vào 'Gửi tin nhắn cho chủ nhà'. 2. Gõ câu hỏi hoặc tin nhắn của bạn trong trường văn bản. 3. Nhấp vào 'Gửi'. Chủ nhà thường trả lời trong vòng vài giờ. Tin nhắn hiển thị trong phần Tin nhắn của bạn. Bạn cũng có thể gửi tin nhắn cho chủ nhà trước khi đặt phòng để hỏi những câu hỏi cụ thể về bất động sản."
+    },
+    {
+      "id": "guest_008",
+      "question": "Làm thế nào để viết bài đánh giá cho một danh sách?",
+      "answer": "Sau khi tham quan của bạn: 1. Đi đến phần 'Chuyến đi' của bạn và tìm đặt phòng đã hoàn thành. 2. Nhấp vào 'Viết bài đánh giá'. 3. Đánh giá sạch sẽ, giao tiếp, độ chính xác, nhận phòng, vị trí và giá trị (1-5 sao). 4. Viết bài đánh giá chi tiết về trải nghiệm của bạn. 5. Nhấp vào 'Gửi đánh giá'. Bài đánh giá của bạn giúp những khách hàng khác đưa ra quyết định sáng suốt."
+    },
+    {
+      "id": "guest_009",
+      "question": "Tôi có thể sửa đổi ngày đặt phòng của mình không?",
+      "answer": "Để sửa đổi đặt phòng của bạn: 1. Đi đến phần 'Chuyến đi' của bạn. 2. Tìm đặt phòng sắp tới của bạn. 3. Nhấp vào 'Sửa đổi'. 4. Thay đổi ngày nhận phòng hoặc ngày trả phòng. 5. Xem lại giá mới và bất kỳ khoản phí bổ sung. 6. Xác nhận sửa đổi. Các sửa đổi tùy thuộc vào tính sẵn có và lịch của chủ nhà."
+    },
+    {
+      "id": "guest_010",
+      "question": "Tôi nên làm gì nếu gặp sự cố trong quá trình lưu trú?",
+      "answer": "Nếu gặp sự cố trong quá trình lưu trú: 1. Gửi tin nhắn cho chủ nhà ngay lập tức để cố gắng giải quyết vấn đề. 2. Nếu vấn đề không được giải quyết, hãy đi đến phần 'Chuyến đi' của bạn và nhấp vào 'Báo cáo vấn đề'. 3. Mô tả vấn đề chi tiết và cung cấp ảnh nếu có thể. 4. Airbnb sẽ xem xét báo cáo của bạn và có thể cung cấp bồi thường hoặc các giải pháp khác. Luôn liên lạc với chủ nhà trước tiên."
+    },
+    {
+      "id": "guest_011",
+      "question": "Làm thế nào để xem chi tiết đặt phòng của tôi?",
+      "answer": "Để xem chi tiết đặt phòng của bạn: 1. Nhấp vào biểu tượng hồ sơ ở góc trên cùng bên phải. 2. Chọn 'Chuyến đi'. 3. Nhấp vào đặt phòng cụ thể để xem: ngày nhận phòng và ngày trả phòng, địa chỉ, thông tin chủ nhà, bảng giá chi tiết và số xác nhận. Bạn cũng có thể tải xuống biên lai từ trang này."
+    },
+    {
+      "id": "guest_012",
+      "question": "Làm thế nào để thêm danh sách vào mục Yêu thích của tôi?",
+      "answer": "Để lưu danh sách để xem lại: 1. Khi xem danh sách, nhấp vào biểu tượng trái tim ở góc trên cùng bên phải. 2. Danh sách sẽ được thêm vào Mục yêu thích của bạn. 3. Để xem mục yêu thích của bạn, hãy đi đến hồ sơ của bạn và nhấp vào 'Mục yêu thích' hoặc 'Danh sách đã lưu'. Bạn có thể sắp xếp mục yêu thích thành các danh sách theo danh mục hoặc vị trí."
+    }
+  ]
+}

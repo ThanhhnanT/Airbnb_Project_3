@@ -1,0 +1,26 @@
+[
+  {
+    "subskill": "Mixed Precision Training",
+    "theory": "Mixed Precision Training là kỹ thuật sử dụng cả số thực 16-bit (FP16) và 32-bit (FP32) trong quá trình huấn luyện. Điều này giúp giảm dung lượng bộ nhớ, tăng tốc độ huấn luyện nhờ tận dụng khả năng tính toán song song của GPU hiện đại (như NVIDIA Tensor Cores). Tuy nhiên, một số phép toán nhạy cảm như tính toán gradient vẫn giữ ở độ chính xác FP32 để tránh mất mát thông tin. Mixed Precision giúp mô hình có thể train trên batch size lớn hơn mà không cần thêm GPU, đồng thời giảm chi phí tính toán đáng kể."
+  },
+  {
+    "subskill": "Distributed Training with PyTorch/TF",
+    "theory": "Distributed Training cho phép huấn luyện mô hình trên nhiều GPU hoặc nhiều máy khác nhau nhằm rút ngắn thời gian train cho các mô hình lớn. Hai cách tiếp cận phổ biến là Data Parallelism (chia batch dữ liệu trên nhiều thiết bị) và Model Parallelism (chia mô hình thành nhiều phần để xử lý song song). PyTorch cung cấp DistributedDataParallel (DDP), còn TensorFlow có tf.distribute.Strategy. Thách thức chính là đồng bộ gradient giữa các thiết bị và tối ưu hóa truyền thông qua mạng để không làm chậm quá trình huấn luyện."
+  },
+  {
+    "subskill": "Gradient Accumulation and Checkpointing",
+    "theory": "Gradient Accumulation là kỹ thuật tích lũy gradient qua nhiều mini-batch nhỏ trước khi cập nhật trọng số, cho phép mô phỏng batch size lớn mà không cần nhiều VRAM. Gradient Checkpointing lại nhằm tiết kiệm bộ nhớ bằng cách chỉ lưu một phần tensor trung gian trong forward pass và tính toán lại khi backward. Hai kỹ thuật này thường được kết hợp trong huấn luyện mô hình lớn như Transformer, giúp giảm chi phí phần cứng và cho phép train với batch size hiệu quả hơn trên GPU hạn chế bộ nhớ."
+  },
+  {
+    "subskill": "Model Parallelism and Data Parallelism",
+    "theory": "Data Parallelism phân chia dữ liệu đầu vào thành các mini-batch nhỏ để huấn luyện song song trên nhiều GPU, trong khi Model Parallelism phân chia mô hình thành nhiều phần, mỗi phần chạy trên một GPU khác nhau. Model Parallelism hữu ích cho các mô hình quá lớn không thể chứa trên một GPU đơn. Trong thực tế, người ta thường kết hợp cả hai (Hybrid Parallelism) để tối ưu tốc độ huấn luyện các mô hình deep learning khổng lồ như GPT hoặc BERT. Điểm khó là cân bằng tải giữa các GPU để tránh bottleneck."
+  },
+  {
+    "subskill": "Neural Architecture Search",
+    "theory": "Neural Architecture Search (NAS) là quá trình tự động tìm kiếm kiến trúc mạng neuron tối ưu thay vì thiết kế thủ công. NAS thường dùng các kỹ thuật như Reinforcement Learning, Evolutionary Algorithms hoặc Gradient-based Search để thử nghiệm hàng ngàn kiến trúc khác nhau. Mục tiêu là đạt được hiệu năng cao (accuracy, tốc độ suy luận) với chi phí tính toán thấp hơn. NAS đã tạo ra nhiều kiến trúc nổi bật như EfficientNet, MobileNet. Tuy nhiên, NAS đòi hỏi tài nguyên tính toán cực lớn và các phương pháp hiện đại tập trung vào 'Efficient NAS' để giảm chi phí tìm kiếm."
+  },
+  {
+    "subskill": "Model Compression and Pruning",
+    "theory": "Model Compression và Pruning là các kỹ thuật tối ưu hóa mô hình nhằm giảm số lượng tham số, dung lượng bộ nhớ và tăng tốc độ suy luận. Pruning loại bỏ những trọng số hoặc neuron ít quan trọng, trong khi Quantization chuyển đổi tham số từ 32-bit sang định dạng nhẹ hơn (như INT8). Ngoài ra, Knowledge Distillation cho phép huấn luyện một mô hình nhỏ (student) từ một mô hình lớn (teacher). Các kỹ thuật này đặc biệt quan trọng khi triển khai mô hình trên thiết bị di động, IoT hoặc hệ thống real-time có hạn chế phần cứng."
+  }
+]

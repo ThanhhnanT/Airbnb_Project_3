@@ -1,0 +1,22 @@
+[
+  {
+    "subskill": "Distributed Training for Large Language Models",
+    "youtube_link": "https://www.youtube.com/watch?v=toUSzwR0EV8"
+  },
+  {
+    "subskill": "Gradient Checkpointing and Memory Optimization",
+    "youtube_link": "https://www.youtube.com/watch?v=l5s0dwvUbnE"
+  },
+  {
+    "subskill": "Mixed Precision Training in NLP",
+    "youtube_link": "https://www.youtube.com/watch?v=ks3oZ7Va8HU"
+  },
+  {
+    "subskill": "Scaling Laws in Language Models",
+    "youtube_link": "https://www.youtube.com/watch?v=FUqzdvlaoRk"
+  },
+  {
+    "subskill": "Model Distillation and Compression",
+    "youtube_link": "https://www.youtube.com/watch?v=FLkUOkeMd5M"
+  }
+]

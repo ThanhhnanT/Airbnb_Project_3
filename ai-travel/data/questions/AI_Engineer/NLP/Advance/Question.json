@@ -1,0 +1,431 @@
+[
+  {
+    "id": "ETS-001",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training for Large Language Models",
+    "question_text": "Distributed Training là gì trong ngữ cảnh huấn luyện mô hình lớn?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Kỹ thuật huấn luyện mô hình trên nhiều GPU hoặc nhiều máy để rút ngắn thời gian huấn luyện",
+      "B. Chỉ huấn luyện mô hình trên CPU",
+      "C. Một phương pháp giảm overfitting bằng regularization",
+      "D. Kỹ thuật tăng kích thước batch mà không dùng GPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "Distributed Training dùng nhiều GPU/máy để chia tải công việc, giảm thời gian huấn luyện cho mô hình lớn.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-002",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training for Large Language Models",
+    "question_text": "Trong distributed training, Data Parallelism khác gì so với Model Parallelism?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Data Parallelism chia dữ liệu cho nhiều thiết bị; Model Parallelism chia kiến trúc mô hình giữa các thiết bị",
+      "B. Data Parallelism chia mô hình; Model Parallelism chia dữ liệu",
+      "C. Cả hai đều là cùng một kỹ thuật",
+      "D. Data Parallelism chỉ dùng cho inference"
+    ],
+    "correct_answer": "A",
+    "explanation": "Data Parallelism sao chép mô hình trên nhiều thiết bị và chia batch dữ liệu; Model Parallelism tách mô hình thành phần để chạy trên nhiều thiết bị.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-003",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training for Large Language Models",
+    "question_text": "Một thách thức chính khi huấn luyện phân tán là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Đồng bộ gradient và chi phí truyền thông (communication overhead)",
+      "B. Thiếu dữ liệu huấn luyện",
+      "C. Không thể dùng optimizer Adam",
+      "D. Không hỗ trợ GPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "Đồng bộ gradient giữa nhiều GPU/máy gây overhead truyền thông; tối ưu hoá giao tiếp là thách thức lớn.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-004",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training for Large Language Models",
+    "question_text": "Framework nào sau đây được thiết kế hỗ trợ huấn luyện mô hình ngôn ngữ lớn phân tán?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. DeepSpeed",
+      "B. Scikit-learn",
+      "C. Matplotlib",
+      "D. Pandas"
+    ],
+    "correct_answer": "A",
+    "explanation": "DeepSpeed (cùng với Megatron-LM, FairScale) là các framework hỗ trợ huấn luyện phân tán và tối ưu bộ nhớ cho LLMs.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-005",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training for Large Language Models",
+    "question_text": "Pipeline Parallelism khác với Model Parallelism ở điểm nào chính?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Pipeline parallelism chia các tầng (layers) thành các giai đoạn và xử lý nối tiếp theo pipeline, còn model parallelism phân chia tham số từng phần",
+      "B. Pipeline parallelism chỉ chia dữ liệu",
+      "C. Model parallelism chạy trên 1 GPU duy nhất",
+      "D. Pipeline parallelism dùng cho inference, không dùng cho training"
+    ],
+    "correct_answer": "A",
+    "explanation": "Pipeline parallelism tổ chức các tầng thành các giai đoạn chạy nối tiếp để tận dụng song song theo micro-batches; model parallelism phân chia mô hình theo tham số/khối.",
+    "level": "medium"
+  },
+
+  {
+    "id": "ETS-006",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Checkpointing and Memory Optimization",
+    "question_text": "Gradient checkpointing là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Kỹ thuật lưu một số activation (checkpoint) và tái tính toán các activation khác trong backprop để tiết kiệm bộ nhớ",
+      "B. Một dạng optimizer mới",
+      "C. Phương pháp tăng kích thước batch mà không thay đổi bộ nhớ",
+      "D. Kỹ thuật nén dataset"
+    ],
+    "correct_answer": "A",
+    "explanation": "Gradient checkpointing lưu chỉ một số checkpoint trong forward pass và recompute các activation khi backprop để giảm footprint bộ nhớ, đổi lấy tính toán lại.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-007",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Checkpointing and Memory Optimization",
+    "question_text": "Một trade-off chính khi dùng gradient checkpointing là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tiết kiệm bộ nhớ nhưng tăng thời gian tính toán do recomputation",
+      "B. Giảm accuracy mô hình",
+      "C. Tăng dung lượng lưu trữ đĩa",
+      "D. Phối hợp không tốt với mixed precision"
+    ],
+    "correct_answer": "A",
+    "explanation": "Checkpointing giảm bộ nhớ bằng cách tính lại một số activation trong backprop, nên đổi lấy chi phí tính toán tăng lên.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-008",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Checkpointing and Memory Optimization",
+    "question_text": "Offloading trong context tối ưu bộ nhớ thường có ý nghĩa gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Chuyển một phần tensor từ GPU sang CPU để giảm tiêu thụ GPU memory",
+      "B. Nén model sang định dạng zip",
+      "C. Huỷ một phần gradient",
+      "D. Tăng batch size vô hạn"
+    ],
+    "correct_answer": "A",
+    "explanation": "Offloading chuyển dữ liệu tạm thời sang CPU/disk nhằm giảm bộ nhớ GPU, thường dùng cùng các kỹ thuật khác.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-009",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Checkpointing and Memory Optimization",
+    "question_text": "Sharded training (chia tham số) giúp ích gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mỗi GPU lưu một phần trọng số để giảm memory footprint trên từng thiết bị",
+      "B. Tăng tốc inference trên CPU",
+      "C. Giảm độ chính xác của mô hình",
+      "D. Loại bỏ nhu cầu optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Sharded training (như ZeRO) chia trọng số/optimizer state giữa các GPU để giảm memory per device và cho phép train các mô hình lớn hơn.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-010",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Checkpointing and Memory Optimization",
+    "question_text": "Kỹ thuật nào thường kết hợp với gradient checkpointing để tối ưu bộ nhớ nữa?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mixed precision và sharded optimizer (ZeRO)",
+      "B. Data augmentation",
+      "C. Early stopping",
+      "D. Label smoothing"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixed precision + sharded optimizer (ví dụ ZeRO) + checkpointing thường được kết hợp để giảm memory footprint và tăng khả năng train mô hình lớn.",
+    "level": "medium"
+  },
+
+  {
+    "id": "ETS-011",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training in NLP",
+    "question_text": "Mixed precision training chủ yếu sử dụng kết hợp những định dạng số nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. FP16 (hoặc bfloat16) và FP32",
+      "B. INT8 và UINT8",
+      "C. FP64 và INT32",
+      "D. One-hot và sparse"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixed precision thường chạy các phép toán nặng bằng FP16/bfloat16 để tiết kiệm bộ nhớ và dùng FP32 cho các phép toán nhạy cảm để giữ ổn định.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-012",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training in NLP",
+    "question_text": "Tại sao cần loss scaling khi dùng FP16?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Để tránh underflow/overflow khi tính gradient với FP16",
+      "B. Để tăng kích thước batch",
+      "C. Để giảm kích thước vocab",
+      "D. Để tăng số epoch"
+    ],
+    "correct_answer": "A",
+    "explanation": "Loss scaling nhân loss lên trước khi tính gradient để tránh underflow trong FP16 và sau đó chia lại khi cập nhật gradient.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-013",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training in NLP",
+    "question_text": "Một lợi ích chính của mixed precision là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm memory usage và tăng throughput (tốc độ) trên GPU",
+      "B. Tự động cải thiện accuracy",
+      "C. Loại bỏ need for attention",
+      "D. Thay thế optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixed precision giảm bộ nhớ và tận dụng tensor cores để tăng tốc độ huấn luyện, cho phép batch lớn hơn hoặc mô hình lớn hơn.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-014",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training in NLP",
+    "question_text": "Which API helps do automatic mixed precision easily in PyTorch?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. torch.cuda.amp",
+      "B. torch.nn.parallel",
+      "C. torch.optim.lr_scheduler",
+      "D. torch.utils.data"
+    ],
+    "correct_answer": "A",
+    "explanation": "torch.cuda.amp cung cấp autocast và GradScaler để thực hiện mixed precision tự động trong PyTorch.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-015",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training in NLP",
+    "question_text": "Một rủi ro có thể gặp khi dùng FP16 mà không thận trọng là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Numerical instability do underflow/overflow gây NaN trong gradient",
+      "B. Giảm tốc độ huấn luyện xuống rất thấp",
+      "C. Tăng đáng kể chi phí phần cứng",
+      "D. Mất khả năng fine-tune"
+    ],
+    "correct_answer": "A",
+    "explanation": "FP16 có phạm vi biểu diễn hẹp hơn; nếu không dùng loss scaling/kinh nghiệm, gradient có thể underflow dẫn đến NaN.",
+    "level": "medium"
+  },
+
+  {
+    "id": "ETS-016",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Scaling Laws in Language Models",
+    "question_text": "Scaling laws trong LLMs mô tả điều gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mối quan hệ có thể dự đoán giữa kích thước mô hình, dữ liệu, FLOPs và hiệu năng",
+      "B. Cách nén model để giảm kích thước",
+      "C. Các luật phần cứng GPU",
+      "D. Cách chia batch data"
+    ],
+    "correct_answer": "A",
+    "explanation": "Scaling laws (ví dụ Kaplan et al.) mô tả mối quan hệ giữa tham số, dữ liệu và hiệu năng, giúp dự đoán lợi ích khi mở rộng.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-017",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Scaling Laws in Language Models",
+    "question_text": "Theo các nghiên cứu về scaling laws, để cải thiện hiệu năng thường cần mở rộng những yếu tố nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Cả kích thước mô hình (parameters), khối lượng dữ liệu và tính toán (FLOPs)",
+      "B. Chỉ tăng số epoch",
+      "C. Chỉ thay optimizer",
+      "D. Chỉ giảm learning rate"
+    ],
+    "correct_answer": "A",
+    "explanation": "Nghiên cứu cho thấy hiệu năng tăng khi mở rộng đồng thời tham số, dữ liệu và công suất tính toán theo tỷ lệ hợp lý.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-018",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Scaling Laws in Language Models",
+    "question_text": "Một hệ quả thực tế của scaling laws là gì đối với thiết kế mô hình?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Quyết định cân bằng giữa tăng kích thước mô hình và thu thập thêm dữ liệu",
+      "B. Loại bỏ need for pretraining",
+      "C. Luôn giảm overfitting",
+      "D. Làm cho mô hình chạy tốt trên CPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "Scaling laws giúp cân nhắc trade-off: mở rộng mô hình đơn lẻ ít hiệu quả nếu không tăng dữ liệu tương ứng.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-019",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Scaling Laws in Language Models",
+    "question_text": "Scaling laws cho thấy hiệu suất mô hình khi tăng tham số thường có đặc điểm nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Hiệu suất tăng dần với law kiểu hàm mũ/luật tỉ lệ nhưng có diminishing returns",
+      "B. Luôn tăng tuyến tính vô hạn",
+      "C. Luôn giảm khi tăng tham số",
+      "D. Không phụ thuộc vào dữ liệu"
+    ],
+    "correct_answer": "A",
+    "explanation": "Hiệu suất cải thiện theo biểu thức tỷ lệ có thể dự đoán, nhưng lợi ích mỗi lần mở rộng thường giảm dần (diminishing returns).",
+    "level": "hard"
+  },
+
+  {
+    "id": "ETS-020",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Distillation and Compression",
+    "question_text": "Knowledge distillation là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Kỹ thuật huấn luyện một mô hình nhỏ (student) học từ dự đoán mềm của một mô hình lớn (teacher)",
+      "B. Kỹ thuật tăng dữ liệu bằng cách dịch văn bản",
+      "C. Tối ưu bộ nhớ bằng checkpointing",
+      "D. Thủ thuật để đo lường perplexity"
+    ],
+    "correct_answer": "A",
+    "explanation": "Knowledge distillation cho phép truyền thông tin từ mô hình lớn sang mô hình nhỏ bằng soft labels hoặc intermediate representations.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-021",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Distillation and Compression",
+    "question_text": "Quantization trong model compression có ý nghĩa gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm độ chính xác của trọng số (ví dụ từ FP32 xuống INT8) để giảm kích thước và tăng tốc inference",
+      "B. Tăng số lượng tham số",
+      "C. Chia dữ liệu thành nhiều phần",
+      "D. Tăng kích thước embedding"
+    ],
+    "correct_answer": "A",
+    "explanation": "Quantization chuyển trọng số/activation sang định dạng ít bit hơn (INT8, FP16) để giảm dung lượng và tăng tốc suy luận.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-022",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Distillation and Compression",
+    "question_text": "Pruning (cắt tỉa trọng số) thường làm gì cho mô hình?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Loại bỏ các kết nối/neurons ít quan trọng để giảm số tham số và độ phức tạp",
+      "B. Thêm layers vào mô hình",
+      "C. Chuyển mô hình sang GPU",
+      "D. Tăng batch size tự động"
+    ],
+    "correct_answer": "A",
+    "explanation": "Pruning loại bỏ các trọng số ít quan trọng (gần 0) để giảm kích thước mô hình và chi phí tính toán.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-023",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Distillation and Compression",
+    "question_text": "Một lợi ích chính của model distillation là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Cho phép deploy mô hình nhỏ hơn với hiệu năng gần tương đương mô hình lớn",
+      "B. Luôn cải thiện accuracy hơn teacher",
+      "C. Loại bỏ nhu cầu huấn luyện",
+      "D. Làm tăng power consumption"
+    ],
+    "correct_answer": "A",
+    "explanation": "Distillation giúp mô hình student nhỏ gọn đạt hiệu năng gần người dạy (teacher) nhưng nhẹ hơn để triển khai thực tế.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-024",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Distillation and Compression",
+    "question_text": "Weight sharing (chia sẻ trọng số) trong compression thường áp dụng cho trường hợp nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Khi nhiều phần của mô hình có thể dùng chung tham số để giảm dung lượng",
+      "B. Khi training bằng CPU",
+      "C. Khi tăng kích thước vocab",
+      "D. Khi dùng RNN thay vì Transformer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Weight sharing gộp nhiều tham số tương tự thành cùng một tham số chung để giảm memory và kích thước lưu trữ.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-025",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Distillation and Compression",
+    "question_text": "Khi muốn triển khai LLM trên thiết bị edge với giới hạn tài nguyên, chiến lược nào thích hợp nhất?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Kết hợp distillation, quantization và pruning để giảm kích thước và tăng tốc inference",
+      "B. Chạy model full-size trên thiết bị mà không thay đổi",
+      "C. Chỉ tăng learning rate",
+      "D. Thay đổi ngôn ngữ của dữ liệu"
+    ],
+    "correct_answer": "A",
+    "explanation": "Để deploy trên edge, thường kết hợp distillation (nhỏ model), quantization (ít bit) và pruning để giảm footprint và giữ hiệu năng chấp nhận được.",
+    "level": "hard"
+  }
+]

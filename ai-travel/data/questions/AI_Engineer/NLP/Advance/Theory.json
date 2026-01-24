@@ -1,0 +1,22 @@
+[
+  {
+    "subskill": "Distributed Training for Large Language Models",
+    "theory": "Distributed Training cho phép huấn luyện các mô hình ngôn ngữ lớn (LLMs) trên nhiều GPU hoặc nhiều máy tính cùng lúc, nhờ đó giảm đáng kể thời gian huấn luyện. Có ba chiến lược phổ biến: Data Parallelism (chia batch dữ liệu cho nhiều GPU), Model Parallelism (chia từng phần của mô hình cho các GPU khác nhau), và Pipeline Parallelism (chia tầng của mô hình thành pipeline). Frameworks phổ biến hỗ trợ gồm DeepSpeed, Megatron-LM, và PyTorch DDP. Thách thức chính là tối ưu truyền thông và đồng bộ gradient để không tạo nghẽn cổ chai."
+  },
+  {
+    "subskill": "Gradient Checkpointing and Memory Optimization",
+    "theory": "Gradient Checkpointing là kỹ thuật giảm sử dụng bộ nhớ GPU khi huấn luyện mô hình lớn. Thay vì lưu toàn bộ giá trị trung gian của từng layer để tính gradient, mô hình chỉ lưu một số checkpoint, còn lại sẽ được tính toán lại trong bước backpropagation. Điều này giúp train mô hình sâu hơn với cùng lượng GPU. Ngoài ra, Memory Optimization còn bao gồm kỹ thuật như offloading (chuyển bớt tensor sang CPU), sharded training (chia nhỏ trọng số), và recomputation để giảm footprint bộ nhớ."
+  },
+  {
+    "subskill": "Mixed Precision Training in NLP",
+    "theory": "Mixed Precision Training trong NLP sử dụng kết hợp số thực 16-bit (FP16 hoặc bfloat16) và 32-bit (FP32) trong quá trình huấn luyện. Các phép toán chính như ma trận nhân sẽ chạy bằng FP16 để tăng tốc độ và giảm tiêu tốn bộ nhớ, trong khi các bước nhạy cảm như tính toán gradient hoặc loss vẫn giữ ở FP32 để đảm bảo độ ổn định số học. Mixed Precision cho phép huấn luyện với batch size lớn hơn trên cùng GPU, rút ngắn thời gian train và giảm chi phí phần cứng."
+  },
+  {
+    "subskill": "Scaling Laws in Language Models",
+    "theory": "Scaling Laws mô tả mối quan hệ giữa kích thước mô hình, dữ liệu huấn luyện và hiệu suất của các mô hình ngôn ngữ lớn. Các nghiên cứu (như Kaplan et al. 2020) cho thấy rằng tăng số lượng tham số, dữ liệu và FLOPs theo một tỷ lệ cân đối sẽ giúp mô hình cải thiện hiệu suất theo cách dự đoán được. Điều này cung cấp hướng dẫn cho việc thiết kế và huấn luyện LLMs: muốn tăng chất lượng, cần mở rộng đồng thời cả mô hình và dữ liệu thay vì chỉ tăng một yếu tố."
+  },
+  {
+    "subskill": "Model Distillation and Compression",
+    "theory": "Model Distillation và Compression là kỹ thuật giúp giảm kích thước và chi phí suy luận của các mô hình ngôn ngữ lớn. Distillation huấn luyện một mô hình nhỏ (student) bắt chước mô hình lớn (teacher) thông qua soft labels hoặc biểu diễn trung gian. Compression bao gồm các phương pháp như pruning (cắt bỏ trọng số không quan trọng), quantization (giảm độ chính xác từ FP32 xuống INT8/FP16), và weight sharing. Các kỹ thuật này giúp triển khai NLP models trên thiết bị biên (edge devices) hoặc trong môi trường giới hạn tài nguyên."
+  }
+]

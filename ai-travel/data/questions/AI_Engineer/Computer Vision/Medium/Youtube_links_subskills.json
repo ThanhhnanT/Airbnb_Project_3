@@ -1,0 +1,26 @@
+[
+  {
+    "subskill": "Data Augmentation Techniques",
+    "youtube_link for Data Augmentation Techniques": "https://www.youtube.com/watch?v=Pqm0KJINK8o"
+  },
+  {
+    "subskill": "Hyperparameter Optimization",
+    "youtube_link for Hyperparameter Optimization": "https://www.youtube.com/watch?v=1HlnucQG3FE"
+  },
+  {
+    "subskill": "Fine-tuning Pretrained Models",
+    "youtube_link for Fine-tuning Pretrained Models": "https://www.youtube.com/watch?v=Pqm0KJINK8o"
+  },
+  {
+    "subskill": "Regularization Methods (Dropout, BatchNorm)",
+    "youtube_link for Regularization Methods (Dropout, BatchNorm)": "https://www.youtube.com/watch?v=Pqm0KJINK8o"
+  },
+  {
+    "subskill": "Transfer Learning in Practice",
+    "youtube_link for Transfer Learning in Practice": "https://www.youtube.com/watch?v=1HlnucQG3FE"
+  },
+  {
+    "subskill": "Efficient Training with GPUs/TPUs",
+    "youtube_link for Efficient Training with GPUs/TPUs": "https://www.youtube.com/watch?v=Pqm0KJINK8o"
+  }
+]

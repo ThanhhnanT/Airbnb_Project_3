@@ -1,0 +1,34 @@
+[
+  {
+    "subskill": "Linear Algebra",
+    "youtube_link": "https://www.youtube.com/watch?v=kjBOesZCoqc"
+  },
+  {
+    "subskill": "Probability and Statistics",
+    "youtube_link": "https://www.youtube.com/watch?v=xxpc-HPKN28"
+  },
+  {
+    "subskill": "Optimization",
+    "youtube_link": "https://www.youtube.com/watch?v=EG6mWkOlh6o"
+  },
+  {
+    "subskill": "Machine Learning Basics",
+    "youtube_link": "https://www.youtube.com/watch?v=Gv9_4yMHFhI"
+  },
+  {
+    "subskill": "Deep Learning Fundamentals",
+    "youtube_link": "https://www.youtube.com/watch?v=aircAruvnKk"
+  },
+  {
+    "subskill": "Image Filtering",
+    "youtube_link": "https://www.youtube.com/watch?v=F45J9ekAEp4"
+  },
+  {
+    "subskill": "Image Enhancement",
+    "youtube_link": "https://www.youtube.com/watch?v=HTJBq96UOQY"
+  },
+  {
+    "subskill": "Edge Detection",
+    "youtube_link": "https://www.youtube.com/watch?v=uihBwtPIBxM"
+  }
+]

@@ -1,0 +1,716 @@
+[
+  {
+    "id": "ETS-001",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "Mixed precision training là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Sử dụng cả FP16 và FP32 để tăng tốc và giảm bộ nhớ trong quá trình huấn luyện",
+      "B. Huấn luyện bằng CPU thay vì GPU",
+      "C. Chỉ dùng FP64 cho tất cả phép toán",
+      "D. Một phương pháp augmentation dữ liệu"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixed precision dùng số có độ chính xác thấp (FP16) kết hợp FP32 để giảm bộ nhớ và tăng throughput, đồng thời giữ độ ổn định bằng kỹ thuật như loss scaling.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-002",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "Tại sao cần loss scaling khi dùng FP16?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Để tránh underflow gradient do độ rộng động nhỏ của FP16",
+      "B. Để tăng batch size tự động",
+      "C. Để chuyển mô hình sang ONNX",
+      "D. Để làm giảm latency inference"
+    ],
+    "correct_answer": "A",
+    "explanation": "FP16 có dynamic range hẹp hơn, gradient có thể bị làm tròn thành 0 — loss scaling nhân loss lên để giữ gradient có thể biểu diễn được và sau đó chia nhỏ lại.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-003",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "GPU nào hỗ trợ mixed precision phổ biến hiện nay?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. NVIDIA Tensor Cores (Volta, Turing, Ampere trở lên)",
+      "B. GPU đời cũ không hỗ trợ FP16",
+      "C. Chỉ CPU Intel hỗ trợ",
+      "D. FPGA mặc định hỗ trợ FP128"
+    ],
+    "correct_answer": "A",
+    "explanation": "NVIDIA Tensor Cores trên các kiến trúc Volta/Turing/Ampere tăng tốc tính toán FP16/FP32 hybrid, phù hợp cho mixed precision.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-004",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "Một rủi ro chính khi dùng mixed precision là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mất ổn định số học nếu không dùng kỹ thuật phù hợp (ví dụ loss scaling)",
+      "B. Tăng gấp đôi kích thước mô hình",
+      "C. Không thể dùng batch normalization",
+      "D. Không thể dùng optimizer Adam"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixed precision có thể gây underflow hoặc overflow nếu không điều chỉnh; cần loss scaling và kiểm tra độ ổn định.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-005",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "Khi chuyển sang mixed precision, phần nào thường vẫn giữ ở FP32?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Trọng số chính (master weights) và một số phép toán quan trọng",
+      "B. Tất cả toán đều ở FP16",
+      "C. Chỉ bias được giữ ở FP8",
+      "D. Batch size"
+    ],
+    "correct_answer": "A",
+    "explanation": "Một kỹ thuật phổ biến là giữ master weights ở FP32 để cập nhật chính xác, còn các phép toán ma trận nặng có thể chạy ở FP16.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-006",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "Thư viện nào hỗ trợ mixed precision dễ dùng trong PyTorch?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. torch.cuda.amp (Automatic Mixed Precision)",
+      "B. torchvision.transforms",
+      "C. scikit-learn",
+      "D. matplotlib"
+    ],
+    "correct_answer": "A",
+    "explanation": "PyTorch cung cấp torch.cuda.amp để tự động dùng mixed precision và loss scaling; torchvision, sklearn, matplotlib không liên quan trực tiếp.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-007",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "Mixed precision có thể cải thiện điều gì khi huấn luyện mô hình lớn?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm memory footprint và tăng throughput",
+      "B. Tăng độ chính xác điểm kiểm tra (test accuracy) luôn luôn",
+      "C. Thay thế cần dùng GPU bằng CPU",
+      "D. Loại bỏ cần checkpointing"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixed precision giúp giảm bộ nhớ và tăng tốc tính toán; không bảo đảm luôn tăng accuracy và không thay CPU cho GPU.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-008",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "Data-parallel distributed training hoạt động như thế nào cơ bản?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mỗi worker có bản sao model, xử lý batch khác nhau, rồi đồng bộ gradients",
+      "B. Mỗi worker chỉ lưu một phần nhỏ của data mà không huấn luyện",
+      "C. Mỗi worker chạy cùng một batch giống nhau",
+      "D. Dùng model nhỏ hơn để chia sẻ giữa workers"
+    ],
+    "correct_answer": "A",
+    "explanation": "Data-parallel replicate model trên nhiều worker/GPUs, mỗi worker xử lý mini-batch riêng, rồi aggregate gradients (synchronous/asynchronous).",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-009",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "Synchronous vs asynchronous gradient update điểm khác chính là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Synchronous đợi tất cả worker rồi mới cập nhật; Asynchronous cập nhật khi worker gửi gradient",
+      "B. Synchronous không đợi, Asynchronous luôn đợi",
+      "C. Cả hai giống nhau",
+      "D. Asynchronous chỉ dùng cho CPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "Synchronous đảm bảo gradient đồng bộ nhưng có overhead chờ; asynchronous giảm chờ nhưng có nguy cơ stale gradient.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-010",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "PyTorch DDP (DistributedDataParallel) hoạt động chủ yếu ở chế độ nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Synchronous data-parallel",
+      "B. Model-parallel",
+      "C. Chỉ inference phân tán",
+      "D. Không hỗ trợ multi-GPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "DDP trong PyTorch thực hiện synchronous data-parallel, replicate model trên mỗi process/GPU và đồng bộ gradients.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-011",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "Horovod là thư viện hỗ trợ điều gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tạo pipeline distributed training với ring-allreduce cho nhiều framework (TF/PyTorch/MXNet)",
+      "B. Một optimizer mới thay thế Adam",
+      "C. Một dạng normalization",
+      "D. Thư viện augmentation"
+    ],
+    "correct_answer": "A",
+    "explanation": "Horovod dùng ring-allreduce để hiệu quả đồng bộ gradients across many workers và hỗ trợ nhiều framework.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-012",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "Gradient compression (ví dụ quantization) trong distributed training nhằm mục đích gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm lượng dữ liệu truyền gradients giữa workers để tiết kiệm băng thông",
+      "B. Tăng chính xác gradient",
+      "C. Tăng kích thước gradient",
+      "D. Thay thế optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Kỹ thuật nén gradient giảm traffic mạng và có thể tăng throughput cho training phân tán, nhưng cần cân bằng tổn thất thông tin.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-013",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "Khi triển khai distributed training, yếu tố hẹp cổ chai (bottleneck) phổ biến nhất là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Băng thông mạng (network bandwidth) và độ trễ (latency)",
+      "B. Số lượng CPU cores",
+      "C. Kích thước màn hình hiển thị",
+      "D. Phiên bản Python"
+    ],
+    "correct_answer": "A",
+    "explanation": "Communication overhead giữa nodes (bandwidth/latency) thường là bottleneck chính trong distributed training.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-014",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Accumulation and Checkpointing",
+    "question_text": "Gradient accumulation giúp gì khi GPU memory hạn chế?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Cộng dồn gradients qua nhiều mini-step để mô phỏng batch lớn mà không cần memory cho batch lớn",
+      "B. Tăng batch size thật sự lên gấp đôi",
+      "C. Giảm số epoch cần train",
+      "D. Tăng kích thước mạng"
+    ],
+    "correct_answer": "A",
+    "explanation": "Gradient accumulation cho phép chia batch lớn thành nhiều micro-batches, cộng gradients rồi cập nhật sau N bước, tiết kiệm memory.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-015",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Accumulation and Checkpointing",
+    "question_text": "Checkpointing (model checkpoint) dùng để làm gì phổ biến nhất?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Lưu trạng thái model/optimizer để resume huấn luyện khi bị gián đoạn",
+      "B. Lưu ảnh đầu vào để phân tích",
+      "C. Tăng tốc inference",
+      "D. Là một kiểu regularization"
+    ],
+    "correct_answer": "A",
+    "explanation": "Checkpointing lưu weights và optimizer states, cho phép resume training hoặc rollback khi cần.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-016",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Accumulation and Checkpointing",
+    "question_text": "Activation checkpointing (remat) có tác dụng gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Lưu ít activation trong forward pass và tính lại một số activation trong backward để giảm memory",
+      "B. Lưu toàn bộ activations để tăng tốc backward",
+      "C. Một kỹ thuật augmentation",
+      "D. Thay thế cần dùng optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Activation checkpointing trade CPU/GPU compute để tái tính activation trong backward đổi lấy giảm memory footprint.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-017",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Accumulation and Checkpointing",
+    "question_text": "Kết hợp gradient accumulation và mixed precision có cần lưu ý gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Phải xử lý loss scaling đúng cách khi cộng dồn gradients để không sai lệch cập nhật",
+      "B. Không thể dùng chung được",
+      "C. Luôn làm tăng memory footprint",
+      "D. Không ảnh hưởng gì cả"
+    ],
+    "correct_answer": "A",
+    "explanation": "Khi sử dụng cả hai, cần cân nhắc loss scaling và cách chia/nhân gradients để đảm bảo cập nhật đúng sau accumulation.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-018",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Accumulation and Checkpointing",
+    "question_text": "Một nhược điểm của activation checkpointing là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tăng thời gian tính toán do phải tái tính activation trong backward",
+      "B. Tăng memory usage",
+      "C. Giảm accuracy",
+      "D. Không tương thích với GPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "Checkpointing giảm memory nhưng đổi lấy overhead tính toán (tính lại trong backward), có thể làm tăng thời gian huấn luyện.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-019",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Parallelism and Data Parallelism",
+    "question_text": "Model parallelism khác data parallelism ở điểm nào chính?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Model parallelism chia mô hình thành phần trên nhiều device; data parallelism nhân bản model trên nhiều device",
+      "B. Model parallelism chỉ dùng cho CPU",
+      "C. Data parallelism luôn chậm hơn model parallelism",
+      "D. Hai phương pháp giống hệt nhau"
+    ],
+    "correct_answer": "A",
+    "explanation": "Model parallelism chia các layer/chi nhánh của model giữa devices; data parallelism replicate model và chia data giữa devices.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-020",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Parallelism and Data Parallelism",
+    "question_text": "Pipeline parallelism làm gì trong training mô hình rất lớn?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Chia mô hình theo thứ tự layers và chuyển mini-batch theo pipeline giữa devices để tăng throughput",
+      "B. Là một dạng optimizer",
+      "C. Mã hóa dữ liệu sang định dạng pipeline",
+      "D. Giảm độ dài sequence"
+    ],
+    "correct_answer": "A",
+    "explanation": "Pipeline parallelism phân chia layers thành stages trên nhiều devices và truyền micro-batches qua stages theo pipeline để tăng utilization.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-021",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Parallelism and Data Parallelism",
+    "question_text": "Hybrid parallelism là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Kết hợp nhiều chiến lược parallelism (data + model + pipeline) để tận dụng tốt tài nguyên",
+      "B. Chỉ dùng data-parallel trên CPU",
+      "C. Một kỹ thuật giảm precision",
+      "D. Là một loại regularization"
+    ],
+    "correct_answer": "A",
+    "explanation": "Hybrid parallelism phối hợp data-, model-, pipeline-parallel để xử lý mô hình rất lớn và tận dụng nhiều node/GPU hiệu quả.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-022",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Parallelism and Data Parallelism",
+    "question_text": "Một thách thức lớn khi thực hiện model parallelism là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Communication overhead giữa devices do phụ thuộc tính toán theo thứ tự layers",
+      "B. Không cần checkpointing",
+      "C. Luôn tăng speed training mà không có trade-off",
+      "D. Không tương thích với mixed precision"
+    ],
+    "correct_answer": "A",
+    "explanation": "Model parallelism thường cần truyền intermediate activations giữa devices, tạo overhead giao tiếp và đồng bộ phức tạp.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-023",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Parallelism and Data Parallelism",
+    "question_text": "Sharding optimizer state (ví dụ ZeRO stage 1/2/3) nhằm mục đích gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Phân chia trạng thái optimizer/trọng số giữa nhiều GPU để giảm memory footprint trên mỗi GPU",
+      "B. Tăng batch size tự động",
+      "C. Thay thế need for data-parallel",
+      "D. Là một loại augmentation"
+    ],
+    "correct_answer": "A",
+    "explanation": "Các kỹ thuật như ZeRO shard optimizer, gradients và parameters để giảm memory dùng trên mỗi device, cho phép huấn luyện mô hình lớn hơn.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-024",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Neural Architecture Search",
+    "question_text": "Neural Architecture Search (NAS) là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tự động tìm kiến trúc mạng neural tốt nhất trong không gian kiến trúc đã định nghĩa",
+      "B. Một kiểu optimizer mới",
+      "C. Data augmentation cho mạng",
+      "D. Một bộ dữ liệu chuẩn"
+    ],
+    "correct_answer": "A",
+    "explanation": "NAS tự động khám phá kiến trúc (ví dụ layer, connections) bằng cách search và đánh giá, thay vì thiết kế thủ công.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-025",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Neural Architecture Search",
+    "question_text": "Một phương pháp phổ biến để thực hiện NAS là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Reinforcement learning, evolutionary algorithms, hoặc gradient-based search (differentiable NAS)",
+      "B. Chỉ grid search",
+      "C. Chỉ dùng manual tuning",
+      "D. Dùng PCA để chọn kiến trúc"
+    ],
+    "correct_answer": "A",
+    "explanation": "RL, evolutionary và differentiable NAS là các phương pháp chính; grid/manual không phải là NAS tự động hiện đại.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-026",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Neural Architecture Search",
+    "question_text": "Một nhược điểm lớn của NAS truyền thống là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Chi phí tính toán và thời gian tìm kiếm rất cao",
+      "B. Luôn cho kiến trúc tốt nhất không cần validate",
+      "C. Giảm accuracy của mô hình",
+      "D. Không thể áp dụng cho CNN"
+    ],
+    "correct_answer": "A",
+    "explanation": "NAS truyền thống yêu cầu train nhiều candidate architectures, tốn tài nguyên; các phương pháp tiết kiệm (weight sharing, surrogate) được phát triển để giảm chi phí.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-027",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Neural Architecture Search",
+    "question_text": "Weight-sharing trong NAS làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Chia sẻ weights giữa các kiến trúc candidate để giảm chi phí train mỗi candidate",
+      "B. Lưu trữ weights vào shared drive",
+      "C. Một loại model-parallel",
+      "D. Tăng memory footprint"
+    ],
+    "correct_answer": "A",
+    "explanation": "Weight-sharing (ví dụ trong ENAS) cho phép nhiều cấu trúc dùng chung weights, giảm đáng kể chi phí huấn luyện khi search.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-028",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Compression and Pruning",
+    "question_text": "Model pruning là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Loại bỏ các weights/neurons ít quan trọng để giảm kích thước và tính toán",
+      "B. Thêm nhiều layer vào model",
+      "C. Một kỹ thuật augmentation",
+      "D. Chuyển model sang FP64"
+    ],
+    "correct_answer": "A",
+    "explanation": "Pruning giảm số tham số bằng cách xóa weights nhỏ/không cần thiết, giúp mô hình nhẹ hơn và nhanh hơn.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-029",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Compression and Pruning",
+    "question_text": "Quantization trong model compression làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm độ chính xác số (ví dụ FP32 → INT8) để giảm memory và tăng inference speed",
+      "B. Tăng số lượng parameters",
+      "C. Thêm dropout",
+      "D. Một optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Quantization giảm precision (INT8, INT4) giúp tiết kiệm bộ nhớ và tăng tốc inference trên phần cứng hỗ trợ.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-030",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Compression and Pruning",
+    "question_text": "Knowledge distillation là phương pháp gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Huấn luyện model nhỏ (student) học theo dự đoán mềm của model lớn (teacher)",
+      "B. Một dạng augmentation",
+      "C. Chỉ dùng cho NLP",
+      "D. Tăng kích thước model"
+    ],
+    "correct_answer": "A",
+    "explanation": "Distillation truyền kiến thức từ teacher sang student để student đạt hiệu năng tương đương trong khi nhỏ gọn hơn.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-031",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Compression and Pruning",
+    "question_text": "Một rủi ro khi prune quá mức là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mất accuracy do loại bỏ quá nhiều tham số quan trọng",
+      "B. Luôn luôn giảm thời gian inference",
+      "C. Tăng memory usage",
+      "D. Pruning không ảnh hưởng tới mô hình"
+    ],
+    "correct_answer": "A",
+    "explanation": "Prune quá mức có thể làm tổn hại khả năng biểu diễn của mô hình và giảm accuracy nếu loại bỏ tham số quan trọng.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-032",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Compression and Pruning",
+    "question_text": "Structured pruning khác unstructured pruning ở điểm nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Structured pruning loại nguyên block/layer/filters (dễ tối ưu phần cứng); unstructured loại weights rời rạc",
+      "B. Structured chỉ dùng cho RNN, unstructured chỉ cho CNN",
+      "C. Hai phương pháp giống nhau",
+      "D. Unstructured luôn tốt hơn structured"
+    ],
+    "correct_answer": "A",
+    "explanation": "Structured pruning loại bỏ cấu trúc có ích (filter, channel) dễ tận dụng tối ưu phần cứng; unstructured loại từng weight rời rạc khó tối ưu.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-033",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Mixed Precision Training",
+    "question_text": "FP16 training khi nào đặc biệt hiệu quả?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Khi model có nhiều phép toán ma trận nặng (matrix-multiply) và phần cứng hỗ trợ tensor cores",
+      "B. Khi chỉ dùng CPU",
+      "C. Khi cần tính toán double precision cho khoa học",
+      "D. Khi muốn tăng memory footprint"
+    ],
+    "correct_answer": "A",
+    "explanation": "FP16 có lợi với mô hình lớn có nhiều GEMM operations trên GPU hỗ trợ Tensor Cores; không phù hợp khi cần high-precision.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-034",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "Parameter server architecture thường làm gì trong distributed training?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Lưu và quản lý parameters trung tâm cho tất cả worker cập nhật",
+      "B. Tăng batch size tự động",
+      "C. Là một phương pháp pruning",
+      "D. Không liên quan tới gradient"
+    ],
+    "correct_answer": "A",
+    "explanation": "Parameter server là mô hình nơi servers lưu parameters và workers gửi gradients tới server để cập nhật (có thể asynchronous).",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-035",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Gradient Accumulation and Checkpointing",
+    "question_text": "Resume training từ checkpoint cần lưu những thành phần nào tối thiểu?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Model weights và optimizer state (momentum, lr scheduler state nếu có)",
+      "B. Chỉ lưu weights là đủ mọi lúc",
+      "C. Chỉ lưu seed random",
+      "D. Không cần lưu gì cả"
+    ],
+    "correct_answer": "A",
+    "explanation": "Để resume chính xác cần weights và optimizer states (vì optimizer chứa momentum/ADAM moments) và trạng thái scheduler để tiếp tục.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-036",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Parallelism and Data Parallelism",
+    "question_text": "Tiling activations và recomputation có liên quan đến kỹ thuật nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Model parallelism và activation checkpointing để tiết kiệm memory",
+      "B. Data augmentation",
+      "C. Quantization",
+      "D. NAS"
+    ],
+    "correct_answer": "A",
+    "explanation": "Tiling và recomputation là chiến lược trong model parallel/activation checkpointing để quản lý memory bằng cách tính lại activations khi cần.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-037",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Neural Architecture Search",
+    "question_text": "Differentiable NAS (DARTS) khác nas truyền thống ở điểm nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. DARTS relaxes discrete search space into continuous để gradient-based optimization có thể áp dụng",
+      "B. DARTS là một loại quantization",
+      "C. DARTS chỉ là một framework distributed",
+      "D. DARTS luôn rẻ hơn mọi phương pháp"
+    ],
+    "correct_answer": "A",
+    "explanation": "DARTS transform discrete architecture choices thành các weights liên tục, cho phép sử dụng gradient descent để search nhanh hơn.",
+    "level": "hard"
+  },
+  {
+    "id": "ETS-038",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Compression and Pruning",
+    "question_text": "Post-training quantization nghĩa là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Áp dụng quantization lên model đã huấn luyện mà không cần retrain",
+      "B. Quantize data trước khi train",
+      "C. Là một dạng NAS",
+      "D. Tăng precision của model"
+    ],
+    "correct_answer": "A",
+    "explanation": "Post-training quantization chuyển model FP32 sang INT8/FP16 sau khi huấn luyện, thường cần calibration dataset để giữ accuracy.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-039",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "TPU khác GPU ở điểm nào nổi bật liên quan tới training?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. TPU được tối ưu cho dense matrix ops và có kiến trúc khác biệt; API và cách sử dụng khác GPU",
+      "B. TPU chỉ dùng cho inference",
+      "C. GPU không hỗ trợ mixed precision",
+      "D. TPU không cần data pipeline"
+    ],
+    "correct_answer": "A",
+    "explanation": "TPU thiết kế cho các tensor ops với performance cao; tuy nhiên cần optimized code/data pipeline và khác biệt về lập trình so với GPU.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-040",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Distributed Training with PyTorch/TF",
+    "question_text": "Consistency giữa random seeds trên nhiều worker quan trọng vì sao?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Để đảm bảo reproducibility và tránh sự khác biệt không mong muốn do nhiễu ngẫu nhiên",
+      "B. Để tăng tốc mạng",
+      "C. Không quan trọng trong distributed training",
+      "D. Để giảm memory usage"
+    ],
+    "correct_answer": "A",
+    "explanation": "Seed thống nhất giúp tái tạo kết quả; distributed setup cần kiểm soát seed cho data shuffling, augmentation và initializations.",
+    "level": "easy"
+  },
+  {
+    "id": "ETS-041",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Neural Architecture Search",
+    "question_text": "NAS có thể được dùng để tối ưu điều gì ngoài accuracy?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Latency, model size, energy consumption (multi-objective NAS)",
+      "B. Chỉ accuracy thôi",
+      "C. Tăng số parameter vô hạn",
+      "D. Chỉ dùng cho augmentation"
+    ],
+    "correct_answer": "A",
+    "explanation": "Multi-objective NAS tối ưu trade-off giữa accuracy và các ràng buộc thực tế như latency, FLOPs, memory.",
+    "level": "medium"
+  },
+  {
+    "id": "ETS-042",
+    "target": "AI Engineer",
+    "skill_name": "Efficient Training and Scaling",
+    "subskill_name": "Model Compression and Pruning",
+    "question_text": "Khi triển khai model đã compress lên edge device, việc cần làm trước khi deploy là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Calibration/validation để đảm bảo accuracy trên dữ liệu thực tế và tối ưu runtime cho phần cứng mục tiêu",
+      "B. Không cần test, deploy trực tiếp",
+      "C. Chỉ cần tăng learning rate",
+      "D. Giảm batch size"
+    ],
+    "correct_answer": "A",
+    "explanation": "Trước khi deploy model được quantize/pruned cần calibration và benchmarking trên thiết bị mục tiêu để kiểm tra accuracy và performance.",
+    "level": "easy"
+  }
+]

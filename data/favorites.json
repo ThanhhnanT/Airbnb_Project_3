@@ -1,0 +1,12 @@
+[
+  { "_id": { "$oid": "691aa00183e1d30f0d708700" }, "user_id": { "$oid": "691aa00183e1d30f0d703700" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d70167e" }], "createdAt": { "$date": "2025-11-18T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-18T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708701" }, "user_id": { "$oid": "691aa00183e1d30f0d703701" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d70167e" }], "createdAt": { "$date": "2025-11-20T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-20T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708702" }, "user_id": { "$oid": "691aa00183e1d30f0d703702" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d701682" }], "createdAt": { "$date": "2025-11-22T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-22T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708703" }, "user_id": { "$oid": "691aa00183e1d30f0d703703" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d701681" }], "createdAt": { "$date": "2025-11-23T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-23T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708704" }, "user_id": { "$oid": "691aa00183e1d30f0d703704" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d701680" }], "createdAt": { "$date": "2025-11-24T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-24T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708705" }, "user_id": { "$oid": "691aa00183e1d30f0d703705" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d70167f" }], "createdAt": { "$date": "2025-11-25T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-25T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708706" }, "user_id": { "$oid": "691aa00183e1d30f0d703708" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d70167f" }], "createdAt": { "$date": "2025-11-26T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-26T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708707" }, "user_id": { "$oid": "691aa00183e1d30f0d703710" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d701681" }], "createdAt": { "$date": "2025-11-27T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-27T09:00:00.000Z" } },
+  { "_id": { "$oid": "691aa00183e1d30f0d708708" }, "user_id": { "$oid": "691aa00183e1d30f0d703714" }, "listing_ids": [{ "$oid": "691a9f6183e1d30f0d701682" }], "createdAt": { "$date": "2025-11-28T09:00:00.000Z" }, "updatedAt": { "$date": "2025-11-28T09:00:00.000Z" } }
+]
+

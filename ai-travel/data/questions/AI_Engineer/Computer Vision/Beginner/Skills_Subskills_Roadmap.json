@@ -1,0 +1,79 @@
+[
+  {
+    "Roadmap for Computer Vision Beginner": {
+        "Foundations": [
+            "Linear Algebra",
+            "Probability and Statistics",
+            "Machine Learning Basics",
+            "Deep Learning Fundamentals"
+        ],
+        "Image Processing": [
+            "Image Filtering",
+            "Image Enhancement",
+            "Edge Detection",
+            "Image Segmentation",
+            "Morphological Operations",
+            "Color Models and Transformations",
+            "Feature Extraction (SIFT, SURF, ORB, HOG)"
+        ],
+        "Object Detection": [
+            "Object Localization",
+            "Object Recognition",
+            "Face Detection",
+            "Pedestrian Detection",
+            "Instance Segmentation",
+            "Saliency Detection",
+            "Popular Models (Faster R-CNN, YOLO, SSD, RetinaNet, DETR)"
+        ],
+        "3D Vision": [
+            "Stereo Vision",
+            "Structure from Motion (SfM)",
+            "Visual SLAM",
+            "Depth Estimation",
+            "Scene Reconstruction",
+            "3D Pose Estimation",
+            "Motion Estimation",
+            "Visual Servoing"
+        ],
+        "Learning and Indexing": [
+            "Image Classification",
+            "Transfer Learning",
+            "Image Restoration",
+            "Activity Recognition",
+            "Image Retrieval",
+            "Metric Learning",
+            "Representation Learning"
+        ],
+        "Video Analysis": [
+            "Optical Flow",
+            "Action Recognition",
+            "Event Detection",
+            "Video Summarization",
+            "Object Tracking",
+            "Multi-object Tracking",
+            "Video Super-Resolution"
+        ],
+        "Advanced Topics": [
+            "Generative Models (GANs, Diffusion Models)",
+            "Self-Supervised Learning",
+            "Few-shot and Zero-shot Learning",
+            "Vision Transformers (ViT, Swin)",
+            "Multimodal Learning (Vision + Language)",
+            "Neural Radiance Fields (NeRF)",
+            "Foundation Models (CLIP, Segment Anything)"
+        ],
+        "Applications": [
+            "Autonomous Driving",
+            "Medical Imaging",
+            "Face Recognition",
+            "Gesture Recognition",
+            "Augmented Reality",
+            "Surveillance and Security",
+            "Industrial Inspection",
+            "Robotics Vision"
+        ]
+    }
+}
+
+
+]

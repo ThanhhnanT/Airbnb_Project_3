@@ -1,0 +1,22 @@
+[
+  {
+    "subskill": "Contextual Word Embeddings (ELMo, BERT)",
+    "youtube_link": "https://www.youtube.com/watch?v=qMCbvLRppew"
+  },
+  {
+    "subskill": "Subword Tokenization (BPE, WordPiece)",
+    "youtube_link": "https://www.youtube.com/watch?v=hL4ZnAWSyuU"
+  },
+  {
+    "subskill": "Transformer Encoder-Decoder Models",
+    "youtube_link": "https://www.youtube.com/watch?v=0_4KEb08xrE"
+  },
+  {
+    "subskill": "Self-Attention Mechanism",
+    "youtube_link": "https://www.youtube.com/watch?v=W28LfOld44Y"
+  },
+  {
+    "subskill": "Pretraining vs Fine-tuning",
+    "youtube_link": "https://www.youtube.com/watch?v=kYkPDaQun4g"
+  }
+]

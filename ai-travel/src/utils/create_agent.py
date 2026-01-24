@@ -8,38 +8,75 @@ from src.utils.vector_store import get_similar_docs
 import sys
 
 
-def create_agent(domain:str ,level: str,llm: Any, vector_store: Chroma, memory: ConversationBufferMemory) -> Any:
+def create_agent(domain: str, level: str, llm: Any, vector_store: Chroma, memory: ConversationBufferMemory, mode: str = "learning") -> Any:
+    """
+    Create an agent with appropriate tools based on mode.
+    
+    Args:
+        domain: Learning domain for learning mode or 'airbnb' for chatbot mode
+        level: User knowledge level for learning mode
+        llm: Language model to use
+        vector_store: Chroma vector store
+        memory: Conversation memory
+        mode: 'learning' for learning paths or 'chatbot' for consultation
+    """
 
     try:
         wiki = WikipediaAPIWrapper()
 
-        tools = [
-            Tool.from_function(
-                func=lambda q: get_similar_docs(q, vector_store, level, file_type="Youtube_links_subskills", domain=domain),
-                name="retrieval_youtube_links",
-                description="Useful for get youtube link of subskill."
-            ),
-            Tool.from_function(
-                func=lambda q: get_similar_docs(q, vector_store, level, file_type="Theory", domain=domain),
-                name="retrieval_theory",
-                description="Useful for get theory of subskill."
-            ),
-            Tool.from_function(
-                func=lambda q: get_similar_docs(q, vector_store, level, file_type="Question", domain=domain),
-                name="retrieval_question",
-                description="Useful for get question of subskill."
-            ),
-            Tool.from_function(
-                func=lambda q: get_similar_docs(q, vector_store, level, file_type="Skills_Subskills_Roadmap", domain= domain),
-                name="retrieval_roadmap",
-                description="Useful for get roadmap."
-            ),
-            Tool.from_function(
-                func=wiki.run,
-                name="Wikipedia",
-                description="Useful for answering general knowledge questions using Wikipedia."
-            ),
-        ]
+        if mode == "chatbot":
+            # Chatbot mode - Airbnb consultation tools
+            tools = [
+                Tool.from_function(
+                    func=lambda q: get_similar_docs(q, vector_store, level="general", file_type="FAQ", domain="airbnb", k=3),
+                    name="retrieval_guest_guide",
+                    description="Useful for getting answers about guest features, booking, payments, and reviews on Airbnb."
+                ),
+                Tool.from_function(
+                    func=lambda q: get_similar_docs(q, vector_store, level="general", file_type="FAQ", domain="airbnb", k=3),
+                    name="retrieval_host_guide",
+                    description="Useful for getting answers about host features, listing creation, pricing, and payout on Airbnb."
+                ),
+                Tool.from_function(
+                    func=lambda q: get_similar_docs(q, vector_store, level="general", file_type="FAQ", domain="airbnb", k=3),
+                    name="retrieval_general_guide",
+                    description="Useful for general Airbnb information like account security, verification, policies, and support."
+                ),
+                Tool.from_function(
+                    func=wiki.run,
+                    name="Wikipedia",
+                    description="Useful for answering general knowledge questions when Airbnb documentation is insufficient."
+                ),
+            ]
+        else:
+            # Learning mode - Original learning path tools
+            tools = [
+                Tool.from_function(
+                    func=lambda q: get_similar_docs(q, vector_store, level, file_type="Youtube_links_subskills", domain=domain),
+                    name="retrieval_youtube_links",
+                    description="Useful for get youtube link of subskill."
+                ),
+                Tool.from_function(
+                    func=lambda q: get_similar_docs(q, vector_store, level, file_type="Theory", domain=domain),
+                    name="retrieval_theory",
+                    description="Useful for get theory of subskill."
+                ),
+                Tool.from_function(
+                    func=lambda q: get_similar_docs(q, vector_store, level, file_type="Question", domain=domain),
+                    name="retrieval_question",
+                    description="Useful for get question of subskill."
+                ),
+                Tool.from_function(
+                    func=lambda q: get_similar_docs(q, vector_store, level, file_type="Skills_Subskills_Roadmap", domain=domain),
+                    name="retrieval_roadmap",
+                    description="Useful for get roadmap."
+                ),
+                Tool.from_function(
+                    func=wiki.run,
+                    name="Wikipedia",
+                    description="Useful for answering general knowledge questions using Wikipedia."
+                ),
+            ]
 
         agent = initialize_agent(
             tools=tools,

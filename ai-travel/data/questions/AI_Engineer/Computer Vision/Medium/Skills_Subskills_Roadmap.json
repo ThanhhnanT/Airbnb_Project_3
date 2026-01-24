@@ -1,0 +1,48 @@
+[
+  {
+    "Roadmap for Computer Vision Medium": {
+      "Model Training and Tuning": [
+        "Data Augmentation Techniques",
+        "Hyperparameter Optimization",
+        "Fine-tuning Pretrained Models",
+        "Transfer Learning in Practice",
+        "Efficient Training with GPUs/TPUs"
+      ],
+      "Detection and Segmentation": [
+        "Region Proposal Networks",
+        "Semantic Segmentation (UNet, DeepLab)",
+        "Instance Segmentation (Mask R-CNN)",
+        "Panoptic Segmentation",
+        "Object Tracking with Deep Learning"
+      ],
+      "3D and Geometry": [
+        "Camera Calibration",
+        "Epipolar Geometry",
+        "Bundle Adjustment",
+        "Multi-view Stereo",
+        "Monocular Depth Estimation"
+      ],
+      "Representation Learning": [
+        "Contrastive Learning (SimCLR, MoCo)",
+        "Triplet Loss and Metric Learning",
+        "Self-Supervised Vision Models",
+        "Knowledge Distillation",
+        "Domain Adaptation Techniques"
+      ],
+      "Video Understanding": [
+        "Temporal Action Localization",
+        "Video Captioning",
+        "Spatio-Temporal Attention",
+        "Multi-object Tracking with Transformers",
+        "Video Question Answering"
+      ],
+      "Applications": [
+        "Medical Image Segmentation",
+        "Human Pose Estimation",
+        "Gesture Recognition in Real-time",
+        "Drone-based Vision Systems",
+        "Retail and E-commerce Vision"
+      ]
+    }
+  }
+]

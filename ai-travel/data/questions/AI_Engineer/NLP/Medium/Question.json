@@ -1,0 +1,431 @@
+[
+  {
+    "id": "RL-001",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Contextual Word Embeddings (ELMo, BERT)",
+    "question_text": "Điểm khác biệt cơ bản giữa embedding tĩnh (Word2Vec, GloVe) và contextual embedding (ELMo, BERT) là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Contextual embedding cho vector khác nhau tùy ngữ cảnh trong câu",
+      "B. Embedding tĩnh thay đổi theo từng câu",
+      "C. Contextual embedding chỉ áp dụng cho tiếng Anh",
+      "D. Embedding tĩnh luôn tốt hơn contextual embedding"
+    ],
+    "correct_answer": "A",
+    "explanation": "Contextual embeddings (ELMo, BERT) sinh vector phụ thuộc vào ngữ cảnh xuất hiện của từ, trong khi Word2Vec/GloVe cho vector cố định cho mỗi từ.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-002",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Contextual Word Embeddings (ELMo, BERT)",
+    "question_text": "ELMo tạo embedding ngữ cảnh dựa trên kiến trúc nào chính?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Transformer encoder",
+      "B. BiLSTM hai chiều",
+      "C. Convolutional neural network",
+      "D. Skip-gram"
+    ],
+    "correct_answer": "B",
+    "explanation": "ELMo dựa trên BiLSTM hai chiều (bi-directional LSTM) để học biểu diễn theo ngữ cảnh.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-003",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Contextual Word Embeddings (ELMo, BERT)",
+    "question_text": "BERT được huấn luyện với nhiệm vụ nào tiêu biểu để học biểu diễn ngôn ngữ?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Next Word Prediction (GPT style)",
+      "B. Masked Language Modeling và Next Sentence Prediction",
+      "C. Skip-gram và CBOW",
+      "D. Text summarization trực tiếp"
+    ],
+    "correct_answer": "B",
+    "explanation": "BERT dùng Masked Language Modeling (che bớt token và dự đoán) và Next Sentence Prediction để học ngữ cảnh hai chiều.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-004",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Contextual Word Embeddings (ELMo, BERT)",
+    "question_text": "Ưu điểm lớn nhất của contextual embeddings trong xử lý từ đa nghĩa (polysemy) là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Luôn dùng vector cố định cho mọi ngữ cảnh",
+      "B. Biểu diễn khác nhau cho cùng một từ trong ngữ cảnh khác nhau",
+      "C. Giảm kích thước embedding xuống 1 chiều",
+      "D. Không cần tiền xử lý dữ liệu"
+    ],
+    "correct_answer": "B",
+    "explanation": "Contextual embeddings cho phép cùng một từ có các biểu diễn khác nhau tùy theo ngữ cảnh, giúp xử lý từ đa nghĩa tốt hơn.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-005",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Contextual Word Embeddings (ELMo, BERT)",
+    "question_text": "Một ứng dụng trực tiếp của contextual embeddings là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tăng tốc GPU",
+      "B. Cải thiện kết quả Question Answering",
+      "C. Nén ảnh",
+      "D. Sinh nhạc"
+    ],
+    "correct_answer": "B",
+    "explanation": "Contextual embeddings thường cải thiện hiệu năng cho các task như Question Answering, NER, và text classification.",
+    "level": "easy"
+  },
+
+  {
+    "id": "RL-006",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Subword Tokenization (BPE, WordPiece)",
+    "question_text": "Mục tiêu chính của subword tokenization (như BPE, WordPiece) là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm overfitting",
+      "B. Giải quyết vấn đề out-of-vocabulary (OOV)",
+      "C. Thay thế hoàn toàn word tokenization",
+      "D. Chỉ dùng cho từ tiếng Anh"
+    ],
+    "correct_answer": "B",
+    "explanation": "Subword tokenization chia từ thành các phần nhỏ để có thể biểu diễn từ hiếm hoặc từ mới, giảm OOV.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-007",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Subword Tokenization (BPE, WordPiece)",
+    "question_text": "WordPiece tokenization thường được sử dụng trong mô hình nào sau đây?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Word2Vec",
+      "B. BERT",
+      "C. ELMo",
+      "D. FastText"
+    ],
+    "correct_answer": "B",
+    "explanation": "BERT sử dụng WordPiece tokenization để xây dựng từ điển subword của mình.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-008",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Subword Tokenization (BPE, WordPiece)",
+    "question_text": "Byte Pair Encoding (BPE) hoạt động theo nguyên tắc nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Ghép các cặp ký tự/tokens xuất hiện nhiều nhất thành token mới",
+      "B. Dịch từ sang ngôn ngữ khác",
+      "C. Loại bỏ stopwords",
+      "D. Tối ưu hàm mất mát"
+    ],
+    "correct_answer": "A",
+    "explanation": "BPE lặp lại việc hợp nhất cặp ký tự (hoặc subtoken) có tần suất cao để tạo token mới, tạo từ điển subword.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-009",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Subword Tokenization (BPE, WordPiece)",
+    "question_text": "Nhược điểm tiềm ẩn của subword tokenization là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Luôn làm tăng chiều embedding",
+      "B. Có thể tạo token không trực quan/khó đọc",
+      "C. Không xử lý được ngôn ngữ đa byte",
+      "D. Không tương thích với transformer"
+    ],
+    "correct_answer": "B",
+    "explanation": "Subword có thể tạo ra token kỳ lạ (ví dụ: '##ing', 'un', ...), làm giảm tính trực quan khi đọc.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-010",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Subword Tokenization (BPE, WordPiece)",
+    "question_text": "Subword tokenization giúp ích nhất trong trường hợp nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Khi làm image classification",
+      "B. Khi dataset có nhiều từ hiếm và tên riêng",
+      "C. Khi mô hình là Random Forest",
+      "D. Khi không dùng embedding"
+    ],
+    "correct_answer": "B",
+    "explanation": "Subword hữu ích khi dữ liệu chứa nhiều từ hiếm, tên riêng, hoặc biến thể từ vựng, vì nó giảm OOV.",
+    "level": "easy"
+  },
+
+  {
+    "id": "RL-011",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Transformer Encoder-Decoder Models",
+    "question_text": "Trong kiến trúc encoder-decoder của Transformer, vai trò chính của encoder là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Sinh câu đầu ra từng bước",
+      "B. Mã hóa đầu vào thành biểu diễn ngữ cảnh",
+      "C. Tính loss cho mô hình",
+      "D. Tiền xử lý dữ liệu"
+    ],
+    "correct_answer": "B",
+    "explanation": "Encoder chuyển đổi chuỗi đầu vào thành các biểu diễn ngữ cảnh để decoder sử dụng khi sinh đầu ra.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-012",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Transformer Encoder-Decoder Models",
+    "question_text": "Ưu điểm lớn nhất của Transformer so với RNN là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Dễ bị quên thông tin dài hạn",
+      "B. Có khả năng học phụ thuộc dài hạn và train song song hiệu quả",
+      "C. Luôn dùng ít tham số hơn",
+      "D. Chỉ chạy trên CPU"
+    ],
+    "correct_answer": "B",
+    "explanation": "Transformer dùng self-attention để nắm quan hệ dài hạn và không có tính tuần tự như RNN nên có thể train song song nhanh hơn.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-013",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Transformer Encoder-Decoder Models",
+    "question_text": "Transformer encoder-decoder thường được dùng cho task nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Machine Translation (dịch máy)",
+      "B. Image denoising",
+      "C. Clustering dữ liệu",
+      "D. K-means"
+    ],
+    "correct_answer": "A",
+    "explanation": "Kiến trúc encoder-decoder của Transformer rất phổ biến cho các tác vụ seq2seq như dịch máy và tóm tắt văn bản.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-014",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Transformer Encoder-Decoder Models",
+    "question_text": "Trong pipeline Encoder-Decoder, decoder sử dụng gì để chú ý tới đầu vào đã mã hóa khi sinh token?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Convolution",
+      "B. Cross-attention (encoder-decoder attention)",
+      "C. Batch normalization",
+      "D. Max pooling"
+    ],
+    "correct_answer": "B",
+    "explanation": "Decoder dùng cơ chế cross-attention để tham chiếu biểu diễn do encoder tạo ra khi sinh từng token đầu ra.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-015",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Transformer Encoder-Decoder Models",
+    "question_text": "Một nhược điểm của kiến trúc Transformer khi áp dụng cho rất nhiều token là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tăng chi phí tính toán và bộ nhớ theo O(n^2) do attention",
+      "B. Không thể học quan hệ dài hạn",
+      "C. Không hỗ trợ fine-tuning",
+      "D. Không áp dụng cho ngôn ngữ tự nhiên"
+    ],
+    "correct_answer": "A",
+    "explanation": "Attention truyền thống có độ phức tạp O(n^2) theo độ dài chuỗi, làm tăng chi phí tính toán/bộ nhớ khi n lớn.",
+    "level": "medium"
+  },
+
+  {
+    "id": "RL-016",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Self-Attention Mechanism",
+    "question_text": "Self-attention tính trọng số attention dựa trên thành phần nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Query, Key và Value",
+      "B. Convolution filter",
+      "C. Pooling window",
+      "D. Embedding tĩnh"
+    ],
+    "correct_answer": "A",
+    "explanation": "Self-attention dùng Query, Key, Value để tính trọng số attention (softmax(QK^T / sqrt(d))).",
+    "level": "easy"
+  },
+  {
+    "id": "RL-017",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Self-Attention Mechanism",
+    "question_text": "Tại sao phải chia cho sqrt(d_k) trong công thức attention (softmax(QK^T / sqrt(d_k)))?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Để khử bias của optimizer",
+      "B. Để chuẩn hóa giá trị dot-product và tránh gradient quá lớn",
+      "C. Để tăng tốc độ inference",
+      "D. Để giảm số chiều của embedding"
+    ],
+    "correct_answer": "B",
+    "explanation": "Chia cho sqrt(d_k) giúp chuẩn hoá dot-product giữa Query và Key, tránh giá trị quá lớn trước softmax gây gradient xấu.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-018",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Self-Attention Mechanism",
+    "question_text": "Multi-head attention có lợi gì so với single-head attention?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Cho phép mô hình chú ý tới các không gian biểu diễn khác nhau song song",
+      "B. Luôn giảm số tham số",
+      "C. Loại bỏ need for positional encoding",
+      "D. Chỉ dùng cho RNN"
+    ],
+    "correct_answer": "A",
+    "explanation": "Multi-head attention tạo nhiều head để học các loại quan hệ khác nhau trong không gian biểu diễn, giúp mô hình phong phú hơn.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-019",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Self-Attention Mechanism",
+    "question_text": "Self-attention cho phép mô hình học được gì mà RNN khó nắm bắt?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mối liên hệ dài hạn giữa các token trong chuỗi một cách trực tiếp",
+      "B. Chỉ mối quan hệ địa phương",
+      "C. Tính toán trên CPU hiệu quả hơn",
+      "D. Giảm kích thước vocab"
+    ],
+    "correct_answer": "A",
+    "explanation": "Self-attention có thể kết nối trực tiếp mọi token với mọi token khác, giúp nắm mối quan hệ dài hạn dễ dàng hơn RNN.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-020",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Self-Attention Mechanism",
+    "question_text": "Positional encoding được dùng trong Transformer vì lý do gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Để cung cấp thông tin về thứ tự token",
+      "B. Để thay thế attention",
+      "C. Để chuẩn hoá embedding",
+      "D. Để giảm overfitting"
+    ],
+    "correct_answer": "A",
+    "explanation": "Vì self-attention không nắm thứ tự token, positional encoding được thêm vào embedding để cung cấp thông tin vị trí.",
+    "level": "easy"
+  },
+
+  {
+    "id": "RL-021",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Pretraining vs Fine-tuning",
+    "question_text": "Pretraining trong NLP thường làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Huấn luyện mô hình trên tập dữ liệu lớn bằng nhiệm vụ tự giám sát để học biểu diễn chung",
+      "B. Chỉ tinh chỉnh mô hình cho một task cụ thể",
+      "C. Loại bỏ từ hiếm khỏi vocab",
+      "D. Tối ưu hyperparameters cho từng dataset nhỏ"
+    ],
+    "correct_answer": "A",
+    "explanation": "Pretraining huấn luyện mô hình trên lượng lớn dữ liệu (thường tự giám sát) để học biểu diễn ngôn ngữ tổng quát.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-022",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Pretraining vs Fine-tuning",
+    "question_text": "Fine-tuning khác gì so với pretraining?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Fine-tuning điều chỉnh mô hình pretrained cho một task cụ thể với dữ liệu nhỏ hơn",
+      "B. Fine-tuning luôn train từ đầu (scratch)",
+      "C. Pretraining dùng cho supervised learning nhỏ",
+      "D. Fine-tuning chỉ thay đổi embedding"
+    ],
+    "correct_answer": "A",
+    "explanation": "Fine-tuning dùng mô hình đã pretrain và tinh chỉnh trên task cụ thể (ví dụ classification, QA) thường với dataset nhỏ hơn.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-023",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Pretraining vs Fine-tuning",
+    "question_text": "Một lợi ích lớn của pretraining rồi fine-tuning là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm thời gian và dữ liệu cần cho task cụ thể",
+      "B. Hoàn toàn loại bỏ nhu cầu tiền xử lý",
+      "C. Luôn cho kết quả tốt hơn training từ đầu bất kể tình huống",
+      "D. Giảm kích thước mô hình xuống 1 tham số"
+    ],
+    "correct_answer": "A",
+    "explanation": "Nhờ pretraining, mô hình đã học biểu diễn chung, nên fine-tuning cần ít dữ liệu/time hơn để đạt hiệu năng tốt cho task đặc thù.",
+    "level": "easy"
+  },
+  {
+    "id": "RL-024",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Pretraining vs Fine-tuning",
+    "question_text": "Which of the following is a common pretraining objective for encoder-only models like BERT?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Masked Language Modeling (MLM)",
+      "B. Next Word Prediction (NWP) only",
+      "C. Image classification",
+      "D. K-means clustering"
+    ],
+    "correct_answer": "A",
+    "explanation": "Masked Language Modeling (MLM) là mục tiêu thường dùng cho encoder-only models như BERT.",
+    "level": "medium"
+  },
+  {
+    "id": "RL-025",
+    "target": "AI Engineer",
+    "skill_name": "Representation Learning",
+    "subskill_name": "Pretraining vs Fine-tuning",
+    "question_text": "Khi fine-tuning một mô hình lớn, kỹ thuật nào thường được dùng để tránh overfitting trên tập dữ liệu nhỏ?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giữ learning rate nhỏ và dùng regularization/dropout",
+      "B. Tăng learning rate lớn lên",
+      "C. Loại bỏ toàn bộ lớp cuối cùng mà không thay thế",
+      "D. Không dùng optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Trong fine-tuning nên dùng learning rate nhỏ, regularization, dropout và có thể freezing một số layer để tránh overfitting.",
+    "level": "medium"
+  }
+]

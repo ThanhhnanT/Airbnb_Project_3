@@ -1,0 +1,345 @@
+[
+  {
+    "id": "FUN-001",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Introduction to NLP and Applications",
+    "question_text": "NLP (Natural Language Processing) là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Lĩnh vực nghiên cứu về xử lý ngôn ngữ tự nhiên của con người bằng máy tính",
+      "B. Một loại phần cứng máy tính",
+      "C. Phương pháp nén dữ liệu văn bản",
+      "D. Hệ thống quản lý cơ sở dữ liệu"
+    ],
+    "correct_answer": "A",
+    "explanation": "NLP là lĩnh vực AI tập trung vào việc xử lý, hiểu và sinh ngôn ngữ tự nhiên.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-002",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Introduction to NLP and Applications",
+    "question_text": "Ứng dụng phổ biến nào sau đây KHÔNG thuộc NLP?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Dịch máy",
+      "B. Nhận diện giọng nói",
+      "C. Phân tích cảm xúc",
+      "D. Rendering 3D trong game"
+    ],
+    "correct_answer": "D",
+    "explanation": "Rendering 3D trong game không phải là ứng dụng NLP, mà thuộc lĩnh vực đồ họa máy tính.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-003",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Introduction to NLP and Applications",
+    "question_text": "Một ứng dụng NLP trong lĩnh vực chăm sóc khách hàng là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Chatbot tự động",
+      "B. Máy in laser",
+      "C. Công cụ thiết kế CAD",
+      "D. Bộ xử lý tín hiệu hình ảnh"
+    ],
+    "correct_answer": "A",
+    "explanation": "Chatbot sử dụng NLP để hiểu và trả lời ngôn ngữ tự nhiên của khách hàng.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-004",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Introduction to NLP and Applications",
+    "question_text": "Ứng dụng dịch tự động (Google Translate) dùng kỹ thuật chính nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Machine Translation",
+      "B. Reinforcement Learning",
+      "C. Computer Vision",
+      "D. Robotics"
+    ],
+    "correct_answer": "A",
+    "explanation": "Google Translate dựa vào NLP và machine translation để dịch văn bản giữa các ngôn ngữ.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-005",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Introduction to NLP and Applications",
+    "question_text": "Phân tích cảm xúc (Sentiment Analysis) thường dùng để làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Xác định thái độ tích cực, tiêu cực hay trung lập trong văn bản",
+      "B. Đếm số lượng từ trong văn bản",
+      "C. Loại bỏ khoảng trắng",
+      "D. Dịch văn bản từ tiếng Anh sang tiếng Việt"
+    ],
+    "correct_answer": "A",
+    "explanation": "Sentiment Analysis xác định cảm xúc/quan điểm trong văn bản.",
+    "level": "easy"
+  },
+
+  {
+    "id": "FUN-006",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+    "question_text": "Mục đích của việc chuyển văn bản thành chữ thường (lowercasing) là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm độ phức tạp do phân biệt chữ hoa và chữ thường",
+      "B. Làm văn bản đẹp hơn",
+      "C. Loại bỏ stopwords",
+      "D. Dịch sang ngôn ngữ khác"
+    ],
+    "correct_answer": "A",
+    "explanation": "Lowercasing giúp giảm số lượng từ vựng cần xử lý, tránh trùng lặp do khác biệt hoa/thường.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-007",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+    "question_text": "Stopwords trong NLP là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Những từ ít mang ý nghĩa ngữ nghĩa (ví dụ: the, is, a)",
+      "B. Từ khóa chính trong câu",
+      "C. Các ký hiệu đặc biệt",
+      "D. Các dấu câu"
+    ],
+    "correct_answer": "A",
+    "explanation": "Stopwords là những từ thường xuyên xuất hiện nhưng không mang nhiều giá trị ngữ nghĩa.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-008",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+    "question_text": "Loại bỏ dấu câu trong văn bản giúp ích gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Chuẩn hóa dữ liệu để dễ xử lý hơn",
+      "B. Dịch văn bản chính xác hơn",
+      "C. Thêm nghĩa cho câu",
+      "D. Tăng tốc độ nhập văn bản"
+    ],
+    "correct_answer": "A",
+    "explanation": "Loại bỏ dấu câu giúp dữ liệu văn bản gọn nhẹ và nhất quán hơn để xử lý.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-009",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+    "question_text": "Trong Python, thư viện nào phổ biến để xử lý stopwords?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. NLTK",
+      "B. NumPy",
+      "C. OpenCV",
+      "D. Matplotlib"
+    ],
+    "correct_answer": "A",
+    "explanation": "NLTK cung cấp danh sách stopwords phổ biến trong nhiều ngôn ngữ.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-010",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+    "question_text": "Vì sao cần chuẩn hóa văn bản trước khi huấn luyện mô hình NLP?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Để giảm nhiễu và tăng chất lượng dữ liệu",
+      "B. Để tăng tốc độ mạng Internet",
+      "C. Để tăng kích thước tập dữ liệu",
+      "D. Để làm dữ liệu phức tạp hơn"
+    ],
+    "correct_answer": "A",
+    "explanation": "Chuẩn hóa giúp mô hình học tốt hơn bằng cách loại bỏ nhiễu và biến thể không cần thiết.",
+    "level": "easy"
+  },
+
+  {
+    "id": "FUN-011",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Tokenization (Word, Subword, Sentence)",
+    "question_text": "Tokenization là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Quá trình chia văn bản thành các đơn vị nhỏ hơn (token)",
+      "B. Quá trình dịch văn bản",
+      "C. Loại bỏ stopwords",
+      "D. Gắn nhãn văn bản"
+    ],
+    "correct_answer": "A",
+    "explanation": "Tokenization tách văn bản thành token để mô hình xử lý.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-012",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Tokenization (Word, Subword, Sentence)",
+    "question_text": "Phân tách văn bản thành từng câu gọi là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Sentence Tokenization",
+      "B. Word Tokenization",
+      "C. Subword Tokenization",
+      "D. Character Tokenization"
+    ],
+    "correct_answer": "A",
+    "explanation": "Sentence Tokenization tách văn bản thành câu dựa trên dấu chấm câu.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-013",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Tokenization (Word, Subword, Sentence)",
+    "question_text": "Subword tokenization được sử dụng nhiều trong mô hình nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. BERT, GPT",
+      "B. CNN",
+      "C. Random Forest",
+      "D. SVM"
+    ],
+    "correct_answer": "A",
+    "explanation": "Các mô hình transformer hiện đại thường dùng subword tokenization để xử lý từ mới.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-014",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Tokenization (Word, Subword, Sentence)",
+    "question_text": "Word tokenization chia văn bản thành?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Từng từ",
+      "B. Từng ký tự",
+      "C. Từng câu",
+      "D. Từng đoạn văn"
+    ],
+    "correct_answer": "A",
+    "explanation": "Word tokenization chia văn bản thành từng từ riêng biệt.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-015",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Tokenization (Word, Subword, Sentence)",
+    "question_text": "Byte Pair Encoding (BPE) thuộc loại tokenization nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Subword Tokenization",
+      "B. Word Tokenization",
+      "C. Sentence Tokenization",
+      "D. Character Tokenization"
+    ],
+    "correct_answer": "A",
+    "explanation": "BPE là một kỹ thuật subword tokenization giúp mô hình xử lý từ mới.",
+    "level": "medium"
+  },
+
+  {
+    "id": "FUN-016",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Stemming and Lemmatization",
+    "question_text": "Stemming là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Cắt bỏ hậu tố để đưa từ về dạng gốc",
+      "B. Dịch văn bản sang ngôn ngữ khác",
+      "C. Đếm số lượng từ",
+      "D. Tách câu thành từ"
+    ],
+    "correct_answer": "A",
+    "explanation": "Stemming đưa từ về dạng gốc bằng cách cắt hậu tố, không xét ngữ pháp.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-017",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Stemming and Lemmatization",
+    "question_text": "Lemmatization khác gì so với stemming?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Lemmatization dựa trên từ điển và ngữ pháp, stemming chỉ cắt hậu tố",
+      "B. Lemmatization nhanh hơn stemming",
+      "C. Lemmatization dịch sang ngôn ngữ khác",
+      "D. Không có sự khác biệt"
+    ],
+    "correct_answer": "A",
+    "explanation": "Lemmatization đưa từ về dạng chuẩn dựa trên từ điển, còn stemming chỉ cắt bỏ đuôi từ.",
+    "level": "medium"
+  },
+  {
+    "id": "FUN-018",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Stemming and Lemmatization",
+    "question_text": "Từ 'running' khi stemming có thể thành gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. run",
+      "B. runn",
+      "C. ran",
+      "D. runner"
+    ],
+    "correct_answer": "B",
+    "explanation": "Stemming có thể trả về 'runn', dạng không chuẩn nhưng vẫn cắt gốc từ.",
+    "level": "easy"
+  },
+  {
+    "id": "FUN-019",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Stemming and Lemmatization",
+    "question_text": "Từ 'better' khi lemmatization có thể trở thành gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. good",
+      "B. better",
+      "C. best",
+      "D. well"
+    ],
+    "correct_answer": "A",
+    "explanation": "Lemmatization dựa trên từ điển nên có thể biến 'better' về dạng chuẩn 'good'.",
+    "level": "medium"
+  },
+  {
+    "id": "FUN-020",
+    "target": "AI Engineer",
+    "skill_name": "Fundamentals",
+    "subskill_name": "Stemming and Lemmatization",
+    "question_text": "Tại sao lemmatization thường chậm hơn stemming?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Vì cần tra từ điển và xét ngữ pháp",
+      "B. Vì chạy trên CPU thay vì GPU",
+      "C. Vì cần dịch ngôn ngữ",
+      "D. Vì dữ liệu lớn hơn"
+    ],
+    "correct_answer": "A",
+    "explanation": "Lemmatization cần tra cứu ngữ pháp và từ điển, nên chậm hơn so với stemming.",
+    "level": "medium"
+  }
+]

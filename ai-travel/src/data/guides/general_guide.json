@@ -1,0 +1,67 @@
+{
+  "category": "general",
+  "name": "Hướng dẫn Chung Airbnb",
+  "description": "Hướng dẫn toàn diện về bảo mật tài khoản, xác minh, giải quyết tranh chấp và chính sách Airbnb",
+  "faqs": [
+    {
+      "id": "general_001",
+      "question": "Làm thế nào để tạo tài khoản Airbnb?",
+      "answer": "Để tạo tài khoản: 1. Truy cập website hoặc ứng dụng Airbnb. 2. Nhấp vào 'Đăng ký'. 3. Nhập email hoặc kết nối qua Facebook/Google. 4. Tạo mật khẩu mạnh (ít nhất 8 ký tự, chứa chữ hoa, chữ thường, số và ký tự đặc biệt). 5. Nhập tên đầu tiên và tên cuối cùng. 6. Xác minh email của bạn. 7. Thêm ảnh hồ sơ và sinh nhật. 8. Xác minh số điện thoại của bạn."
+    },
+    {
+      "id": "general_002",
+      "question": "Tôi nên làm thế nào để bảo vệ tài khoản của mình?",
+      "answer": "Để bảo vệ tài khoản Airbnb: 1. Sử dụng mật khẩu mạnh và duy nhất cho Airbnb. 2. Bật xác thực hai yếu tố (2FA). 3. Không chia sẻ mật khẩu với ai. 4. Cập nhật địa chỉ email và số điện thoại. 5. Kiểm tra hoạt động đăng nhập gần đây. 6. Sử dụng WiFi an toàn, không sử dụng WiFi công cộng khi giao dịch nhạy cảm. 7. Đăng xuất khỏi các thiết bị khác. 8. Báo cáo hoạt động bất thường ngay lập tức."
+    },
+    {
+      "id": "general_003",
+      "question": "Xác minh danh tính là gì và tại sao nó quan trọng?",
+      "answer": "Xác minh danh tính giúp bảo vệ cộng đồng Airbnb: 1. Airbnb yêu cầu người dùng xác minh danh tính trước khi đặt phòng hoặc tạo danh sách. 2. Quá trình xác minh bao gồm cung cấp ID chính phủ hoặc giấy phép lái xe. 3. Airbnb sử dụng công nghệ nhận dạng khuôn mặt để xác minh. 4. Quá trình này bảo vệ chủ nhà khỏi khách bất lương. 5. Nó bảo vệ khách khỏi chủ nhà gian lận. 6. Xác minh mất khoảng 24 giờ. 7. Thông tin xác minh được lưu trữ an toàn và không được chia sẻ với công khai."
+    },
+    {
+      "id": "general_004",
+      "question": "Làm thế nào để đặt lại mật khẩu?",
+      "answer": "Để đặt lại mật khẩu: 1. Truy cập trang đăng nhập Airbnb. 2. Nhấp vào 'Quên mật khẩu?'. 3. Nhập email liên kết với tài khoản. 4. Airbnb sẽ gửi email đặt lại mật khẩu. 5. Nhấp vào liên kết trong email trong vòng 24 giờ. 6. Tạo mật khẩu mới mạnh. 7. Xác nhận mật khẩu mới. 8. Đăng nhập với mật khẩu mới của bạn."
+    },
+    {
+      "id": "general_005",
+      "question": "Làm thế nào để liên hệ với hỗ trợ khách hàng Airbnb?",
+      "answer": "Để liên hệ với hỗ trợ: 1. Đi đến tài khoản của bạn và chọn 'Trợ giúp'. 2. Chọn danh mục của vấn đề của bạn. 3. Tìm kiếm câu hỏi thường gặp. 4. Nếu cần thêm trợ giúp, nhấp vào 'Liên hệ với chúng tôi'. 5. Mô tả vấn đề chi tiết. 6. Chọn phương thức liên hệ (chat, email, điện thoại). 7. Gửi yêu cầu. 8. Hỗ trợ Airbnb thường phản hồi trong 24 giờ."
+    },
+    {
+      "id": "general_006",
+      "question": "Chính sách chặn lưỡng hướng là gì?",
+      "answer": "Chính sách chặn lưỡng hướng của Airbnb: 1. Nếu khách hủy đặt phòng và chủ nhà cho phép, chủ nhà có thể chặn khách 3 ngày. 2. Nếu chủ nhà hủy, khách có thể chặn chủ nhà 3 ngày. 3. Chặn ngăn những người khác gửi tin nhắn cho bạn. 4. Chặn vẫn cho phép xem hồ sơ nhưng không nhắn tin. 5. Cách mở khóa: tìm hồ sơ, nhấp vào menu (...), chọn 'Bỏ chặn'. 6. Hộp thoại hòa giải mật được cung cấp để giải quyết tranh chấp trước khi chặn. 7. Airbnb hỗ trợ nếu cần thiết."
+    },
+    {
+      "id": "general_007",
+      "question": "Giải quyết tranh chấp như thế nào?",
+      "answer": "Quy trình giải quyết tranh chấp: 1. Nếu khách và chủ nhà không đồng ý, họ có thể mở hộp thoại hòa giải. 2. Cả hai bên thảo luận vấn đề và cố gắng đạt được thỏa thuận. 3. Nếu không thể giải quyết, Airbnb can thiệp. 4. Airbnb xem xét các bằng chứng từ cả hai bên. 5. Airbnb đưa ra quyết định cuối cùng. 6. Quyết định có thể bao gồm hoàn lại tiền, khoán phí hoặc hành động chống lại bên vi phạm. 7. Không có đơn xin tái xét sau khi Airbnb quyết định. 8. Quá trình mất vài tuần."
+    },
+    {
+      "id": "general_008",
+      "question": "Chương trình Superhost là gì?",
+      "answer": "Chương trình Superhost Airbnb: 1. Superhost là những chủ nhà được Airbnb công nhận. 2. Tiêu chí: duy trì tỷ lệ hủy thấp, tỷ lệ phản hồi cao, đánh giá 4,8 sao trở lên. 3. Superhost nhận được một huy hiệu trên danh sách của họ. 4. Superhost nhận được các lợi ích bổ sung: ưu tiên hỗ trợ, chiết khấu quảng cáo. 5. Superhost được liệt kê cao hơn trong kết quả tìm kiếm. 6. Superhost nhận được nhiều đặt phòng hơn. 7. Airbnb xem xét địa vị Superhost mỗi quý. 8. Chủ nhà có thể mất trạng thái Superhost nếu không đáp ứng các tiêu chí."
+    },
+    {
+      "id": "general_009",
+      "question": "Chính sách bình đẳng cơ hội của Airbnb là gì?",
+      "answer": "Chính sách bình đẳng cơ hội của Airbnb: 1. Airbnb cấm phân biệt dựa trên chủng tộc, màu da, dân tộc, tôn giáo, khuyết tật, giới tính, v.v. 2. Khách và chủ nhà không được từ chối dựa trên các yếu tố này. 3. Airbnb thực thi chính sách này nghiêm ngặt. 4. Vi phạm có thể dẫn đến đình chỉ hoặc bỏ cấm vĩnh viễn. 5. Người dùng có thể báo cáo phân biệt đối xử qua Trung tâm Trợ giúp. 6. Airbnb điều tra báo cáo và hành động thích hợp. 7. Chính sách áp dụng cho tất cả người dùng trên toàn thế giới. 8. Airbnb cam kết tạo một cộng đồng không phân biệt."
+    },
+    {
+      "id": "general_010",
+      "question": "Làm thế nào để báo cáo hành vi không đúng mực?",
+      "answer": "Để báo cáo hành vi không đúng mực: 1. Nếu gặp phân biệt đối xử hoặc qu骚扰, hãy lưu bằng chứng (tin nhắn, ảnh). 2. Đi đến 'Trợ giúp'. 3. Chọn 'An toàn & phân biệt đối xử'. 4. Chọn 'Báo cáo phân biệt đối xử' hoặc 'Báo cáo quần扰'. 5. Cung cấp chi tiết về sự cố. 6. Tải lên bằng chứng. 7. Gửi báo cáo. 8. Airbnb xem xét báo cáo trong 24-48 giờ và hành động nếu cần. Airbnb hỗ trợ nạn nhân nếu cần."
+    },
+    {
+      "id": "general_011",
+      "question": "Bảo hiểm bất động sản của chủ nhà là gì?",
+      "answer": "Chương trình Bảo vệ Chủ nhà của Airbnb: 1. Cung cấp bảo vệ thiệt hại cho bất động sản của chủ nhà. 2. Phạm vi lên tới $3,000 USD cho thiệt hại được báo cáo. 3. Khách phải báo cáo thiệt hại trong 24 giờ sau rời đi. 4. Chủ nhà phải cung cấp bằng chứng (ảnh, hóa đơn sửa chữa). 5. Airbnb xem xét yêu cầu và phê duyệt bồi thường nếu xứng đáng. 6. Airbnb có quyền khiếu nại tiền từ khách nếu cần thiết. 7. Bảo vệ không bao gồm hao mòn bình thường hoặc thiệt hại trước đó. 8. Chủ nhà có thể mua bảo hiểm thêm từ bên thứ ba."
+    },
+    {
+      "id": "general_012",
+      "question": "Chính sách dữ liệu cá nhân của Airbnb là gì?",
+      "answer": "Chính sách dữ liệu cá nhân của Airbnb: 1. Airbnb thu thập dữ liệu cá nhân để cung cấp dịch vụ. 2. Dữ liệu bao gồm: tên, email, số điện thoại, địa chỉ, thông tin thanh toán. 3. Airbnb sử dụng dữ liệu để cá nhân hóa trải nghiệm. 4. Airbnb không bán dữ liệu cho bên thứ ba. 5. Airbnb chia sẻ dữ liệu với các đối tác khi cần thiết để cung cấp dịch vụ. 6. Người dùng có quyền truy cập, sửa chữa hoặc xóa dữ liệu cá nhân. 7. Airbnb tuân theo GDPR và các quy định bảo vệ dữ liệu khác. 8. Dữ liệu được lưu trữ an toàn với mã hóa."
+    }
+  ]
+}
