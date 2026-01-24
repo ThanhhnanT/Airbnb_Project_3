@@ -214,6 +214,14 @@ export default function AllListingsPage() {
       dataIndex: "title",
       key: "title",
       sorter: (a, b) => a.title.localeCompare(b.title),
+      render: (title, record) => (
+        <a
+          onClick={() => router.push(`/admin/listings/${record._id}`)}
+          style={{ cursor: "pointer", color: "#1890ff" }}
+        >
+          {title}
+        </a>
+      ),
     },
     {
       title: "Thành phố",
