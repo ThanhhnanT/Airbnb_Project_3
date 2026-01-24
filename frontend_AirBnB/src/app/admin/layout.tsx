@@ -55,6 +55,7 @@ export default function AdminLayout({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Check auth only once on mount
   useEffect(() => {
     const checkAdminAuth = async () => {
       // Skip auth check for login page
@@ -92,7 +93,9 @@ export default function AdminLayout({
     };
 
     checkAdminAuth();
-  }, [pathname, router]);
+    // Only run on component mount, not on pathname changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCollapse = (state: boolean) => {
     setCollapsed(state);

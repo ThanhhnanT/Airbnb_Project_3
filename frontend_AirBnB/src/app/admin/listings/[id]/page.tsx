@@ -19,6 +19,7 @@ import {
   Input,
   InputNumber,
   Select,
+  App,
 } from "antd";
 import {
   CheckOutlined,
@@ -31,7 +32,6 @@ import {
 } from "@ant-design/icons";
 import { getAccess, patchAccess, deleteData } from "@/helper/api";
 import ListingAnalytics from "@/components/admin/ListingAnalytics";
-import ListingMapComponent from "@/components/admin/ListingMap";
 
 const { Title, Text } = Typography;
 
@@ -72,9 +72,10 @@ interface Listing {
   };
 }
 
-export default function AdminListingDetailPage() {
+function AdminListingDetailPageContent() {
   const params = useParams();
   const router = useRouter();
+  const { message } = App.useApp();
   const listingId = params.id as string;
 
   const [loading, setLoading] = useState(true);
@@ -101,19 +102,23 @@ export default function AdminListingDetailPage() {
       setImages(result.images || []);
       
       // Initialize form with listing data
-      if (result.listing) {
-        form.setFieldsValue({
-          title: result.listing.title,
-          description: result.listing.description,
-          price_base: result.listing.price_base,
-          cleaning_fee: result.listing.cleaning_fee,
-          extra_guest_fee: result.listing.extra_guest_fee,
-          guests: result.listing.guests,
-          bedrooms: result.listing.bedrooms,
-          beds: result.listing.beds,
-          bathrooms: result.listing.bathrooms,
-          cancellation_policy: result.listing.cancellation_policy,
-        });
+      if (result.listing && form) {
+        try {
+          form.setFieldsValue({
+            title: result.listing.title,
+            description: result.listing.description,
+            price_base: result.listing.price_base,
+            cleaning_fee: result.listing.cleaning_fee,
+            extra_guest_fee: result.listing.extra_guest_fee,
+            guests: result.listing.guests,
+            bedrooms: result.listing.bedrooms,
+            beds: result.listing.beds,
+            bathrooms: result.listing.bathrooms,
+            cancellation_policy: result.listing.cancellation_policy,
+          });
+        } catch (formError) {
+          console.warn("Warning setting form values:", formError);
+        }
       }
     } catch (error) {
       console.error("Error fetching listing details:", error);
@@ -327,8 +332,8 @@ export default function AdminListingDetailPage() {
                       )}
                     </Descriptions>
 
-                    <div style={{ marginTop: 16 }}>
-                      <ListingMapComponent latitude={listing.latitude} longitude={listing.longitude} apiKey={apiKey} />
+                    <div style={{ marginTop: 16, padding: "16px", backgroundColor: "#f5f5f5", borderRadius: "4px", textAlign: "center", color: "#999" }}>
+                      Bản đồ đang được phát triển
                     </div>
                   </Card>
 
@@ -571,5 +576,13 @@ export default function AdminListingDetailPage() {
         <p>Bạn có chắc chắn muốn từ chối listing này? Listing sẽ không được hiển thị cho users.</p>
       </Modal>
     </div>
+  );
+}
+
+export default function AdminListingDetailPage() {
+  return (
+    <App>
+      <AdminListingDetailPageContent />
+    </App>
   );
 }
