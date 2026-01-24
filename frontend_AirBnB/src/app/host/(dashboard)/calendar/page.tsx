@@ -34,6 +34,7 @@ export default function CalendarPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
 
   useEffect(() => {
     fetchBookings();
@@ -83,9 +84,13 @@ export default function CalendarPage() {
     setSelectedDate(date);
   };
 
+  const onMonthChange = (date: Dayjs) => {
+    setCurrentMonth(date);
+  };
+
   const getDateBookingStyle = (date: Dayjs) => {
     const dateKey = date.format("YYYY-MM-DD");
-    const bookedDates = getBookedDates(dayjs());
+    const bookedDates = getBookedDates(currentMonth);
     const dateBookings = bookedDates[dateKey] || [];
 
     if (dateBookings.length > 0) {
@@ -99,7 +104,7 @@ export default function CalendarPage() {
   };
 
   const dateCellRender = (date: Dayjs) => {
-    const bookedDates = getBookedDates(dayjs());
+    const bookedDates = getBookedDates(currentMonth);
     const dateKey = date.format("YYYY-MM-DD");
     const dateBookings = bookedDates[dateKey] || [];
 
@@ -127,7 +132,7 @@ export default function CalendarPage() {
 
   const cellRender = (date: Dayjs) => {
     const dateKey = date.format("YYYY-MM-DD");
-    const bookedDates = getBookedDates(dayjs());
+    const bookedDates = getBookedDates(currentMonth);
     const dateBookings = bookedDates[dateKey] || [];
 
     if (dateBookings.length > 0) {
@@ -143,7 +148,7 @@ export default function CalendarPage() {
   };
 
   const selectedDateKey = selectedDate?.format("YYYY-MM-DD") || "";
-  const bookedDates = getBookedDates(dayjs());
+  const bookedDates = getBookedDates(currentMonth);
   const selectedBookings = bookedDates[selectedDateKey] || [];
 
   return (
@@ -165,6 +170,7 @@ export default function CalendarPage() {
               dateCellRender={dateCellRender}
               cellRender={cellRender}
               onSelect={onSelectDate}
+              onPanelChange={onMonthChange}
             />
           </Card>
 
