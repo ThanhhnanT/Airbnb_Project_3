@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useCallback, useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { Card, Alert } from "antd";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+import { Card, Alert, Spin } from "antd";
 import { EnvironmentOutlined } from "@ant-design/icons";
 import styles from "./listing-map.module.css";
-
-const GOOGLE_MAPS_LIBRARIES: ("places")[] = ["places"];
 
 interface ListingMapProps {
   latitude: number;
@@ -46,21 +44,6 @@ const ListingMap: React.FC<ListingMapProps> = ({
     fullscreenControl: true,
   };
 
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-
-  if (!apiKey) {
-    return (
-      <Card className={styles.mapCard}>
-        <Alert
-          message="Google Maps API Key Missing"
-          description="Vui lòng cấu hình NEXT_PUBLIC_GOOGLE_MAPS_API_KEY trong file .env"
-          type="warning"
-          icon={<EnvironmentOutlined />}
-        />
-      </Card>
-    );
-  }
-
   const center = { lat: latitude, lng: longitude };
 
   return (
@@ -74,32 +57,24 @@ const ListingMap: React.FC<ListingMapProps> = ({
       <Card className={styles.mapCard}>
         {mapError ? (
           <Alert message={mapError} type="error" />
+        ) : !isMapLoaded ? (
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "400px" }}>
+            <Spin />
+          </div>
         ) : (
-          <LoadScript
-            googleMapsApiKey={apiKey}
-            libraries={GOOGLE_MAPS_LIBRARIES}
-            onLoad={() => {
-              setIsMapLoaded(true);
-            }}
-            onError={(error) => {
-              console.error("Google Maps script error:", error);
-              setMapError("Không thể tải Google Maps. Vui lòng kiểm tra API key.");
-            }}
+          <GoogleMap
+            mapContainerClassName={styles.map}
+            center={center}
+            zoom={15}
+            options={mapOptions}
+            onLoad={handleMapLoad}
           >
-            <GoogleMap
-              mapContainerClassName={styles.map}
-              center={center}
-              zoom={15}
-              options={mapOptions}
-              onLoad={handleMapLoad}
-            >
-              <Marker
-                position={center}
-                title={title}
-                animation={typeof google !== "undefined" && google.maps ? google.maps.Animation.DROP : undefined}
-              />
-            </GoogleMap>
-          </LoadScript>
+            <Marker
+              position={center}
+              title={title}
+              animation={typeof google !== "undefined" && google.maps ? google.maps.Animation.DROP : undefined}
+            />
+          </GoogleMap>
         )}
       </Card>
     </div>
