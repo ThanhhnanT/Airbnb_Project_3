@@ -72,9 +72,10 @@ export default function ListingFilters({
           ratingRange: DEFAULT_RATING_RANGE,
         }}
       >
-        <Row gutter={16}>
-          <Col xs={24} sm={12} md={6}>
-            <Form.Item label="Tìm kiếm" name="searchText">
+        {/* Row 1: Search, Status, City, Date Range */}
+        <Row gutter={[16, 0]} style={{ marginBottom: 16 }}>
+          <Col xs={24} sm={24} md={12} lg={6}>
+            <Form.Item label="Tìm kiếm" name="searchText" style={{ marginBottom: 0 }}>
               <Input
                 placeholder="Tiêu đề hoặc thành phố..."
                 prefix={<SearchOutlined />}
@@ -84,8 +85,8 @@ export default function ListingFilters({
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={12} md={6}>
-            <Form.Item label="Trạng thái" name="status">
+          <Col xs={24} sm={12} md={6} lg={4}>
+            <Form.Item label="Trạng thái" name="status" style={{ marginBottom: 0 }}>
               <Select
                 options={STATUS_OPTIONS}
                 onChange={handleFilterChange}
@@ -93,8 +94,8 @@ export default function ListingFilters({
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={12} md={6}>
-            <Form.Item label="Thành phố" name="city">
+          <Col xs={24} sm={12} md={6} lg={5}>
+            <Form.Item label="Thành phố" name="city" style={{ marginBottom: 0 }}>
               <Select
                 placeholder="Chọn thành phố"
                 options={CITIES.map((c) => ({ label: c, value: c }))}
@@ -104,8 +105,8 @@ export default function ListingFilters({
             </Form.Item>
           </Col>
 
-          <Col xs={24} sm={12} md={6}>
-            <Form.Item label="Ngày tạo" name="dateRange">
+          <Col xs={24} sm={24} md={24} lg={9}>
+            <Form.Item label="Ngày tạo" name="dateRange" style={{ marginBottom: 0 }}>
               <DatePicker.RangePicker
                 style={{ width: "100%" }}
                 onChange={handleFilterChange}
@@ -114,11 +115,13 @@ export default function ListingFilters({
           </Col>
         </Row>
 
-        <Row gutter={16}>
-          <Col xs={24} md={12}>
+        {/* Row 2: Price Range & Rating */}
+        <Row gutter={[16, 0]} style={{ marginBottom: 16 }}>
+          <Col xs={24} lg={12}>
             <Form.Item
               label="Khoảng giá (USD)"
               name="priceRange"
+              style={{ marginBottom: 0 }}
             >
               <Slider
                 range
@@ -134,10 +137,11 @@ export default function ListingFilters({
             </Form.Item>
           </Col>
 
-          <Col xs={24} md={12}>
+          <Col xs={24} lg={12}>
             <Form.Item
               label="Đánh giá (sao)"
               name="ratingRange"
+              style={{ marginBottom: 0 }}
             >
               <Slider
                 range
@@ -154,15 +158,14 @@ export default function ListingFilters({
           </Col>
         </Row>
 
+        {/* Reset Button */}
         <Row justify="end">
-          <Space>
-            <Button
-              icon={<ClearOutlined />}
-              onClick={handleReset}
-            >
-              Reset
-            </Button>
-          </Space>
+          <Button
+            icon={<ClearOutlined />}
+            onClick={handleReset}
+          >
+            Reset
+          </Button>
         </Row>
       </Form>
     </Card>

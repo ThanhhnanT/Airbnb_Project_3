@@ -331,106 +331,116 @@ export default function AllListingsPage() {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div style={{ padding: "24px 0" }}>
       {/* Statistics Cards */}
       {stats && (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title="Tổng Listings"
-                value={stats.totalListings}
-                valueStyle={{ color: "#1890ff" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title="Đã Duyệt"
-                value={stats.activeListings}
-                valueStyle={{ color: "#52c41a" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title="Chờ Duyệt"
-                value={stats.pendingListings}
-                valueStyle={{ color: "#faad14" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card>
-              <Statistic
-                title="Doanh Thu"
-                value={`$${stats.totalRevenue.toLocaleString()}`}
-                valueStyle={{ color: "#eb2f96" }}
-              />
-            </Card>
-          </Col>
-        </Row>
+        <div style={{ paddingLeft: "24px", paddingRight: "24px", marginBottom: 24 }}>
+          <Row gutter={16}>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Tổng Listings"
+                  value={stats.totalListings}
+                  valueStyle={{ color: "#1890ff" }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Đã Duyệt"
+                  value={stats.activeListings}
+                  valueStyle={{ color: "#52c41a" }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Chờ Duyệt"
+                  value={stats.pendingListings}
+                  valueStyle={{ color: "#faad14" }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Doanh Thu"
+                  value={`$${stats.totalRevenue.toLocaleString()}`}
+                  valueStyle={{ color: "#eb2f96" }}
+                />
+              </Card>
+            </Col>
+          </Row>
+        </div>
       )}
 
       {/* Filters */}
-      <ListingFilters
-        onFilterChange={setFilters}
-        onReset={() => setFilters({})}
-      />
+      <div style={{ paddingLeft: "24px", paddingRight: "24px", marginBottom: 16 }}>
+        <ListingFilters
+          onFilterChange={setFilters}
+          onReset={() => setFilters({})}
+        />
+      </div>
 
       {/* Bulk Actions */}
       {selectedRowKeys.length > 0 && (
-        <Card style={{ marginBottom: 16, backgroundColor: "#e6f7ff", borderColor: "#1890ff" }}>
-          <Space wrap>
-            <span>Đã chọn {selectedRowKeys.length} listing</span>
-            <Button
-              size="small"
-              onClick={() => handleBulkStatusUpdate("active")}
-            >
-              Duyệt tất cả
-            </Button>
-            <Button
-              size="small"
-              onClick={() => handleBulkStatusUpdate("inactive")}
-            >
-              Vô hiệu hóa tất cả
-            </Button>
-            <Button
-              size="small"
-              danger
-              onClick={handleBulkDelete}
-            >
-              Xóa tất cả
-            </Button>
-          </Space>
-        </Card>
+        <div style={{ paddingLeft: "24px", paddingRight: "24px", marginBottom: 16 }}>
+          <Card style={{ backgroundColor: "#e6f7ff", borderColor: "#1890ff" }}>
+            <Space wrap>
+              <span>Đã chọn {selectedRowKeys.length} listing</span>
+              <Button
+                size="small"
+                onClick={() => handleBulkStatusUpdate("active")}
+              >
+                Duyệt tất cả
+              </Button>
+              <Button
+                size="small"
+                onClick={() => handleBulkStatusUpdate("inactive")}
+              >
+                Vô hiệu hóa tất cả
+              </Button>
+              <Button
+                size="small"
+                danger
+                onClick={handleBulkDelete}
+              >
+                Xóa tất cả
+              </Button>
+            </Space>
+          </Card>
+        </div>
       )}
 
       {/* Export & Actions */}
-      <Space style={{ marginBottom: 16 }}>
-        <Button
-          icon={<DownloadOutlined />}
-          onClick={handleExportCSV}
-        >
-          Xuất CSV
-        </Button>
-      </Space>
+      <div style={{ paddingLeft: "24px", paddingRight: "24px", marginBottom: 16 }}>
+        <Space>
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={handleExportCSV}
+          >
+            Xuất CSV
+          </Button>
+        </Space>
+      </div>
 
       {/* Table */}
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={filteredListings}
-          rowKey="_id"
-          loading={loading}
-          rowSelection={rowSelection}
-          pagination={{ pageSize: 10 }}
-          scroll={{ x: 1200 }}
-          rowClassName={(record) => (record.status === "inactive" ? "pending-listing-row" : "")}
-        />
-      </Card>
+      <div style={{ paddingLeft: "24px", paddingRight: "24px" }}>
+        <Card>
+          <Table
+            columns={columns}
+            dataSource={filteredListings}
+            rowKey="_id"
+            loading={loading}
+            rowSelection={rowSelection}
+            pagination={{ pageSize: 10 }}
+            scroll={{ x: 1200 }}
+            rowClassName={(record) => (record.status === "inactive" ? "pending-listing-row" : "")}
+          />
+        </Card>
+      </div>
     </div>
   );
 }
