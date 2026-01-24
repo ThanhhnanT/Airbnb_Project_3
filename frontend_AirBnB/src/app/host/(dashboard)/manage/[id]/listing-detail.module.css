@@ -1,5 +1,5 @@
 .container {
-  padding: 24px 0;
+  padding: 24px;
 }
 
 .header {
@@ -61,7 +61,7 @@
 .tabsContainer {
   background: #fff;
   border-radius: 8px;
-  padding: 0;
+  padding: 24px;
 }
 
 @media (max-width: 768px) {
