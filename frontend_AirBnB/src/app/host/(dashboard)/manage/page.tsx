@@ -28,6 +28,13 @@ interface Listing {
   review_count?: number;
   createdAt?: string;
   bedrooms?: number;
+  revenue?: number;
+}
+
+interface BookingStats {
+  listingId: string;
+  totalRevenue: number;
+  count: number;
 }
 
 export default function HostManagePage() {
@@ -45,22 +52,30 @@ export default function HostManagePage() {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      const [listingsData, bookingCountsData] = await Promise.all([
+      const [listingsData, bookingStatsData] = await Promise.all([
         getAccess("listings/host/my-listings"),
-        getAccess("bookings/host/listing-counts").catch(() => []),
+        getAccess("bookings/host/stats").catch(() => []),
       ]);
 
-      const bookingCountMap = new Map<string, number>();
-      if (Array.isArray(bookingCountsData)) {
-        bookingCountsData.forEach((item: any) => {
-          bookingCountMap.set(item.listingId, item.count || 0);
+      const bookingStatsMap = new Map<string, BookingStats>();
+      if (Array.isArray(bookingStatsData)) {
+        bookingStatsData.forEach((item: any) => {
+          bookingStatsMap.set(item.listingId, {
+            listingId: item.listingId,
+            totalRevenue: item.totalRevenue || 0,
+            count: item.count || 0,
+          });
         });
       }
 
-      const enrichedListings = (listingsData || []).map((listing: any) => ({
-        ...listing,
-        bookingCount: bookingCountMap.get(listing._id) || 0,
-      }));
+      const enrichedListings = (listingsData || []).map((listing: any) => {
+        const stats = bookingStatsMap.get(listing._id);
+        return {
+          ...listing,
+          bookingCount: stats?.count || 0,
+          revenue: stats?.totalRevenue || 0,
+        };
+      });
 
       setListings(enrichedListings);
     } catch (error: any) {
