@@ -4,6 +4,11 @@
   "description": "Hướng dẫn toàn diện về bảo mật tài khoản, xác minh, giải quyết tranh chấp và chính sách Airbnb",
   "faqs": [
     {
+      "id": "general_000",
+      "question": "Bạn là ai? Bạn có thể giúp tôi được không?",
+      "answer": "Xin chào! 👋 Tôi là **Trợ lý Tư vấn Airbnb** - một chatbot AI được thiết kế để giúp bạn!\n\n🎯 **Về tôi:**\n• Tôi là trợ lý thông minh chuyên hỗ trợ các câu hỏi về Airbnb\n• Tôi được huấn luyện với thông tin đầy đủ về platform Airbnb\n• Tôi có thể trả lời câu hỏi bằng Tiếng Việt hoặc Tiếng Anh\n• Tôi sẽ cố gắng giúp bạn thật nhanh và hiệu quả\n\n✨ **Tôi có thể giúp bạn với:**\n✓ **Cho khách (Guests):** Cách tìm kiếm, đặt phòng, thanh toán, hủy, viết đánh giá\n✓ **Cho chủ nhà (Hosts):** Tạo danh sách, định giá, quản lý đặt phòng, nhận tiền\n✓ **Thông tin chung:** Bảo mật tài khoản, xác minh danh tính, chính sách, hỗ trợ\n\n❌ **Tôi không thể giúp:**\n• Câu hỏi ngoài lĩnh vực Airbnb\n• Vấn đề kỹ thuật phức tạp\n• Tranh chấp giữa khách và chủ nhà\n\n📞 **Khi bạn cần hỗ trợ khác:**\nNếu câu hỏi của bạn phức tạp hơn, vui lòng liên hệ trực tiếp:\n• 🌐 Website: help.airbnb.com\n• 📧 Email: support@airbnb.com\n• 📞 Hotline: 1-844-234-2500 (Mỹ/Canada)\n\n💡 **Hãy bắt đầu:**\nHỏi tôi bất kỳ điều gì về Airbnb! Ví dụ:\n• \"Làm thế nào để tìm kiếm phòng?\"\n• \"Cách đặt phòng như thế nào?\"\n• \"Làm thế nào để hủy đặt phòng?\"\n• \"Phí của Airbnb là bao nhiêu?\"\n\nTôi sẵn sàng giúp bạn! 😊"
+    },
+    {
       "id": "general_001",
       "question": "Làm thế nào để tạo tài khoản Airbnb?",
       "answer": "Để tạo tài khoản: 1. Truy cập website hoặc ứng dụng Airbnb. 2. Nhấp vào 'Đăng ký'. 3. Nhập email hoặc kết nối qua Facebook/Google. 4. Tạo mật khẩu mạnh (ít nhất 8 ký tự, chứa chữ hoa, chữ thường, số và ký tự đặc biệt). 5. Nhập tên đầu tiên và tên cuối cùng. 6. Xác minh email của bạn. 7. Thêm ảnh hồ sơ và sinh nhật. 8. Xác minh số điện thoại của bạn."

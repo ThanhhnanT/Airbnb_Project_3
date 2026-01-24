@@ -18,6 +18,10 @@ config = dotenv_values(".env")
 
 # Domain keywords for Airbnb chatbot
 AIRBNB_KEYWORDS = [
+    # Chatbot introduction
+    "who are you", "what are you", "bạn là ai", "bạn có thể giúp",
+    "trợ lý", "chatbot", "help me", "giúp tôi",
+    
     # Guest related
     "booking", "search", "listing", "price", "payment", "cancel", "refund",
     "review", "rating", "message", "host", "check-in", "checkout", "guest",
@@ -37,7 +41,8 @@ AIRBNB_KEYWORDS = [
     # Vietnamese keywords
     "đặt phòng", "tìm kiếm", "giá", "thanh toán", "hủy", "hoàn tiền",
     "đánh giá", "chủ nhà", "khách", "danh sách", "quản lý", "tài khoản",
-    "mật khẩu", "xác minh", "hỗ trợ", "chính sách", "airbnb"
+    "mật khẩu", "xác minh", "hỗ trợ", "chính sách", "airbnb",
+    "trợ lý", "ai", "là ai"
 ]
 
 def is_airbnb_related(question: str, threshold: float = 60) -> bool:
