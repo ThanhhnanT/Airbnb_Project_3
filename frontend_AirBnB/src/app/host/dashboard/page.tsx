@@ -17,6 +17,8 @@ import {
   CheckCircleOutlined,
   CalendarOutlined,
   StarOutlined,
+  UndoOutlined,
+  AlertOutlined,
 } from "@ant-design/icons";
 import { getAccess } from "@/helper/api";
 import StatCard from "@/components/host/dashboard/StatCard";
@@ -75,6 +77,11 @@ interface DashboardStats {
     avgRating: number;
     occupancyRate: number;
   }>;
+  refunds?: {
+    total_pending: number;
+    total_confirmed: number;
+    total_amount: number;
+  };
 }
 
 export default function HostDashboardPage() {
@@ -88,9 +95,10 @@ export default function HostDashboardPage() {
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
-      const [dashboardData, bookingStatsData] = await Promise.all([
+      const [dashboardData, bookingStatsData, refundsData] = await Promise.all([
         getAccess("listings/host/dashboard-stats"),
         getAccess("bookings/host/stats").catch(() => []),
+        getAccess("refunds/host/my-refunds").catch(() => []),
       ]);
 
       // Recalculate total revenue from booking stats to match manage page
@@ -99,9 +107,29 @@ export default function HostDashboardPage() {
         totalRevenue = bookingStatsData.reduce((sum: number, item: any) => sum + (item.totalRevenue || 0), 0);
       }
 
-      // Update earnings total with correct revenue
+      // Calculate refund stats
+      const refundsArray = Array.isArray(refundsData) ? refundsData : [];
+      const pendingCount = refundsArray.filter((r: any) => r.status === 'pending_host_confirmation').length;
+      const confirmedCount = refundsArray.filter((r: any) => r.status === 'confirmed_by_host').length;
+      // Only count confirmed refunds in total amount
+      const totalAmount = refundsArray
+        .filter((r: any) => r.status === 'confirmed_by_host')
+        .reduce((sum: number, r: any) => sum + (r.amount || 0), 0);
+
+      // Subtract confirmed refunds from revenue
+      totalRevenue -= totalAmount;
+
+      // Update earnings total with correct revenue (excluding refunded amounts)
       if (dashboardData && dashboardData.earnings) {
         dashboardData.earnings.total = totalRevenue;
+      }
+
+      if (dashboardData) {
+        dashboardData.refunds = {
+          total_pending: pendingCount,
+          total_confirmed: confirmedCount,
+          total_amount: totalAmount,
+        };
       }
 
       setStats(dashboardData);
@@ -200,6 +228,70 @@ export default function HostDashboardPage() {
           />
         </Col>
       </Row>
+
+      {/* Refund Stats */}
+      {stats.refunds && stats.refunds.total_pending > 0 && (
+        <Row gutter={[16, 16]} className={styles.section}>
+          <Col xs={24}>
+            <div style={{
+              background: '#fff7e6',
+              border: '1px solid #ffd591',
+              borderRadius: '8px',
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <AlertOutlined style={{ fontSize: '24px', color: '#ad6800' }} />
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', color: '#ad6800' }}>
+                    {stats.refunds.total_pending} hoàn tiền chờ xác nhận
+                  </h4>
+                  <p style={{ margin: '0', color: '#ad6800', fontSize: '12px' }}>
+                    Vui lòng xác nhận các yêu cầu hoàn tiền để hoàn thành quy trình
+                  </p>
+                </div>
+              </div>
+              <Button 
+                type="primary"
+                onClick={() => window.location.href = '/host/refunds'}
+              >
+                Xem Chi Tiết
+              </Button>
+            </div>
+          </Col>
+        </Row>
+      )}
+
+      {stats.refunds && (
+        <Row gutter={[16, 16]} className={styles.section}>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="Hoàn Tiền Chờ"
+              value={stats.refunds.total_pending}
+              icon={<AlertOutlined />}
+              color="#ff7a45"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="Hoàn Tiền Đã Xác Nhận"
+              value={stats.refunds.total_confirmed}
+              icon={<UndoOutlined />}
+              color="#52c41a"
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatCard
+              title="Tổng Hoàn Tiền"
+              value={formatCurrency(stats.refunds.total_amount)}
+              icon={<DollarOutlined />}
+              color="#1890ff"
+            />
+          </Col>
+        </Row>
+      )}
 
       {/* Charts and Detailed Info */}
       <Row gutter={[16, 16]} className={styles.section}>

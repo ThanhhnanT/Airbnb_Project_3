@@ -1,0 +1,162 @@
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+    .header {
+      background-color: #ff5a5f;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+      margin: -20px -20px 20px -20px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .booking-details {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-left: 4px solid #ff5a5f;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .booking-details h3 {
+      margin-top: 0;
+      color: #ff5a5f;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+    }
+    .detail-value {
+      color: #333;
+    }
+    .amount {
+      font-size: 20px;
+      color: #ff5a5f;
+      font-weight: bold;
+    }
+    .action-required {
+      background-color: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .action-required h3 {
+      margin-top: 0;
+      color: #856404;
+    }
+    .cta-button {
+      display: inline-block;
+      background-color: #ff5a5f;
+      color: white;
+      padding: 12px 30px;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .cta-button:hover {
+      background-color: #ff3b41;
+    }
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⚠️ Action Required: Refund Approval</h1>
+    </div>
+
+    <div class="content">
+      <p>Dear {{host_name}},</p>
+
+      <p>A refund request for one of your listings has been approved by our admin team. Your confirmation is now required to complete the refund process.</p>
+
+      <div class="booking-details">
+        <h3>Booking Information</h3>
+        <div class="detail-row">
+          <span class="detail-label">Listing:</span>
+          <span class="detail-value">{{listing_title}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Guest:</span>
+          <span class="detail-value">{{guest_name}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Refund Amount:</span>
+          <span class="detail-value amount">{{amount}} {{currency}}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Reason:</span>
+          <span class="detail-value">{{reason}}</span>
+        </div>
+      </div>
+
+      <div class="action-required">
+        <h3>⏱️ Action Required</h3>
+        <p>Please confirm this refund in your dashboard within 48 hours. Once you confirm, the refund will be processed to the guest's original payment method.</p>
+        <p><strong>Note:</strong> If you do not take action within 48 hours, the system will automatically process the refund.</p>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="{{dashboard_url}}" class="cta-button">Confirm Refund in Dashboard</a>
+      </p>
+
+      <h3>What Happens Next?</h3>
+      <ol>
+        <li>Click the button above to go to your dashboard</li>
+        <li>Navigate to the Refunds section</li>
+        <li>Review the refund details</li>
+        <li>Click "Confirm" to process the refund</li>
+        <li>The guest will receive their refund within 3-5 business days</li>
+      </ol>
+
+      <p>If you have any questions about this refund or need assistance, please contact our support team.</p>
+
+      <p>Best regards,<br>The Airbnb Support Team</p>
+    </div>
+
+    <div class="footer">
+      <p>This is an automated message. Please do not reply directly to this email.</p>
+      <p>&copy; {{current_year}} Airbnb. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Refund Request Notification - AirBnB</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body
+    style="margin: 0; padding: 0; min-width: 100%; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; background-color: #FAFAFA; color: #222222;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #FFA500; padding: 24px; color: #ffffff;">
+            <h1
+                style="font-size: 24px; font-weight: 700; line-height: 1.25; margin-top: 0; margin-bottom: 15px; text-align: center;">
+                Refund Request Notification</h1>
+        </div>
+        <div style="padding: 24px; background-color: #ffffff;">
+            <p style="margin-top: 0; margin-bottom: 24px;">Hello {{hostName}},</p>
+            <p style="margin-top: 0; margin-bottom: 24px;">A guest has requested a refund for a booking at your property.</p>
+            
+            <div style="background-color: #f6f6f6; padding: 16px; margin: 24px 0; border-left: 4px solid #FFA500;">
+                <h3 style="margin-top: 0; margin-bottom: 12px;">Refund Request Details:</h3>
+                <p style="margin: 8px 0;"><strong>Guest:</strong> {{guestName}}</p>
+                <p style="margin: 8px 0;"><strong>Listing:</strong> {{listingTitle}}</p>
+                <p style="margin: 8px 0;"><strong>Check-in Date:</strong> {{checkInDate}}</p>
+                <p style="margin: 8px 0;"><strong>Check-out Date:</strong> {{checkOutDate}}</p>
+                <p style="margin: 8px 0;"><strong>Refund Amount:</strong> {{amount}} {{currency}}</p>
+                <p style="margin: 8px 0;"><strong>Reason:</strong> {{reason}}</p>
+            </div>
+
+            <p style="margin-top: 0; margin-bottom: 24px;"><strong>Guest's Description:</strong></p>
+            <p style="margin-top: 0; margin-bottom: 24px; padding: 12px; background-color: #f9f9f9; border-left: 3px solid #ddd;">{{description}}</p>
+
+            <p style="margin-top: 0; margin-bottom: 24px;"><strong>What Happens Next:</strong></p>
+            <ul style="margin: 12px 0 24px 24px; padding: 0;">
+                <li style="margin-bottom: 8px;">Our admin team is reviewing this refund request</li>
+                <li style="margin-bottom: 8px;">You will be notified of the decision</li>
+                <li style="margin-bottom: 8px;">If approved, your booking will be cancelled and a refund will be processed</li>
+            </ul>
+
+            <p style="margin-top: 0; margin-bottom: 24px;">This is a notification only - no action is required from you at this time.</p>
+        </div>
+        <div style="background-color: #f6f6f6; padding: 24px;">
+            <p style="margin-top: 0; margin-bottom: 24px;">
+                For further assistance, please contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

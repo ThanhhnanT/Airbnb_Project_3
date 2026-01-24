@@ -311,143 +311,82 @@ export class BookingsService {
       console.log('[BookingsService] findGuestBookings - guestObjectId:', guestObjectId.toString());
       console.log('[BookingsService] findGuestBookings - guestIdString:', guestIdString);
 
-      // Query payments with status = "paid" and user_id = guestId
-      // Since user_id in database is stored as string, try both string and ObjectId formats
-      const paymentFilter: any = {
+      // Query bookings directly instead of through payments
+      const bookingFilter: any = {
         $or: [
-          { user_id: guestIdString },
-          { user_id: guestObjectId },
+          { guest_id: guestIdString },
+          { guest_id: guestObjectId },
         ],
-        status: 'paid',
       };
       
-      console.log('[BookingsService] findGuestBookings - payment filter:', JSON.stringify(paymentFilter, null, 2));
-      console.log('[BookingsService] findGuestBookings - guestIdString:', guestIdString);
-      console.log('[BookingsService] findGuestBookings - guestObjectId:', guestObjectId.toString());
-      
-      // Find all paid payments for this user
-      let payments = await this.paymentModel
-        .find(paymentFilter)
-        .populate({
-          path: 'booking_id',
-          populate: [
-            {
-              path: 'listing_id',
-              select: 'title images city country address',
-            },
-            {
-              path: 'host_id',
-              select: 'name email',
-            },
-          ],
-        })
-        .sort({ createdAt: -1 })
+      // Find all bookings for this guest
+      let bookings = await this.bookingModel
+        .find(bookingFilter)
+        .populate([
+          {
+            path: 'listing_id',
+            select: 'title images city country address',
+          },
+          {
+            path: 'host_id',
+            select: 'name email',
+          },
+          {
+            path: 'payment_id',
+            select: 'amount currency status',
+          },
+        ])
+        .sort({ check_in: -1 })
         .exec();
       
-      console.log('[BookingsService] findGuestBookings - found payments count:', payments.length);
+      console.log('[BookingsService] findGuestBookings - found bookings count:', bookings.length);
       
-      // If still no results, try fetching all and filtering manually
-      if (payments.length === 0) {
-        console.log('[BookingsService] findGuestBookings - Trying manual filter...');
-        const allPaidPayments = await this.paymentModel
-          .find({ status: 'paid' })
-          .populate({
-            path: 'booking_id',
-            populate: [
-              {
-                path: 'listing_id',
-                select: 'title images city country address',
-              },
-              {
-                path: 'host_id',
-                select: 'name email',
-              },
-            ],
-          })
-          .sort({ createdAt: -1 })
-          .exec();
+      // Filter and process bookings
+      const filteredBookings: any[] = [];
+      for (const booking of bookings) {
+        const bookingObj = booking.toObject ? booking.toObject() : booking;
         
-        // Filter manually by comparing string representations
-        payments = allPaidPayments.filter((p: any) => {
-          const paymentUserId = p.user_id?.toString();
-          return paymentUserId === guestIdString || paymentUserId === guestObjectId.toString();
-        });
-        
-        console.log('[BookingsService] findGuestBookings - found payments after manual filter:', payments.length);
-        if (allPaidPayments.length > 0) {
-          console.log('[BookingsService] findGuestBookings - DEBUG: sample paid payments:', allPaidPayments.slice(0, 3).map((p: any) => ({
-            _id: p._id.toString(),
-            user_id: p.user_id?.toString(),
-            user_id_raw: p.user_id,
-            user_id_type: typeof p.user_id,
-            booking_id: p.booking_id ? (p.booking_id as any)._id?.toString() : null,
-            status: p.status,
-            matches: p.user_id?.toString() === guestIdString || p.user_id?.toString() === guestObjectId.toString(),
-          })));
-        }
-      }
-      
-      if (payments.length > 0) {
-        console.log('[BookingsService] findGuestBookings - first payment:', {
-          _id: payments[0]._id.toString(),
-          user_id: (payments[0] as any).user_id?.toString(),
-          booking_id: payments[0].booking_id ? (payments[0].booking_id as any)._id?.toString() : null,
-          status: payments[0].status,
-        });
-      }
-      
-      // Extract bookings from payments
-      const bookings: any[] = [];
-      for (const payment of payments) {
-        if (payment.booking_id) {
-          const booking = payment.booking_id as any;
-          
-          // Convert booking to plain object if it's a Document
-          const bookingObj = booking.toObject ? booking.toObject() : booking;
-          
-          // Add payment info to booking
-          const bookingWithPayment: any = {
-            ...bookingObj,
-            payment_id: {
-              _id: payment._id.toString(),
-              amount: payment.amount,
-              currency: payment.currency,
-              status: payment.status,
-            },
+        // Add payment info if exists
+        const bookingWithPayment: any = bookingObj;
+        if (booking.payment_id) {
+          const paymentDoc = booking.payment_id as any;
+          bookingWithPayment.payment_id = {
+            _id: paymentDoc._id?.toString?.() || paymentDoc._id,
+            amount: paymentDoc.amount,
+            currency: paymentDoc.currency,
+            status: paymentDoc.status,
           };
-          
-          // Filter by booking status if provided
-          if (status) {
-            if (status === 'completed') {
-              const checkOutTime = new Date(bookingWithPayment.check_out).getTime();
-              const isAfterCheckout = !isNaN(checkOutTime) && Date.now() > checkOutTime;
-              const isCompleted =
-                bookingWithPayment.status === 'completed' ||
-                (bookingWithPayment.status === 'confirmed' && isAfterCheckout);
-              if (isCompleted) {
-                // Do not mutate DB; only normalize for UI
-                bookingWithPayment.status = 'completed';
-                bookings.push(bookingWithPayment);
-              }
-            } else if (bookingWithPayment.status === status) {
-              bookings.push(bookingWithPayment);
+        }
+        
+        // Apply status filter if provided
+        if (status) {
+          if (status === 'completed') {
+            // Check if booking is completed (either marked as completed or confirmed but after checkout)
+            const checkOutTime = new Date(bookingWithPayment.check_out).getTime();
+            const isAfterCheckout = !isNaN(checkOutTime) && Date.now() > checkOutTime;
+            const isCompleted =
+              bookingWithPayment.status === 'completed' ||
+              (bookingWithPayment.status === 'confirmed' && isAfterCheckout);
+            if (isCompleted) {
+              bookingWithPayment.status = 'completed';
+              filteredBookings.push(bookingWithPayment);
             }
-          } else {
-            bookings.push(bookingWithPayment);
+          } else if (bookingWithPayment.status === status) {
+            console.log(`[BookingsService] findGuestBookings - filtered booking status=${status}:`, {
+              _id: bookingWithPayment._id,
+              status: bookingWithPayment.status,
+            });
+            filteredBookings.push(bookingWithPayment);
           }
+        } else {
+          filteredBookings.push(bookingWithPayment);
         }
       }
       
-      // Sort by check_in date (descending)
-      bookings.sort((a, b) => {
-        const dateA = new Date(a.check_in).getTime();
-        const dateB = new Date(b.check_in).getTime();
-        return dateB - dateA;
-      });
-      
-      console.log('[BookingsService] findGuestBookings - final bookings count:', bookings.length);
-      if (bookings.length > 0) {
-        const firstBooking = bookings[0] as any;
+      const resultBookings = filteredBookings.length > 0 ? filteredBookings : bookings;
+      console.log('[BookingsService] findGuestBookings - final bookings count:', resultBookings.length);
+      if (resultBookings.length > 0) {
+        const firstBooking = resultBookings[0] as any;
         console.log('[BookingsService] findGuestBookings - first booking:', {
           _id: firstBooking._id,
           guest_id: firstBooking.guest_id?.toString(),
@@ -458,7 +397,7 @@ export class BookingsService {
         });
       }
       
-      return bookings as any;
+      return resultBookings as any;
     } catch (error) {
       console.error('[BookingsService] findGuestBookings - ERROR:', error.message);
       console.error('[BookingsService] findGuestBookings - ERROR stack:', error.stack);

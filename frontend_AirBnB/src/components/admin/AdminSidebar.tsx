@@ -15,6 +15,7 @@ import {
   UnorderedListOutlined,
   LogoutOutlined,
   BarChartOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
@@ -62,6 +63,9 @@ export default function AdminSidebar() {
     } else if (path.startsWith("/admin/payments")) {
       setSelectedKeys(["payments"]);
       setOpenKeys([]);
+    } else if (path.startsWith("/admin/refunds")) {
+      setSelectedKeys(["refunds"]);
+      setOpenKeys([]);
     } else if (path.startsWith("/admin/settings")) {
       setSelectedKeys(["settings"]);
       setOpenKeys([]);
@@ -80,6 +84,7 @@ export default function AdminSidebar() {
     ]),
     getItem("Users", "users", <UserOutlined />),
     getItem("Payments", "payments", <DollarOutlined />),
+    getItem("Refunds", "refunds", <UndoOutlined />),
     getItem("Payouts", "payouts", <DollarOutlined />),
     getItem("Settings", "settings", <SettingOutlined />),
     { type: "divider" },
@@ -103,6 +108,9 @@ export default function AdminSidebar() {
     } else if (key === "payments") {
       router.push("/admin/payments");
       setSelectedKeys(["payments"]);
+    } else if (key === "refunds") {
+      router.push("/admin/refunds");
+      setSelectedKeys(["refunds"]);
     } else if (key === "payouts") {
       router.push("/admin/payouts");
       setSelectedKeys(["payouts"]);

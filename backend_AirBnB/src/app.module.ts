@@ -19,6 +19,7 @@ import { NotificationsModule } from '@/modules/notifications/notifications.modul
 import { AdminModule } from '@/modules/admin/admin.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from '@/modules/upload/upload.module';
+import { RefundsModule } from '@/modules/refunds/refunds.module';
 // import { SeedModule } from './seed/seed.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
@@ -56,6 +57,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     AdminModule,
     AuthModule,
     UploadModule,
+    RefundsModule,
     // SeedModule,
        MailerModule.forRootAsync({
       imports: [ConfigModule],

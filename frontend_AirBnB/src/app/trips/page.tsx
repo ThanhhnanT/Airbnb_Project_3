@@ -26,6 +26,7 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import { getAccess } from "@/helper/api";
 import { useRouter } from "next/navigation";
@@ -108,6 +109,8 @@ export default function TripsPage() {
       let status: string | undefined;
       if (activeTab === "upcoming") {
         status = undefined; // Get all upcoming (pending + confirmed)
+      } else if (activeTab === "pending") {
+        status = "pending"; // Get only pending bookings
       } else if (activeTab === "completed") {
         status = "completed";
       } else if (activeTab === "cancelled") {
@@ -235,6 +238,12 @@ export default function TripsPage() {
       return bookings.filter(
         (b) => b.status === "pending" || b.status === "confirmed"
       );
+    } else if (activeTab === "pending") {
+      return bookings.filter((b) => b.status === "pending");
+    } else if (activeTab === "completed") {
+      return bookings.filter((b) => b.status === "completed");
+    } else if (activeTab === "cancelled") {
+      return bookings.filter((b) => b.status === "cancelled");
     }
     return bookings;
   }, [bookings, activeTab]);
@@ -377,6 +386,13 @@ export default function TripsPage() {
     return paid && statusOk && afterCheckout;
   };
 
+  const canRequestRefund = (booking: Booking) => {
+    const paid = booking.payment_id?.status === "paid";
+    const statusOk = booking.status === "confirmed";
+    const beforeCheckIn = dayjs().isBefore(dayjs(booking.check_in));
+    return paid && statusOk && beforeCheckIn;
+  };
+
   const openReviewModal = (booking: Booking) => {
     const existing = reviewMap[booking._id];
     setActiveBookingForReview(booking);
@@ -473,6 +489,10 @@ export default function TripsPage() {
                 label: "Sắp tới",
               },
               {
+                key: "pending",
+                label: "Đang chờ xử lý",
+              },
+              {
                 key: "completed",
                 label: "Đã hoàn thành",
               },
@@ -567,6 +587,15 @@ export default function TripsPage() {
                         >
                           Liên hệ chủ nhà
                         </Button>
+                        {canRequestRefund(booking) && (
+                          <Button
+                            icon={<UndoOutlined />}
+                            danger
+                            onClick={() => router.push(`/trips/refund-request?bookingId=${booking._id}`)}
+                          >
+                            Yêu cầu hoàn tiền
+                          </Button>
+                        )}
                         {canReviewBooking(booking) && (
                           <>
                             <Button

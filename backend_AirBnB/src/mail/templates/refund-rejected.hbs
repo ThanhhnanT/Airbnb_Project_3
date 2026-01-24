@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Refund Request Decision - AirBnB</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body
+    style="margin: 0; padding: 0; min-width: 100%; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; background-color: #FAFAFA; color: #222222;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #DC3545; padding: 24px; color: #ffffff;">
+            <h1
+                style="font-size: 24px; font-weight: 700; line-height: 1.25; margin-top: 0; margin-bottom: 15px; text-align: center;">
+                Refund Request Decision</h1>
+        </div>
+        <div style="padding: 24px; background-color: #ffffff;">
+            <p style="margin-top: 0; margin-bottom: 24px;">Hello {{guestName}},</p>
+            <p style="margin-top: 0; margin-bottom: 24px;">Thank you for submitting your refund request. After careful review by our admin team, we have made a decision regarding your request.</p>
+            
+            <div style="background-color: #f8d7da; padding: 16px; margin: 24px 0; border-left: 4px solid #DC3545; color: #721c24;">
+                <h3 style="margin-top: 0; margin-bottom: 12px;">Refund Decision: Not Approved</h3>
+                <p style="margin: 8px 0;"><strong>Reason:</strong> {{adminNotes}}</p>
+            </div>
+
+            <p style="margin-top: 0; margin-bottom: 24px;"><strong>What this means:</strong></p>
+            <ul style="margin: 12px 0 24px 24px; padding: 0;">
+                <li style="margin-bottom: 8px;">Your refund request has been reviewed and decided upon</li>
+                <li style="margin-bottom: 8px;">Your booking remains active unless you cancel it</li>
+                <li style="margin-bottom: 8px;">You may contact our support team if you wish to discuss this decision further</li>
+            </ul>
+
+            <p style="margin-top: 0; margin-bottom: 24px;">We understand this may be disappointing. If you believe this decision was made in error or have additional information to provide, please contact our support team with your booking details.</p>
+
+            <p style="margin-top: 0; margin-bottom: 24px;">Thank you for understanding.</p>
+        </div>
+        <div style="background-color: #f6f6f6; padding: 24px;">
+            <p style="margin-top: 0; margin-bottom: 24px;">
+                For further assistance or to appeal this decision, please contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

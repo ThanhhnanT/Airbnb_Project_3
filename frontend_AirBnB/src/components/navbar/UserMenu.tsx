@@ -12,6 +12,7 @@ import {
   LogoutOutlined, 
   UnorderedListOutlined, 
   QuestionCircleOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import { getUserProfile } from "@/service/user";
 import NotificationBell from "@/components/notifications/NotificationBell";
@@ -121,6 +122,15 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
       key: '4',
       label: (
         <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <UndoOutlined className={styles.menuItemIcon} />
+          <span className={styles.menuItemText}>Yêu cầu hoàn tiền</span>
+        </span>
+      ),
+    },
+    {
+      key: '5',
+      label: (
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <UserOutlined className={styles.menuItemIcon} />
           <span className={styles.menuItemText}>Hồ sơ</span>
         </span>
@@ -130,7 +140,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ isLoggedIn, onMenuClick, onOpenAuth
       type: 'divider',
     },
     {
-      key: '5',
+      key: '6',
       label: (
         <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <LogoutOutlined className={styles.menuItemIcon} />

@@ -110,9 +110,13 @@ export default function Navbar() {
           messageApi.info('Tin nhắn của bạn');
           break;
         case '4':
+          router.push('/trips');
+          messageApi.info('Xem các yêu cầu hoàn tiền của bạn');
+          break;
+        case '5':
           router.push('/profile');
           break;
-        case '5': 
+        case '6': 
           messageApi.success('Đăng xuất thành công');
           Cookies.remove("access_token"); 
           setLogin(false);
