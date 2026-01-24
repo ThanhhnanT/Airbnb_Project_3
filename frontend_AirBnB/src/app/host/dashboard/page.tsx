@@ -24,7 +24,6 @@ import RevenueChart from "@/components/host/dashboard/RevenueChart";
 import OccupancyChart from "@/components/host/dashboard/OccupancyChart";
 import RecentReviews from "@/components/host/dashboard/RecentReviews";
 import TopListings from "@/components/host/dashboard/TopListings";
-import QuickActions from "@/components/host/dashboard/QuickActions";
 import styles from "./dashboard.module.css";
 
 const { Title, Text } = Typography;
@@ -145,13 +144,6 @@ export default function HostDashboardPage() {
           Làm mới dữ liệu
         </Button>
       </div>
-
-      {/* Quick Actions */}
-      <Row gutter={[16, 16]} className={styles.section}>
-        <Col span={24}>
-          <QuickActions />
-        </Col>
-      </Row>
 
       {/* Key Stats */}
       <Row gutter={[16, 16]} className={styles.section}>
