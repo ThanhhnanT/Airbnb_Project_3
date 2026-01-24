@@ -71,24 +71,103 @@ export class UsersService {
   }
 
   async findAll(query: string, page: number) {
-    let {filter, limit, sort} = aqp(query)
-    if(!limit) limit =10
-    if (filter.limit) delete filter.limit
-    if (filter.page) delete filter.page
-    console.log(filter, limit)
-    const totalItems = (await this.userModel.find(filter)).length 
-    const totalePage = Math.ceil(totalItems/limit)
-    const offset = (page - 1) * (+limit)
-    const results = await this.userModel.find(filter)
-    .limit(limit)
-    .skip(offset)
-    .sort(sort as any)
-    .select('-password')
-    return results;
+    try {
+      let { filter, limit, sort } = aqp(query);
+      if (!limit) limit = 10;
+      if (filter.limit) delete filter.limit;
+      if (filter.page) delete filter.page;
+
+      // Build MongoDB query from filters
+      const mongoQuery: any = {};
+
+      // Handle search parameter
+      if (filter.search) {
+        mongoQuery.$or = [
+          { name: { $regex: filter.search, $options: 'i' } },
+          { email: { $regex: filter.search, $options: 'i' } }
+        ];
+        delete filter.search;
+      }
+
+      // Handle role filter - map to nested field
+      if (filter.role) {
+        mongoQuery['role.type'] = filter.role;
+        delete filter.role;
+      }
+
+      // Handle boolean string conversions
+      if (filter.email_verified !== undefined) {
+        mongoQuery.email_verified = filter.email_verified === 'true' || filter.email_verified === true;
+        delete filter.email_verified;
+      }
+
+      if (filter.phone_verified !== undefined) {
+        mongoQuery.phone_verified = filter.phone_verified === 'true' || filter.phone_verified === true;
+        delete filter.phone_verified;
+      }
+
+      if (filter.id_verified !== undefined) {
+        mongoQuery.id_verified = filter.id_verified === 'true' || filter.id_verified === true;
+        delete filter.id_verified;
+      }
+
+      if (filter.isActive !== undefined) {
+        mongoQuery.isActive = filter.isActive === 'true' || filter.isActive === true;
+        delete filter.isActive;
+      }
+
+      // Handle Stripe status filter
+      if (filter.stripe_status) {
+        mongoQuery.stripe_account_status = filter.stripe_status;
+        delete filter.stripe_status;
+      }
+
+      // Merge remaining filters
+      Object.assign(mongoQuery, filter);
+
+      console.log('MongoDB Query:', mongoQuery);
+
+      // Get total count for pagination
+      const totalItems = await this.userModel.countDocuments(mongoQuery);
+      const totalPage = Math.ceil(totalItems / limit);
+      const offset = (page - 1) * (+limit);
+
+      // Fetch results
+      const results = await this.userModel
+        .find(mongoQuery)
+        .limit(+limit)
+        .skip(offset)
+        .sort(sort as any)
+        .select('-password');
+
+      return results;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error fetching users: ${error.message}`);
+    }
   }
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
+  }
+
+  async findOneById(id: string) {
+    try {
+      if (!id) {
+        throw new BadRequestException('User ID is required');
+      }
+
+      const user = await this.userModel.findById(id).select('-password');
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error finding user: ${error.message}`);
+    }
   }
 
   async getUserByEmail(email: string) {
@@ -761,6 +840,31 @@ export class UsersService {
         throw error;
       }
       throw new InternalServerErrorException(`Lỗi khi cập nhật role: ${error.message}`);
+    }
+  }
+
+  // Get user analytics (for hosts)
+  async getUserAnalytics(userId: string) {
+    try {
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new NotFoundException('Không tìm thấy người dùng');
+      }
+
+      // For now, return basic stats
+      // In real implementation, would query bookings and listings from other collections
+      const listingCount = user.role?.listID?.length || 0;
+      
+      return {
+        listingCount: listingCount,
+        bookingCount: 0, // Would need to query bookings collection
+        totalRevenue: 0, // Would need to query transactions/bookings
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Lỗi khi lấy thống kê: ${error.message}`);
     }
   }
 

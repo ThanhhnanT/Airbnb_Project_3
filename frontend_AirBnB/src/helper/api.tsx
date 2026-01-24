@@ -138,11 +138,12 @@ const getTokenHeader = (useAdminToken?: boolean) => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-export const getAccess = async (path: string, params: object = {}) => {
+export const getAccess = async (path: string, params: object = {}, useAdminToken?: boolean) => {
   try {
-    const tokenHeader = getTokenHeader();
+    const tokenHeader = getTokenHeader(useAdminToken);
     console.log("[API] getAccess - path:", path);
     console.log("[API] getAccess - params:", params);
+    console.log("[API] getAccess - useAdminToken:", useAdminToken);
     console.log("[API] getAccess - tokenHeader:", tokenHeader ? "Token present" : "No token");
     console.log("[API] getAccess - full URL:", API_DOMAIN + path);
     

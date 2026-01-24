@@ -1,12 +1,15 @@
-import { Injectable, ForbiddenException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, ForbiddenException, InternalServerErrorException, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User } from '../users/schemas/user.schema';
 import { Listing, ListingDocument } from '../listings/schemas/listing.schema';
 import { Booking, BookingDocument } from '../bookings/schemas/booking.schema';
 import { Payment, PaymentDocument } from '../payments/schemas/payment.schemas';
+import { Payout, PayoutDocument } from '../payouts/schemas/payout.schema';
 import { Settings, SettingsDocument } from './schemas/settings.schema';
 import { ListingImage, ListingImageDocument } from '../listing_images/schemas/listing_image.schema';
+import { PaymentsService } from '../payments/payments.service';
+import { PayoutsService } from '../payouts/payouts.service';
 
 @Injectable()
 export class AdminService {
@@ -15,8 +18,13 @@ export class AdminService {
     @InjectModel(Listing.name) private listingModel: Model<ListingDocument>,
     @InjectModel(Booking.name) private bookingModel: Model<BookingDocument>,
     @InjectModel(Payment.name) private paymentModel: Model<PaymentDocument>,
+    @InjectModel(Payout.name) private payoutModel: Model<PayoutDocument>,
     @InjectModel(Settings.name) private settingsModel: Model<SettingsDocument>,
     @InjectModel(ListingImage.name) private listingImageModel: Model<ListingImageDocument>,
+    @Inject(forwardRef(() => PaymentsService))
+    private paymentsService: PaymentsService,
+    @Inject(forwardRef(() => PayoutsService))
+    private payoutsService: PayoutsService,
   ) {}
 
   async verifyAdmin(userId: string): Promise<boolean> {
@@ -216,6 +224,28 @@ export class AdminService {
     }
   }
 
+  async getUserDetails(id: string) {
+    try {
+      const user = await this.userModel
+        .findById(id)
+        .select('-password')
+        .exec();
+
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      return {
+        data: user,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error getting user details: ${error.message}`);
+    }
+  }
+
   async updateListingStatus(id: string, status: string) {
     try {
       const listing = await this.listingModel.findByIdAndUpdate(
@@ -355,6 +385,198 @@ export class AdminService {
       return settings;
     } catch (error) {
       throw new InternalServerErrorException(`Error updating settings: ${error.message}`);
+    }
+  }
+
+  // Payment management methods
+  async getPaymentStats(filters?: any) {
+    try {
+      return await this.paymentsService.getPaymentStats(filters);
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting payment stats: ${error.message}`);
+    }
+  }
+
+  async refundPayment(paymentId: string, reason: string, adminId?: string) {
+    try {
+      return await this.paymentsService.refundPayment(paymentId, reason, adminId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async exportPaymentsCSV(filters?: any): Promise<string> {
+    try {
+      return await this.paymentsService.exportPaymentsCSV(filters);
+    } catch (error) {
+      throw new InternalServerErrorException(`Error exporting payments: ${error.message}`);
+    }
+  }
+
+  // Payout management methods
+  async getAllPayouts(page: number = 1, limit: number = 10) {
+    try {
+      const skip = (page - 1) * limit;
+      const [payouts, total] = await Promise.all([
+        this.payoutModel
+          .find()
+          .populate('host_id', 'name email')
+          .populate('booking_id', 'check_in check_out')
+          .populate('bank_account_id', 'bank_name account_number account_holder_name')
+          .populate('processed_by', 'name')
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .exec(),
+        this.payoutModel.countDocuments().exec(),
+      ]);
+
+      return {
+        data: payouts,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting payouts: ${error.message}`);
+    }
+  }
+
+  async getPayoutStats(): Promise<{
+    total: number;
+    pending: number;
+    paid: number;
+    failed: number;
+    totalAmount: number;
+    pendingAmount: number;
+    paidAmount: number;
+  }> {
+    try {
+      const payouts = await this.payoutModel.find().exec();
+
+      const stats = {
+        total: payouts.length,
+        pending: 0,
+        paid: 0,
+        failed: 0,
+        totalAmount: 0,
+        pendingAmount: 0,
+        paidAmount: 0,
+      };
+
+      payouts.forEach((payout) => {
+        stats.totalAmount += payout.amount;
+        if (payout.status === 'pending') {
+          stats.pending++;
+          stats.pendingAmount += payout.amount;
+        } else if (payout.status === 'paid') {
+          stats.paid++;
+          stats.paidAmount += payout.amount;
+        } else if (payout.status === 'failed') {
+          stats.failed++;
+        }
+      });
+
+      return stats;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting payout stats: ${error.message}`);
+    }
+  }
+
+  async batchMarkPayoutAsPaid(
+    payoutIds: string[],
+    adminId: string,
+    adminNote?: string,
+  ): Promise<any[]> {
+    try {
+      const updatedPayouts: any[] = [];
+      for (const payoutId of payoutIds) {
+        const payout = await this.payoutsService.markAsPaid(
+          payoutId,
+          adminId,
+          adminNote,
+        );
+        updatedPayouts.push(payout);
+      }
+      return updatedPayouts;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error marking payouts as paid: ${error.message}`);
+    }
+  }
+
+  async schedulePayouts(
+    payoutIds: string[],
+    scheduledAt: Date,
+    sendNotification?: boolean,
+  ): Promise<any> {
+    try {
+      // Store scheduled payouts (can be implemented with a cron job)
+      const scheduledPayouts: any[] = [];
+      for (const payoutId of payoutIds) {
+        const payout = await this.payoutModel
+          .findByIdAndUpdate(
+            payoutId,
+            {
+              scheduled_at: scheduledAt,
+              send_notification: sendNotification || false,
+            },
+            { new: true } as any,
+          )
+          .exec();
+        if (payout) {
+          scheduledPayouts.push(payout);
+        }
+      }
+      return {
+        message: `Scheduled ${scheduledPayouts.length} payout(s)`,
+        payouts: scheduledPayouts,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(`Error scheduling payouts: ${error.message}`);
+    }
+  }
+
+  async generateComplianceReport(filters: {
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+  }): Promise<string> {
+    try {
+      const query: any = {};
+
+      if (filters?.status) query.status = filters.status;
+      if (filters?.startDate && filters?.endDate) {
+        query.createdAt = {
+          $gte: new Date(filters.startDate),
+          $lte: new Date(filters.endDate),
+        };
+      }
+
+      const payouts = await this.payoutModel
+        .find(query)
+        .populate('host_id', 'name email')
+        .populate('booking_id', 'check_in check_out')
+        .exec();
+
+      // Generate CSV with compliance information
+      let csv =
+        'Host Name,Host Email,Total Payout,Platform Fee,Currency,Status,Created Date,Processed Date\n';
+
+      payouts.forEach((payout: any) => {
+        const createdDate = new Date(payout.createdAt).toLocaleDateString('vi-VN');
+        const processedDate = payout.processed_at
+          ? new Date(payout.processed_at).toLocaleDateString('vi-VN')
+          : '';
+
+        csv += `"${(payout.host_id as any)?.name || ''}","${(payout.host_id as any)?.email || ''}",${payout.amount},${payout.platform_fee},"${payout.currency}","${payout.status}","${createdDate}","${processedDate}"\n`;
+      });
+
+      return csv;
+    } catch (error) {
+      throw new InternalServerErrorException(`Error generating compliance report: ${error.message}`);
     }
   }
 }

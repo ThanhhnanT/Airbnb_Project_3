@@ -13,8 +13,8 @@ import {
   SettingOutlined,
   PlusOutlined,
   UnorderedListOutlined,
-  ClockCircleOutlined,
   LogoutOutlined,
+  BarChartOutlined,
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
@@ -55,7 +55,7 @@ export default function AdminSidebar() {
       setOpenKeys(["listings"]);
     } else if (path.startsWith("/admin/bookings")) {
       setSelectedKeys([path]);
-      setOpenKeys(["bookings"]);
+      setOpenKeys(["bookings-popup"]);
     } else if (path.startsWith("/admin/users")) {
       setSelectedKeys(["users"]);
       setOpenKeys([]);
@@ -74,9 +74,9 @@ export default function AdminSidebar() {
       getItem("All Listings", "/admin/listings", <UnorderedListOutlined />),
       getItem("Create Listing", "/admin/listings/create", <PlusOutlined />),
     ]),
-    getItem("Bookings", "bookings", <BookOutlined />, [
+    getItem("Bookings", "bookings-popup", <BookOutlined />, [
       getItem("All Bookings", "/admin/bookings", <UnorderedListOutlined />),
-      getItem("Pending Bookings", "/admin/bookings/pending", <ClockCircleOutlined />),
+      getItem("Statistics", "/admin/bookings/statistics", <BarChartOutlined />),
     ]),
     getItem("Users", "users", <UserOutlined />),
     getItem("Payments", "payments", <DollarOutlined />),

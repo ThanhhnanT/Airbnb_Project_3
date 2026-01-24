@@ -47,6 +47,12 @@ export class AdminController {
     return this.adminService.getAllUsers(pageNum, limitNum);
   }
 
+  @Get('users/:id')
+  @ApiOperation({ summary: 'Lấy chi tiết user theo ID (admin)' })
+  async getUserDetails(@Param('id') id: string) {
+    return this.adminService.getUserDetails(id);
+  }
+
   @Patch('listings/:id/status')
   @ApiOperation({ summary: 'Cập nhật trạng thái listing (admin)' })
   async updateListingStatus(
@@ -86,6 +92,98 @@ export class AdminController {
     const pageNum = page ? parseInt(page, 10) : 1;
     const limitNum = limit ? parseInt(limit, 10) : 10;
     return this.adminService.getAllPayments(pageNum, limitNum);
+  }
+
+  @Get('payments/stats')
+  @ApiOperation({ summary: 'Lấy thống kê payments (admin)' })
+  async getPaymentStats(
+    @Query('status') status?: string,
+    @Query('provider') provider?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.adminService.getPaymentStats({
+      status,
+      provider,
+      dateRange: startDate && endDate ? [startDate, endDate] : undefined,
+    });
+  }
+
+  @Get('payments/export')
+  @ApiOperation({ summary: 'Xuất danh sách payments sang CSV (admin)' })
+  async exportPayments(
+    @Query('status') status?: string,
+    @Query('provider') provider?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    return this.adminService.exportPaymentsCSV({
+      status,
+      provider,
+      dateRange: startDate && endDate ? [startDate, endDate] : undefined,
+    });
+  }
+
+  @Post('refunds')
+  @ApiOperation({ summary: 'Tạo refund cho payment (admin)' })
+  async refundPayment(
+    @Req() req: any,
+    @Body('payment_id') paymentId: string,
+    @Body('reason') reason: string,
+  ) {
+    const adminId = req.user?._id || req.user?.id || req.user?.user_id;
+    return this.adminService.refundPayment(paymentId, reason, adminId);
+  }
+
+  @Get('payouts')
+  @ApiOperation({ summary: 'Lấy danh sách tất cả payouts (admin)' })
+  async getAllPayouts(@Query('page') page?: string, @Query('limit') limit?: string) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    return this.adminService.getAllPayouts(pageNum, limitNum);
+  }
+
+  @Get('payouts/stats')
+  @ApiOperation({ summary: 'Lấy thống kê payouts (admin)' })
+  async getPayoutStats() {
+    return this.adminService.getPayoutStats();
+  }
+
+  @Post('payouts/batch-mark-paid')
+  @ApiOperation({ summary: 'Đánh dấu nhiều payouts đã chuyển (admin)' })
+  async batchMarkPayoutAsPaid(
+    @Req() req: any,
+    @Body('payout_ids') payoutIds: string[],
+    @Body('admin_note') adminNote?: string,
+  ) {
+    const adminId = req.user?._id || req.user?.id || req.user?.user_id;
+    return this.adminService.batchMarkPayoutAsPaid(payoutIds, adminId, adminNote);
+  }
+
+  @Post('payouts/schedule')
+  @ApiOperation({ summary: 'Lên lịch payout (admin)' })
+  async schedulePayouts(
+    @Req() req: any,
+    @Body('payout_id') payoutId: string,
+    @Body('scheduled_at') scheduledAt: string,
+    @Body('send_notification') sendNotification?: boolean,
+  ) {
+    const adminId = req.user?._id || req.user?.id || req.user?.user_id;
+    return this.adminService.schedulePayouts([payoutId], new Date(scheduledAt), sendNotification);
+  }
+
+  @Get('payouts/compliance-report')
+  @ApiOperation({ summary: 'Xuất báo cáo tuân thủ & thuế (admin)' })
+  async generateComplianceReport(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('status') status?: string,
+  ) {
+    return this.adminService.generateComplianceReport({
+      startDate,
+      endDate,
+      status,
+    });
   }
 
   @Get('settings')

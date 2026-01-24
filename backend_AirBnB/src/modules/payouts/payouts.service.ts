@@ -453,4 +453,68 @@ export class PayoutsService {
       );
     }
   }
+
+  // Batch mark multiple payouts as paid
+  async batchMarkAsPaid(
+    payoutIds: string[],
+    adminId: string,
+    note?: string,
+  ): Promise<any[]> {
+    try {
+      await this.payoutModel
+        .updateMany(
+          {
+            _id: { $in: payoutIds },
+            status: 'pending',
+          },
+          {
+            status: 'paid',
+            processed_by: adminId,
+            processed_at: new Date(),
+            admin_note: note || '',
+          },
+        )
+        .exec();
+
+      // Fetch updated payouts to return
+      const payouts = await this.payoutModel
+        .find({ _id: { $in: payoutIds } })
+        .exec();
+
+      return payouts;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Error batch marking payouts as paid: ${error.message}`,
+      );
+    }
+  }
+
+  // Schedule payouts for future processing
+  async schedulePayouts(
+    payoutIds: string[],
+    scheduledAt: Date,
+    sendNotification?: boolean,
+  ): Promise<any[]> {
+    try {
+      await this.payoutModel
+        .updateMany(
+          { _id: { $in: payoutIds } },
+          {
+            scheduled_at: scheduledAt,
+            send_notification: sendNotification || false,
+          },
+        )
+        .exec();
+
+      const payouts = await this.payoutModel
+        .find({ _id: { $in: payoutIds } })
+        .exec();
+
+      return payouts;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Error scheduling payouts: ${error.message}`,
+      );
+    }
+  }
 }
