@@ -105,11 +105,20 @@ export default function ListingDetailPage() {
         <div
           className={styles.coverImage}
           style={{
-            backgroundImage: listing.cover_image ? `url(${listing.cover_image})` : "none",
+            backgroundImage:
+              listing.images && listing.images.length > 0 && listing.images[0]?.image_url?.[0]
+                ? `url(${listing.images[0].image_url[0]})`
+                : listing.cover_image
+                  ? `url(${listing.cover_image})`
+                  : "none",
           }}
-          title={listing.cover_image ? "Hình ảnh phòng" : "Chưa có hình ảnh"}
+          title={
+            (listing.images && listing.images.length > 0) || listing.cover_image
+              ? "Hình ảnh phòng"
+              : "Chưa có hình ảnh"
+          }
         >
-          {!listing.cover_image && "Không có hình ảnh"}
+          {!listing.images?.length && !listing.cover_image && "Không có hình ảnh"}
         </div>
         <div className={styles.headerInfo}>
           <div>

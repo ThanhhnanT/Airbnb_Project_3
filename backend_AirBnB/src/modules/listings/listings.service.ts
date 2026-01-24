@@ -77,13 +77,23 @@ export class ListingsService {
     }
   }
 
-  async findOne(id: string): Promise<Listing> {
+  async findOne(id: string): Promise<any> {
     try {
       const listing = await this.listingModel.findById(id).exec();
       if (!listing) {
         throw new NotFoundException(`Listing with ID ${id} not found`);
       }
-      return listing;
+
+      // Get images for this listing
+      const listingIdForImages = Types.ObjectId.isValid(id) ? [new Types.ObjectId(id), id] : [id];
+      const images = await this.listingImageModel
+        .find({ listing_id: { $in: listingIdForImages } })
+        .lean();
+
+      return {
+        ...listing.toObject(),
+        images,
+      };
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

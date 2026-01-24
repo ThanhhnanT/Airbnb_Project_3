@@ -14,6 +14,15 @@ export interface ListingAnalytics {
   ratingDistribution: Record<number, number>;
 }
 
+export interface ListingImage {
+  _id?: string;
+  listing_id: string;
+  image_url: string[];
+  is_cover: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Listing {
   _id: string;
   title: string;
@@ -36,4 +45,5 @@ export interface Listing {
   cover_image?: string;
   avg_rating: number;
   review_count: number;
+  images?: ListingImage[];
 }
