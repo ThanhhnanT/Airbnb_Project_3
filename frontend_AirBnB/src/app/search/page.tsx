@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState, Suspense, useRef, useCallback, useMemo } from "react";
+import React, { useEffect, useState, Suspense, useRef, useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Spin, Empty, Pagination, message, Button, Typography } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
 import ListingGridCard from "@/components/search/ListingGridCard";
 import MapView from "@/components/search/MapView";
 import SearchFilters from "@/components/search/SearchFilters";
+
+// Memoize MapView to prevent re-mount on navigation
+const MemoizedMapView = React.memo(MapView);
 import { searchListings, SearchParams } from "@/service/search";
 import styles from "@/styles/search-page.module.css";
 
@@ -481,7 +484,7 @@ function SearchContent() {
             {/* Right Panel - Map */}
             {showMap && (
               <div className={styles.mapPanel}>
-                <MapView
+                <MemoizedMapView
                   listings={listings}
                   center={mapCenter}
                   onMarkerClick={handleMarkerClick}
