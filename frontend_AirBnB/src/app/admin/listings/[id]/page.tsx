@@ -324,17 +324,32 @@ export default function AdminListingDetailPage() {
                       )}
                     </Descriptions>
 
-                    {listing.latitude && listing.longitude && apiKey && (
+                    {listing.latitude && listing.longitude && (
                       <div style={{ marginTop: 16, height: "300px" }}>
-                        <LoadScript googleMapsApiKey={apiKey}>
-                          <GoogleMap
-                            mapContainerStyle={{ width: "100%", height: "100%" }}
-                            center={{ lat: listing.latitude, lng: listing.longitude }}
-                            zoom={15}
-                          >
-                            <Marker position={{ lat: listing.latitude, lng: listing.longitude }} />
-                          </GoogleMap>
-                        </LoadScript>
+                        {apiKey ? (
+                          <LoadScript googleMapsApiKey={apiKey}>
+                            <GoogleMap
+                              mapContainerStyle={{ width: "100%", height: "100%" }}
+                              center={{ lat: listing.latitude, lng: listing.longitude }}
+                              zoom={15}
+                            >
+                              <Marker position={{ lat: listing.latitude, lng: listing.longitude }} />
+                            </GoogleMap>
+                          </LoadScript>
+                        ) : (
+                          <div style={{ 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center", 
+                            height: "100%",
+                            backgroundColor: "#f5f5f5",
+                            borderRadius: "4px"
+                          }}>
+                            <span style={{ color: "#999" }}>
+                              Google Maps API key not configured
+                            </span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </Card>
