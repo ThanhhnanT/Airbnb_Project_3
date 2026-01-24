@@ -74,6 +74,21 @@ export default function CalendarPage() {
     setSelectedDate(date);
   };
 
+  const getDateBookingStyle = (date: Dayjs) => {
+    const dateKey = date.format("YYYY-MM-DD");
+    const bookedDates = getBookedDates(dayjs());
+    const dateBookings = bookedDates[dateKey] || [];
+
+    if (dateBookings.length > 0) {
+      return {
+        backgroundColor: "#ff4d4f",
+        color: "white",
+        fontWeight: "bold",
+      };
+    }
+    return {};
+  };
+
   const dateCellRender = (date: Dayjs) => {
     const bookedDates = getBookedDates(dayjs());
     const dateKey = date.format("YYYY-MM-DD");
@@ -88,15 +103,34 @@ export default function CalendarPage() {
         <Badge
           count={dateBookings.length}
           style={{
-            backgroundColor: "#ff4d4f",
+            backgroundColor: "#fff",
+            color: "#ff4d4f",
             fontSize: "10px",
             height: "16px",
             lineHeight: "16px",
             minWidth: "16px",
+            fontWeight: "bold",
           }}
         />
       </div>
     );
+  };
+
+  const cellRender = (date: Dayjs) => {
+    const dateKey = date.format("YYYY-MM-DD");
+    const bookedDates = getBookedDates(dayjs());
+    const dateBookings = bookedDates[dateKey] || [];
+
+    if (dateBookings.length > 0) {
+      return (
+        <div className={styles.bookedDay} style={getDateBookingStyle(date)}>
+          <span>{date.format("D")}</span>
+          <div className={styles.dayCell}>{dateCellRender(date)}</div>
+        </div>
+      );
+    }
+
+    return <div className={styles.normalDay}>{date.format("D")}</div>;
   };
 
   const selectedDateKey = selectedDate?.format("YYYY-MM-DD") || "";
@@ -120,6 +154,7 @@ export default function CalendarPage() {
             <Calendar
               fullscreen
               dateCellRender={dateCellRender}
+              cellRender={cellRender}
               onSelect={onSelectDate}
             />
           </Card>
