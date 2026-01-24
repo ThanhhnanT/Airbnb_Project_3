@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ListingsService } from './listings.service';
+import { ListingsStatsService } from './listings-stats.service';
 import { ListingsController, AdminListingsController } from './listings.controller';
 import { Listing, ListingSchema } from './schemas/listing.schema';
 import { Booking, BookingSchema } from '../bookings/schemas/booking.schema';
@@ -39,7 +40,7 @@ import { MongooseModule } from '@nestjs/mongoose';
     ]),
   ],
   controllers: [ListingsController, AdminListingsController],
-  providers: [ListingsService],
-  exports: [ListingsService],
+  providers: [ListingsService, ListingsStatsService],
+  exports: [ListingsService, ListingsStatsService],
 })
 export class ListingsModule {}

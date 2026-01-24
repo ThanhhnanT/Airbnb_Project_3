@@ -39,7 +39,7 @@ interface HostSidebarProps {
 }
 
 const items: MenuItem[] = [
-  getItem("Bảng điều khiển", "/host", <DashboardOutlined />),
+  getItem("Bảng điều khiển", "/host/dashboard", <DashboardOutlined />),
   getItem("Chỗ ở của tôi", "/host/manage", <HomeOutlined />),
   getItem("Đơn đặt phòng", "/host/bookings", <BookOutlined />),
   getItem("Tin nhắn", "/host/messages", <MessageOutlined />),
@@ -55,8 +55,8 @@ export default function HostSidebar({ collapsed, userInfo }: HostSidebarProps) {
 
   useEffect(() => {
     if (!pathname) return;
-    if (pathname === "/host" || pathname === "/host/") {
-      setSelectedKeys(["/host"]);
+    if (pathname === "/host" || pathname === "/host/" || pathname.startsWith("/host/dashboard")) {
+      setSelectedKeys(["/host/dashboard"]);
     } else if (pathname.startsWith("/host/manage")) {
       setSelectedKeys(["/host/manage"]);
     } else if (pathname.startsWith("/host/bookings")) {

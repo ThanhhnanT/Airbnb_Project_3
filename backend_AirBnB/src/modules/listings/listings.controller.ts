@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from '@nestjs/common';
 import { ListingsService } from './listings.service';
+import { ListingsStatsService } from './listings-stats.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { SearchListingDto } from './dto/search-listing.dto';
@@ -9,7 +10,10 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 @ApiTags('Listings')
 @Controller('listings')
 export class ListingsController {
-  constructor(private readonly listingsService: ListingsService) {}
+  constructor(
+    private readonly listingsService: ListingsService,
+    private readonly listingsStatsService: ListingsStatsService,
+  ) {}
 
   @Public()
   @Post('search')
@@ -25,6 +29,13 @@ export class ListingsController {
     // Override host_id with authenticated user
     createListingDto.host_id = userId;
     return this.listingsService.create(createListingDto);
+  }
+
+  @Get('host/dashboard-stats')
+  @ApiOperation({ summary: 'Lấy thống kê dashboard cho host' })
+  getHostDashboardStats(@Req() req: any) {
+    const userId = req.user?.id || req.user?.user_id;
+    return this.listingsStatsService.getHostDashboardStats(userId);
   }
 
   @Get('host/my-listings')
