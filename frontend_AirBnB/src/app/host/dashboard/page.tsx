@@ -88,8 +88,23 @@ export default function HostDashboardPage() {
   const fetchDashboardStats = async () => {
     try {
       setLoading(true);
-      const data = await getAccess("listings/host/dashboard-stats");
-      setStats(data);
+      const [dashboardData, bookingStatsData] = await Promise.all([
+        getAccess("listings/host/dashboard-stats"),
+        getAccess("bookings/host/stats").catch(() => []),
+      ]);
+
+      // Recalculate total revenue from booking stats to match manage page
+      let totalRevenue = 0;
+      if (Array.isArray(bookingStatsData)) {
+        totalRevenue = bookingStatsData.reduce((sum: number, item: any) => sum + (item.totalRevenue || 0), 0);
+      }
+
+      // Update earnings total with correct revenue
+      if (dashboardData && dashboardData.earnings) {
+        dashboardData.earnings.total = totalRevenue;
+      }
+
+      setStats(dashboardData);
     } catch (error: any) {
       console.error("Error fetching dashboard stats:", error);
       message.error("Không thể tải dữ liệu dashboard");

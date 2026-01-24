@@ -257,7 +257,7 @@ export default function HostManagePage() {
     },
   ];
 
-  const totalRevenue = listings.reduce((sum, l) => sum + l.price_base, 0);
+  const totalRevenue = listings.reduce((sum, l) => sum + (l.revenue || 0), 0);
   const totalBookings = listings.reduce((sum, l) => sum + (l.bookingCount || 0), 0);
   const avgRating = listings.length > 0 ? listings.reduce((sum, l) => sum + (l.avg_rating || 0), 0) / listings.length : 0;
   const activeCount = listings.filter((l) => l.status === "active").length;
