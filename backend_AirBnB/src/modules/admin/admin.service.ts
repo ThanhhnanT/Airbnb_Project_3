@@ -133,10 +133,17 @@ export class AdminService {
         throw new NotFoundException(`Listing with ID ${id} not found`);
       }
 
-      // Get listing images - handle both ObjectId and string formats (same as public service)
-      const listingIdForImages = Types.ObjectId.isValid(id) ? [new Types.ObjectId(id), id] : [id];
+      // Get listing images - the listing_id may be stored as string or ObjectId
+      // Create array with all possible ID formats
+      const listingIdVariants: any[] = [id];
+      
+      if (Types.ObjectId.isValid(id)) {
+        const objId = new Types.ObjectId(id);
+        listingIdVariants.push(objId);
+      }
+
       const listingImages = await this.listingImageModel
-        .find({ listing_id: { $in: listingIdForImages } })
+        .find({ listing_id: { $in: listingIdVariants } })
         .exec();
 
       return {
