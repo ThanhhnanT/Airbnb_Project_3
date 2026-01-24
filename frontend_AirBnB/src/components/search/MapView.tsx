@@ -540,6 +540,20 @@ const MapView: React.FC<MapViewProps> = ({
     );
   }
 
+  // Show loading state
+  if (isScriptLoading) {
+    return (
+      <div className={styles.mapContainer}>
+        <Card className={styles.mapPlaceholder}>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <Spin size="large" />
+            <p style={{ marginTop: 16, color: '#666' }}>Đang tải Google Maps...</p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   // Show error message if map failed to load
   if (mapError) {
     return (
@@ -608,79 +622,81 @@ const MapView: React.FC<MapViewProps> = ({
       className={styles.mapContainer}
       key={`map-container-${remountKeyRef.current}`}
     >
-      <LoadScript 
-        key={`loadscript-${remountKeyRef.current}-${apiKey?.substring(0, 10)}`}
-        googleMapsApiKey={apiKey}
-        onLoad={handleScriptLoad}
-        onError={handleScriptError}
-        loadingElement={
-          <div className={styles.mapContainer}>
-            <Card className={styles.mapPlaceholder}>
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <Spin size="large" />
-                <p style={{ marginTop: 16, color: '#666' }}>Đang tải Google Maps...</p>
-              </div>
-            </Card>
-          </div>
-        }
-      >
-        <GoogleMap
-          key={`google-map-${remountKeyRef.current}`}
-          mapContainerClassName={styles.map}
-          center={defaultCenter}
-          zoom={listingsWithCoords.length > 0 ? 12 : 10}
-          options={mapOptions}
-          onLoad={handleMapLoad}
-          onUnmount={() => {
-            // Cleanup when unmounting
-            console.log('GoogleMap unmounting, cleaning up');
-            if (mapRef.current) {
-              mapRef.current = null;
-            }
-            setIsMapLoaded(false);
-          }}
+      {!isScriptLoading && !mapError && apiKey ? (
+        <LoadScript 
+          key={`loadscript-${remountKeyRef.current}-${apiKey?.substring(0, 10)}`}
+          googleMapsApiKey={apiKey}
+          onLoad={handleScriptLoad}
+          onError={handleScriptError}
+          loadingElement={
+            <div className={styles.mapContainer}>
+              <Card className={styles.mapPlaceholder}>
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <Spin size="large" />
+                  <p style={{ marginTop: 16, color: '#666' }}>Đang tải Google Maps...</p>
+                </div>
+              </Card>
+            </div>
+          }
         >
-          {listingsWithCoords.map((listing) => {
-            if (!listing.latitude || !listing.longitude) return null;
+          <GoogleMap
+            key={`google-map-${remountKeyRef.current}`}
+            mapContainerClassName={styles.map}
+            center={defaultCenter}
+            zoom={listingsWithCoords.length > 0 ? 12 : 10}
+            options={mapOptions}
+            onLoad={handleMapLoad}
+            onUnmount={() => {
+              // Cleanup when unmounting
+              console.log('GoogleMap unmounting, cleaning up');
+              if (mapRef.current) {
+                mapRef.current = null;
+              }
+              setIsMapLoaded(false);
+            }}
+          >
+            {listingsWithCoords.map((listing) => {
+              if (!listing.latitude || !listing.longitude) return null;
 
-            const isSelected = selectedListingId === listing._id;
-            const markerIcon = createMarkerIcon(listing.title, isSelected);
+              const isSelected = selectedListingId === listing._id;
+              const markerIcon = createMarkerIcon(listing.title, isSelected);
 
-            return (
-              <Marker
-                key={listing._id}
-                position={{ lat: listing.latitude, lng: listing.longitude }}
-                onClick={() => handleMarkerClick(listing)}
-                icon={markerIcon}
-                title={listing.title}
-                animation={isSelected && typeof google !== 'undefined' && google.maps ? google.maps.Animation.BOUNCE : undefined}
-              >
-                {selectedMarker?._id === listing._id && (
-                  <InfoWindow
-                    onCloseClick={() => setSelectedMarker(null)}
-                    position={{ lat: listing.latitude, lng: listing.longitude }}
-                  >
-                    <div className={styles.infoWindow}>
-                      <h3 className={styles.infoTitle}>{listing.title}</h3>
-                      <p className={styles.infoLocation}>
-                        {listing.city}, {listing.country}
-                      </p>
-                      {listing.avg_rating > 0 && (
-                        <p className={styles.infoRating}>
-                          ⭐ {listing.avg_rating.toFixed(1)} ({listing.review_count})
+              return (
+                <Marker
+                  key={listing._id}
+                  position={{ lat: listing.latitude, lng: listing.longitude }}
+                  onClick={() => handleMarkerClick(listing)}
+                  icon={markerIcon}
+                  title={listing.title}
+                  animation={isSelected && typeof google !== 'undefined' && google.maps ? google.maps.Animation.BOUNCE : undefined}
+                >
+                  {selectedMarker?._id === listing._id && (
+                    <InfoWindow
+                      onCloseClick={() => setSelectedMarker(null)}
+                      position={{ lat: listing.latitude, lng: listing.longitude }}
+                    >
+                      <div className={styles.infoWindow}>
+                        <h3 className={styles.infoTitle}>{listing.title}</h3>
+                        <p className={styles.infoLocation}>
+                          {listing.city}, {listing.country}
                         </p>
-                      )}
-                      <p className={styles.infoPrice}>
-                        {formatPrice(listing.price_base, listing.currency)} / đêm
-                      </p>
-                    </div>
-                  </InfoWindow>
-                )}
-              </Marker>
-            );
-          })}
-        </GoogleMap>
-      </LoadScript>
+                        {listing.avg_rating > 0 && (
+                          <p className={styles.infoRating}>
+                            ⭐ {listing.avg_rating.toFixed(1)} ({listing.review_count})
+                          </p>
+                        )}
+                        <p className={styles.infoPrice}>
+                          {formatPrice(listing.price_base, listing.currency)} / đêm
+                        </p>
+                      </div>
+                    </InfoWindow>
+                  )}
+                </Marker>
+              );
+            })}
+          </GoogleMap>
+        </LoadScript>
+      ) : null}
     </div>
   );
 };
