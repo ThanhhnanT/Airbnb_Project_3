@@ -21,6 +21,22 @@ export default function OverviewTab({ listing }: OverviewTabProps) {
 
   return (
     <>
+      {/* Cover Image */}
+      {listing.cover_image && (
+        <Card style={{ marginBottom: 16 }}>
+          <img
+            src={listing.cover_image}
+            alt={listing.title}
+            style={{
+              width: "100%",
+              height: "400px",
+              objectFit: "cover",
+              borderRadius: "8px",
+            }}
+          />
+        </Card>
+      )}
+
       {/* Basic Info */}
       <Card style={{ marginBottom: 16 }} title="Thông Tin Cơ Bản">
         <Row gutter={[16, 16]}>

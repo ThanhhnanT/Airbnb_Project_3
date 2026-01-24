@@ -105,9 +105,12 @@ export default function ListingDetailPage() {
         <div
           className={styles.coverImage}
           style={{
-            backgroundImage: listing.cover_image ? `url(${listing.cover_image})` : "url('/placeholder.png')",
+            backgroundImage: listing.cover_image ? `url(${listing.cover_image})` : "none",
           }}
-        />
+          title={listing.cover_image ? "Hình ảnh phòng" : "Chưa có hình ảnh"}
+        >
+          {!listing.cover_image && "Không có hình ảnh"}
+        </div>
         <div className={styles.headerInfo}>
           <div>
             <Button
