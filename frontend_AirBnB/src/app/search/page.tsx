@@ -351,13 +351,6 @@ function SearchContent() {
             <Spin size="large" />
             <p>Đang tìm kiếm...</p>
           </div>
-        ) : listings.length === 0 ? (
-          <div className={styles.emptyContainer}>
-            <Empty
-              description="Không tìm thấy chỗ ở phù hợp"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-            />
-          </div>
         ) : (
           <div className={styles.resultsWrapper}>
             {/* Left Panel - Filters & Listings */}
