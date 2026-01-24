@@ -538,7 +538,7 @@ export default function AdminListingDetailPage() {
               ),
             },
           ]}
-          onTabChange={(key) => {
+          onChange={(key) => {
             if (key === "analytics" && !analyticsData) {
               fetchAnalytics();
             }
