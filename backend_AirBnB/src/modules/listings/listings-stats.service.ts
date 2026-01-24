@@ -6,7 +6,7 @@ import { Booking, BookingDocument } from '../bookings/schemas/booking.schema';
 import { Calendar, CalendarDocument } from '../calendars/schemas/calendar.schema';
 import { Review, ReviewDocument } from '../reviews/schemas/review.schema';
 
-interface DashboardStats {
+export interface DashboardStats {
   listings: {
     total: number;
     active: number;
@@ -143,7 +143,7 @@ export class ListingsStatsService {
     }
 
     // Sum up bookings by month
-    bookings.forEach((booking) => {
+    bookings.forEach((booking: any) => {
       const bookingDate = new Date(booking.createdAt);
       const monthKey = bookingDate.toISOString().slice(0, 7);
       if (monthlyData.hasOwnProperty(monthKey)) {
@@ -286,7 +286,7 @@ export class ListingsStatsService {
 
     // For each listing, calculate revenue and occupancy
     const topListingsData = await Promise.all(
-      hostListings.map(async (listing) => {
+      hostListings.map(async (listing: any) => {
         // Get revenue for this listing
         const bookings = await this.bookingModel
           .find({
@@ -316,7 +316,7 @@ export class ListingsStatsService {
         return {
           _id: listing._id.toString(),
           title: listing.title,
-          cover_image: listing.cover_image,
+          cover_image: listing.cover_image || undefined,
           city: listing.city,
           price_base: listing.price_base,
           currency: listing.currency,
