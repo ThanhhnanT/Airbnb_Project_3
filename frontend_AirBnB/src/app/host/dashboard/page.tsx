@@ -25,6 +25,7 @@ import OccupancyChart from "@/components/host/dashboard/OccupancyChart";
 import RecentReviews from "@/components/host/dashboard/RecentReviews";
 import TopListings from "@/components/host/dashboard/TopListings";
 import QuickActions from "@/components/host/dashboard/QuickActions";
+import styles from "./dashboard.module.css";
 
 const { Title, Text } = Typography;
 
