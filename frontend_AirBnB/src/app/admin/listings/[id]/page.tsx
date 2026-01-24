@@ -14,6 +14,11 @@ import {
   Spin,
   Typography,
   Divider,
+  Tabs,
+  Form,
+  Input,
+  InputNumber,
+  Select,
 } from "antd";
 import {
   CheckOutlined,
@@ -21,10 +26,12 @@ import {
   EditOutlined,
   DeleteOutlined,
   ArrowLeftOutlined,
-  EnvironmentOutlined,
+  SaveOutlined,
+  StopOutlined,
 } from "@ant-design/icons";
 import { getAccess, patchAccess, deleteData } from "@/helper/api";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import ListingAnalytics from "@/components/admin/ListingAnalytics";
 
 const { Title, Text } = Typography;
 
@@ -75,6 +82,10 @@ export default function AdminListingDetailPage() {
   const [images, setImages] = useState<ListingImage[]>([]);
   const [approveModalVisible, setApproveModalVisible] = useState(false);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     fetchListingDetails();
@@ -83,12 +94,56 @@ export default function AdminListingDetailPage() {
   const fetchListingDetails = async () => {
     try {
       setLoading(true);
-      const result = await getAccess(`admin/listings/${listingId}`, {}, true); // Use admin token
+      const result = await getAccess(`admin/listings/${listingId}`, {}, true);
       setListing(result.listing);
       setImages(result.images || []);
+      
+      // Initialize form with listing data
+      if (result.listing) {
+        form.setFieldsValue({
+          title: result.listing.title,
+          description: result.listing.description,
+          price_base: result.listing.price_base,
+          cleaning_fee: result.listing.cleaning_fee,
+          extra_guest_fee: result.listing.extra_guest_fee,
+          guests: result.listing.guests,
+          bedrooms: result.listing.bedrooms,
+          beds: result.listing.beds,
+          bathrooms: result.listing.bathrooms,
+          cancellation_policy: result.listing.cancellation_policy,
+        });
+      }
     } catch (error) {
       message.error("Không thể tải thông tin listing");
       router.push("/admin/listings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const result = await getAccess(`admin/listings/${listingId}/analytics`, {}, true);
+      setAnalyticsData(result);
+    } catch (error) {
+      message.error("Không thể tải thống kê");
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const values = await form.validateFields();
+      setLoading(true);
+      
+      await patchAccess(`admin/listings/${listingId}`, values, true);
+      message.success("Cập nhật listing thành công");
+      setEditMode(false);
+      fetchListingDetails();
+    } catch (error) {
+      message.error("Có lỗi xảy ra khi cập nhật");
     } finally {
       setLoading(false);
     }
@@ -185,9 +240,32 @@ export default function AdminListingDetailPage() {
                 </Button>
               </>
             )}
-            <Button icon={<EditOutlined />} onClick={() => router.push(`/admin/listings/${listingId}/edit`)}>
-              Chỉnh sửa
-            </Button>
+            {!editMode && (
+              <Button icon={<EditOutlined />} onClick={() => setEditMode(true)}>
+                Chỉnh sửa
+              </Button>
+            )}
+            {editMode && (
+              <>
+                <Button
+                  type="primary"
+                  icon={<SaveOutlined />}
+                  onClick={handleSaveEdit}
+                  loading={loading}
+                >
+                  Lưu
+                </Button>
+                <Button
+                  icon={<StopOutlined />}
+                  onClick={() => {
+                    setEditMode(false);
+                    fetchListingDetails();
+                  }}
+                >
+                  Hủy
+                </Button>
+              </>
+            )}
             <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
               Xóa
             </Button>
@@ -196,142 +274,275 @@ export default function AdminListingDetailPage() {
 
         <Divider />
 
-        {/* Basic Info */}
-        <Card title="Thông tin cơ bản" style={{ marginBottom: 16 }}>
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="Tiêu đề">{listing.title}</Descriptions.Item>
-            <Descriptions.Item label="Trạng thái">
-              <Tag color={listing.status === "active" ? "green" : "red"}>{listing.status}</Tag>
-            </Descriptions.Item>
-            <Descriptions.Item label="Mô tả" span={2}>
-              {listing.description || "Không có mô tả"}
-            </Descriptions.Item>
-            <Descriptions.Item label="Host">
-              {listing.host_id ? (
-                <div>
-                  <div>{listing.host_id.name}</div>
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {listing.host_id.email}
-                  </Text>
-                </div>
+        {/* Tabbed Interface */}
+        <Tabs
+          items={[
+            {
+              key: "overview",
+              label: "Tổng Quan",
+              children: (
+                <>
+                  {/* Basic Info */}
+                  <Card title="Thông tin cơ bản" style={{ marginBottom: 16 }}>
+                    <Descriptions column={2} bordered>
+                      <Descriptions.Item label="Tiêu đề">{listing.title}</Descriptions.Item>
+                      <Descriptions.Item label="Trạng thái">
+                        <Tag color={listing.status === "active" ? "green" : "red"}>{listing.status}</Tag>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Mô tả" span={2}>
+                        {listing.description || "Không có mô tả"}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Host">
+                        {listing.host_id ? (
+                          <div>
+                            <div>{listing.host_id.name}</div>
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {listing.host_id.email}
+                            </Text>
+                          </div>
+                        ) : (
+                          "N/A"
+                        )}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Ngày tạo">
+                        {new Date(listing.createdAt).toLocaleDateString("vi-VN")}
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Card>
+
+                  {/* Location */}
+                  <Card title="Địa điểm" style={{ marginBottom: 16 }}>
+                    <Descriptions column={2} bordered>
+                      <Descriptions.Item label="Địa chỉ">{listing.street || "N/A"}</Descriptions.Item>
+                      <Descriptions.Item label="Thành phố">{listing.city}</Descriptions.Item>
+                      <Descriptions.Item label="Quốc gia">{listing.country}</Descriptions.Item>
+                      <Descriptions.Item label="Mã bưu điện">{listing.postal_code || "N/A"}</Descriptions.Item>
+                      {listing.latitude && listing.longitude && (
+                        <Descriptions.Item label="Tọa độ" span={2}>
+                          {listing.latitude.toFixed(6)}, {listing.longitude.toFixed(6)}
+                        </Descriptions.Item>
+                      )}
+                    </Descriptions>
+
+                    {listing.latitude && listing.longitude && apiKey && (
+                      <div style={{ marginTop: 16, height: "300px" }}>
+                        <LoadScript googleMapsApiKey={apiKey}>
+                          <GoogleMap
+                            mapContainerStyle={{ width: "100%", height: "100%" }}
+                            center={{ lat: listing.latitude, lng: listing.longitude }}
+                            zoom={15}
+                          >
+                            <Marker position={{ lat: listing.latitude, lng: listing.longitude }} />
+                          </GoogleMap>
+                        </LoadScript>
+                      </div>
+                    )}
+                  </Card>
+
+                  {/* Property Details */}
+                  <Card title="Chi tiết property" style={{ marginBottom: 16 }}>
+                    <Descriptions column={3} bordered>
+                      <Descriptions.Item label="Số khách tối đa">{listing.guests}</Descriptions.Item>
+                      <Descriptions.Item label="Phòng ngủ">{listing.bedrooms || "N/A"}</Descriptions.Item>
+                      <Descriptions.Item label="Giường">{listing.beds || "N/A"}</Descriptions.Item>
+                      <Descriptions.Item label="Phòng tắm">{listing.bathrooms || "N/A"}</Descriptions.Item>
+                    </Descriptions>
+                  </Card>
+
+                  {/* Pricing */}
+                  <Card title="Giá cả" style={{ marginBottom: 16 }}>
+                    <Descriptions column={2} bordered>
+                      <Descriptions.Item label="Giá mỗi đêm">
+                        {listing.price_base} {listing.currency}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Phí dọn dẹp">
+                        {listing.cleaning_fee || 0} {listing.currency}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Phí khách thêm">
+                        {listing.extra_guest_fee || 0} {listing.currency}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Chính sách hủy">
+                        <Tag>{listing.cancellation_policy}</Tag>
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Card>
+
+                  {/* Amenities */}
+                  {listing.amenities && listing.amenities.length > 0 && (
+                    <Card title="Tiện nghi" style={{ marginBottom: 16 }}>
+                      <Space wrap>
+                        {listing.amenities.map((amenity, index) => (
+                          <Tag key={index} color="blue">
+                            {amenity}
+                          </Tag>
+                        ))}
+                      </Space>
+                    </Card>
+                  )}
+
+                  {/* House Rules */}
+                  {listing.house_rules && (
+                    <Card title="Nội quy nhà" style={{ marginBottom: 16 }}>
+                      <Text>{listing.house_rules}</Text>
+                    </Card>
+                  )}
+
+                  {/* Images Gallery */}
+                  <Card title={`Ảnh (${allImages.length} ảnh)`} style={{ marginBottom: 16 }}>
+                    {allImages.length >= 5 ? (
+                      <div>
+                        <Image.PreviewGroup>
+                          <div
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                              gap: 16,
+                            }}
+                          >
+                            {allImages.map((url, index) => (
+                              <Image
+                                key={index}
+                                src={url}
+                                alt={`Image ${index + 1}`}
+                                style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: 8 }}
+                              />
+                            ))}
+                          </div>
+                        </Image.PreviewGroup>
+                      </div>
+                    ) : (
+                      <div style={{ padding: 24, textAlign: "center", background: "#fff3cd", borderRadius: 8 }}>
+                        <Text type="warning">
+                          ⚠️ Listing này chỉ có {allImages.length} ảnh. Yêu cầu tối thiểu 5 ảnh.
+                        </Text>
+                      </div>
+                    )}
+                  </Card>
+                </>
+              ),
+            },
+            {
+              key: "edit",
+              label: "Chỉnh Sửa",
+              children: editMode ? (
+                <Card>
+                  <Form form={form} layout="vertical">
+                    <Form.Item
+                      label="Tiêu đề"
+                      name="title"
+                      rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}
+                    >
+                      <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Mô tả"
+                      name="description"
+                    >
+                      <Input.TextArea rows={4} />
+                    </Form.Item>
+
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                      <Form.Item
+                        label="Giá mỗi đêm (USD)"
+                        name="price_base"
+                        rules={[{ required: true, message: "Vui lòng nhập giá" }]}
+                      >
+                        <InputNumber style={{ width: "100%" }} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Phí dọn dẹp (USD)"
+                        name="cleaning_fee"
+                      >
+                        <InputNumber style={{ width: "100%" }} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Phí khách thêm (USD)"
+                        name="extra_guest_fee"
+                      >
+                        <InputNumber style={{ width: "100%" }} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Số khách tối đa"
+                        name="guests"
+                        rules={[{ required: true }]}
+                      >
+                        <InputNumber style={{ width: "100%" }} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Phòng ngủ"
+                        name="bedrooms"
+                      >
+                        <InputNumber style={{ width: "100%" }} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Giường"
+                        name="beds"
+                      >
+                        <InputNumber style={{ width: "100%" }} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Phòng tắm"
+                        name="bathrooms"
+                      >
+                        <InputNumber style={{ width: "100%" }} />
+                      </Form.Item>
+
+                      <Form.Item
+                        label="Chính sách hủy"
+                        name="cancellation_policy"
+                      >
+                        <Select
+                          options={[
+                            { label: "Linh hoạt", value: "flexible" },
+                            { label: "Trung bình", value: "moderate" },
+                            { label: "Nghiêm ngặt", value: "strict" },
+                          ]}
+                        />
+                      </Form.Item>
+                    </div>
+                  </Form>
+                </Card>
               ) : (
-                "N/A"
-              )}
-            </Descriptions.Item>
-            <Descriptions.Item label="Ngày tạo">
-              {new Date(listing.createdAt).toLocaleDateString("vi-VN")}
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        {/* Location */}
-        <Card title="Địa điểm" style={{ marginBottom: 16 }}>
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="Địa chỉ">{listing.street || "N/A"}</Descriptions.Item>
-            <Descriptions.Item label="Thành phố">{listing.city}</Descriptions.Item>
-            <Descriptions.Item label="Quốc gia">{listing.country}</Descriptions.Item>
-            <Descriptions.Item label="Mã bưu điện">{listing.postal_code || "N/A"}</Descriptions.Item>
-            {listing.latitude && listing.longitude && (
-              <Descriptions.Item label="Tọa độ" span={2}>
-                {listing.latitude.toFixed(6)}, {listing.longitude.toFixed(6)}
-              </Descriptions.Item>
-            )}
-          </Descriptions>
-
-          {listing.latitude && listing.longitude && apiKey && (
-            <div style={{ marginTop: 16, height: "300px" }}>
-              <LoadScript googleMapsApiKey={apiKey}>
-                <GoogleMap
-                  mapContainerStyle={{ width: "100%", height: "100%" }}
-                  center={{ lat: listing.latitude, lng: listing.longitude }}
-                  zoom={15}
-                >
-                  <Marker position={{ lat: listing.latitude, lng: listing.longitude }} />
-                </GoogleMap>
-              </LoadScript>
-            </div>
-          )}
-        </Card>
-
-        {/* Property Details */}
-        <Card title="Chi tiết property" style={{ marginBottom: 16 }}>
-          <Descriptions column={3} bordered>
-            <Descriptions.Item label="Số khách tối đa">{listing.guests}</Descriptions.Item>
-            <Descriptions.Item label="Phòng ngủ">{listing.bedrooms || "N/A"}</Descriptions.Item>
-            <Descriptions.Item label="Giường">{listing.beds || "N/A"}</Descriptions.Item>
-            <Descriptions.Item label="Phòng tắm">{listing.bathrooms || "N/A"}</Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        {/* Pricing */}
-        <Card title="Giá cả" style={{ marginBottom: 16 }}>
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="Giá mỗi đêm">
-              {listing.price_base} {listing.currency}
-            </Descriptions.Item>
-            <Descriptions.Item label="Phí dọn dẹp">
-              {listing.cleaning_fee || 0} {listing.currency}
-            </Descriptions.Item>
-            <Descriptions.Item label="Phí khách thêm">
-              {listing.extra_guest_fee || 0} {listing.currency}
-            </Descriptions.Item>
-            <Descriptions.Item label="Chính sách hủy">
-              <Tag>{listing.cancellation_policy}</Tag>
-            </Descriptions.Item>
-          </Descriptions>
-        </Card>
-
-        {/* Amenities */}
-        {listing.amenities && listing.amenities.length > 0 && (
-          <Card title="Tiện nghi" style={{ marginBottom: 16 }}>
-            <Space wrap>
-              {listing.amenities.map((amenity, index) => (
-                <Tag key={index} color="blue">
-                  {amenity}
-                </Tag>
-              ))}
-            </Space>
-          </Card>
-        )}
-
-        {/* House Rules */}
-        {listing.house_rules && (
-          <Card title="Nội quy nhà" style={{ marginBottom: 16 }}>
-            <Text>{listing.house_rules}</Text>
-          </Card>
-        )}
-
-        {/* Images Gallery */}
-        <Card title={`Ảnh (${allImages.length} ảnh)`} style={{ marginBottom: 16 }}>
-          {allImages.length >= 5 ? (
-            <div>
-              <Image.PreviewGroup>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-                    gap: 16,
-                  }}
-                >
-                  {allImages.map((url, index) => (
-                    <Image
-                      key={index}
-                      src={url}
-                      alt={`Image ${index + 1}`}
-                      style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: 8 }}
-                    />
-                  ))}
-                </div>
-              </Image.PreviewGroup>
-            </div>
-          ) : (
-            <div style={{ padding: 24, textAlign: "center", background: "#fff3cd", borderRadius: 8 }}>
-              <Text type="warning">
-                ⚠️ Listing này chỉ có {allImages.length} ảnh. Yêu cầu tối thiểu 5 ảnh.
-              </Text>
-            </div>
-          )}
-        </Card>
+                <Card>
+                  <p>Nhấp "Chỉnh sửa" để bắt đầu chỉnh sửa thông tin listing.</p>
+                </Card>
+              ),
+            },
+            {
+              key: "analytics",
+              label: "Thống Kê",
+              children: (
+                <ListingAnalytics 
+                  data={analyticsData} 
+                  loading={analyticsLoading}
+                />
+              ),
+            },
+            {
+              key: "availability",
+              label: "Tính Khả Dụng",
+              children: (
+                <Card>
+                  <Button onClick={() => router.push(`/admin/listings/${listingId}/availability`)}>
+                    Quản lý lịch
+                  </Button>
+                </Card>
+              ),
+            },
+          ]}
+          onTabChange={(key) => {
+            if (key === "analytics" && !analyticsData) {
+              fetchAnalytics();
+            }
+          }}
+        />
       </Card>
 
       {/* Approve Modal */}

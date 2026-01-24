@@ -70,3 +70,27 @@ export class ListingsController {
     return this.listingsService.remove(id);
   }
 }
+
+@ApiTags('Admin Listings')
+@Controller('admin/listings')
+export class AdminListingsController {
+  constructor(private readonly listingsService: ListingsService) {}
+
+  @Get(':id/analytics')
+  @ApiOperation({ summary: 'Lấy thống kê & phân tích cho một listing' })
+  getListingAnalytics(@Param('id') id: string) {
+    return this.listingsService.getListingAnalytics(id);
+  }
+
+  @Get('stats/all')
+  @ApiOperation({ summary: 'Lấy thống kê toàn bộ listings' })
+  getListingsStats() {
+    return this.listingsService.getListingsStats();
+  }
+
+  @Patch('bulk/update')
+  @ApiOperation({ summary: 'Cập nhật hàng loạt listings' })
+  bulkUpdate(@Body() body: { ids: string[]; updateData: UpdateListingDto }) {
+    return this.listingsService.bulkUpdateListings(body.ids, body.updateData);
+  }
+}

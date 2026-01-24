@@ -565,4 +565,169 @@ export class ListingsService {
       throw new InternalServerErrorException(`Error finding host listings: ${error.message}`);
     }
   }
+
+  async getListingAnalytics(id: string) {
+    try {
+      const listingId = new Types.ObjectId(id);
+
+      // Get basic listing info
+      const listing = await this.listingModel.findById(listingId).exec();
+      if (!listing) {
+        throw new NotFoundException(`Listing with ID ${id} not found`);
+      }
+
+      // Get total bookings
+      const totalBookings = await this.bookingModel.countDocuments({
+        listing_id: listingId,
+        status: { $in: ['confirmed', 'completed'] },
+      });
+
+      // Get monthly booking trend
+      const bookingTrend = await this.bookingModel.aggregate([
+        {
+          $match: {
+            listing_id: listingId,
+            status: { $in: ['confirmed', 'completed'] },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: '$createdAt' },
+              month: { $month: '$createdAt' },
+            },
+            count: { $sum: 1 },
+            totalRevenue: {
+              $sum: '$total_price',
+            },
+          },
+        },
+        {
+          $sort: { '_id.year': 1, '_id.month': 1 },
+        },
+      ]);
+
+      // Get reviews and ratings
+      const reviews = await this.reviewModel.find({
+        listing_id: listingId,
+      }).exec();
+
+      const avgRating = reviews.length > 0
+        ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+        : 0;
+
+      // Get occupancy info from calendar
+      const totalDays = await this.calendarModel.countDocuments({
+        listing_id: listingId,
+      });
+
+      const bookedDays = await this.calendarModel.countDocuments({
+        listing_id: listingId,
+        status: 'booked',
+      });
+
+      const occupancyRate = totalDays > 0 ? (bookedDays / totalDays) * 100 : 0;
+
+      // Get current month bookings
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+      const currentMonthBookings = await this.bookingModel.countDocuments({
+        listing_id: listingId,
+        status: { $in: ['confirmed', 'completed'] },
+        check_in: { $gte: startOfMonth, $lt: endOfMonth },
+      });
+
+      return {
+        listingId: id,
+        title: listing.title,
+        totalBookings,
+        currentMonthBookings,
+        avgRating: parseFloat(avgRating.toFixed(2)),
+        reviewCount: reviews.length,
+        occupancyRate: parseFloat(occupancyRate.toFixed(2)),
+        bookingTrend: bookingTrend.map((item) => ({
+          month: `${item._id.month}/${item._id.year}`,
+          bookings: item.count,
+          revenue: parseFloat(item.totalRevenue.toFixed(2)),
+        })),
+        ratingDistribution: this.calculateRatingDistribution(reviews),
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error getting listing analytics: ${error.message}`);
+    }
+  }
+
+  async getListingsStats() {
+    try {
+      const total = await this.listingModel.countDocuments();
+      const active = await this.listingModel.countDocuments({ status: 'active' });
+      const pending = await this.listingModel.countDocuments({ status: 'inactive' });
+
+      // Get revenue from all completed bookings
+      const bookingStats = await this.bookingModel.aggregate([
+        {
+          $match: {
+            status: { $in: ['confirmed', 'completed'] },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: '$total_price' },
+            totalBookings: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const totalRevenue = bookingStats[0]?.totalRevenue || 0;
+      const totalBookings = bookingStats[0]?.totalBookings || 0;
+
+      return {
+        totalListings: total,
+        activeListings: active,
+        pendingListings: pending,
+        totalRevenue: parseFloat(totalRevenue.toFixed(2)),
+        totalBookings,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(`Error getting listings stats: ${error.message}`);
+    }
+  }
+
+  async bulkUpdateListings(ids: string[], updateData: UpdateListingDto): Promise<any> {
+    try {
+      const objectIds = ids.map((id) => new Types.ObjectId(id));
+
+      const result = await this.listingModel.updateMany(
+        { _id: { $in: objectIds } },
+        updateData,
+        { new: true },
+      );
+
+      return {
+        modifiedCount: result.modifiedCount,
+        matchedCount: result.matchedCount,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(`Error bulk updating listings: ${error.message}`);
+    }
+  }
+
+  private calculateRatingDistribution(reviews: ReviewDocument[]): Record<number, number> {
+    const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+
+    reviews.forEach((review) => {
+      const rating = Math.round(review.rating);
+      if (distribution.hasOwnProperty(rating)) {
+        distribution[rating]++;
+      }
+    });
+
+    return distribution;
+  }
 }
