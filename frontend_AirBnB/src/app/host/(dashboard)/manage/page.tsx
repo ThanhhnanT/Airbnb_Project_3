@@ -344,6 +344,12 @@ export default function HostManagePage() {
             selectedRowKeys,
             onChange: (keys) => setSelectedRowKeys(keys as string[]),
           }}
+          onRow={(record) => ({
+            onClick: () => {
+              router.push(`/host/manage/${record._id}`);
+            },
+            style: { cursor: "pointer" },
+          })}
         />
       </div>
 
