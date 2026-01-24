@@ -34,7 +34,6 @@ export default function CalendarPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const [currentMonth, setCurrentMonth] = useState<Dayjs>(dayjs());
 
   useEffect(() => {
     fetchBookings();
@@ -52,9 +51,8 @@ export default function CalendarPage() {
     }
   };
 
-  // Get all booked dates for current month
-  const getBookedDates = (date: Dayjs) => {
-    const currentMonth = date.format("YYYY-MM");
+  // Get all booked dates
+  const getBookedDates = () => {
     const bookedDates: { [key: string]: Booking[] } = {};
 
     bookings.forEach((booking) => {
@@ -64,14 +62,11 @@ export default function CalendarPage() {
       let currentDate = checkIn;
       while (currentDate.isBefore(checkOut) || currentDate.isSame(checkOut)) {
         const dateKey = currentDate.format("YYYY-MM-DD");
-        const dateMonth = currentDate.format("YYYY-MM");
 
-        if (dateMonth === currentMonth) {
-          if (!bookedDates[dateKey]) {
-            bookedDates[dateKey] = [];
-          }
-          bookedDates[dateKey].push(booking);
+        if (!bookedDates[dateKey]) {
+          bookedDates[dateKey] = [];
         }
+        bookedDates[dateKey].push(booking);
 
         currentDate = currentDate.add(1, "day");
       }
@@ -84,13 +79,10 @@ export default function CalendarPage() {
     setSelectedDate(date);
   };
 
-  const onMonthChange = (date: Dayjs) => {
-    setCurrentMonth(date);
-  };
+  const bookedDates = getBookedDates();
 
   const getDateBookingStyle = (date: Dayjs) => {
     const dateKey = date.format("YYYY-MM-DD");
-    const bookedDates = getBookedDates(currentMonth);
     const dateBookings = bookedDates[dateKey] || [];
 
     if (dateBookings.length > 0) {
@@ -104,7 +96,6 @@ export default function CalendarPage() {
   };
 
   const dateCellRender = (date: Dayjs) => {
-    const bookedDates = getBookedDates(currentMonth);
     const dateKey = date.format("YYYY-MM-DD");
     const dateBookings = bookedDates[dateKey] || [];
 
@@ -132,7 +123,6 @@ export default function CalendarPage() {
 
   const cellRender = (date: Dayjs) => {
     const dateKey = date.format("YYYY-MM-DD");
-    const bookedDates = getBookedDates(currentMonth);
     const dateBookings = bookedDates[dateKey] || [];
 
     if (dateBookings.length > 0) {
@@ -148,7 +138,6 @@ export default function CalendarPage() {
   };
 
   const selectedDateKey = selectedDate?.format("YYYY-MM-DD") || "";
-  const bookedDates = getBookedDates(currentMonth);
   const selectedBookings = bookedDates[selectedDateKey] || [];
 
   return (
@@ -170,7 +159,6 @@ export default function CalendarPage() {
               dateCellRender={dateCellRender}
               cellRender={cellRender}
               onSelect={onSelectDate}
-              onPanelChange={onMonthChange}
             />
           </Card>
 
