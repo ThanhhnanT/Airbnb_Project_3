@@ -83,7 +83,32 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  overflow: visible;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.avatarWrapper:focus,
+.avatarWrapper:focus-visible,
+.avatarWrapper:active {
+  outline: none !important;
+}
+
+/* Remove red border from dropdown trigger when open */
+.avatarWrapper.ant-dropdown-open .avatar,
+.avatarWrapper.ant-dropdown-open :global(.ant-avatar) {
+  outline: none !important;
+  border: 2px solid var(--color-background) !important;
+  box-shadow: 0 2px 8px var(--color-shadow-primary) !important;
+}
+
+/* Remove Ant Design focus outline */
+.avatarWrapper :global(.ant-dropdown-trigger:focus),
+.avatarWrapper :global(.ant-dropdown-trigger:focus-visible) {
+  outline: none !important;
+}
+
+.avatarWrapper :global(.ant-dropdown-trigger.ant-dropdown-open) {
+  outline: none !important;
 }
 
 .avatar {
@@ -96,8 +121,29 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   border: 2px solid var(--color-background);
+  border-radius: 50% !important;
+  outline: none !important;
+  box-shadow: 0 2px 8px var(--color-shadow-primary) !important;
+}
+
+.avatar:focus,
+.avatar:focus-visible,
+.avatar:active {
+  outline: none !important;
+  border: 2px solid var(--color-background) !important;
+  box-shadow: 0 2px 8px var(--color-shadow-primary) !important;
+}
+
+.avatar :global(img) {
+  border-radius: 50% !important;
+  object-fit: cover;
+}
+
+.avatar :global(.ant-avatar-image) {
+  border-radius: 50% !important;
+  overflow: hidden;
 }
 
 .avatar:hover {
@@ -132,6 +178,42 @@
   left: 0 !important;
   transform: none !important;
   position: absolute;
+}
+
+/* Ensure avatar is always circular */
+.avatarWrapper :global(.ant-avatar),
+.avatarWrapper :global(.ant-avatar-circle) {
+  border-radius: 50% !important;
+  overflow: hidden !important;
+  outline: none !important;
+}
+
+.avatarWrapper :global(.ant-avatar img),
+.avatarWrapper :global(.ant-avatar-circle img) {
+  border-radius: 50% !important;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Remove all focus outlines and borders from dropdown trigger */
+.avatarWrapper :global(.ant-dropdown-trigger),
+.avatarWrapper :global(.ant-dropdown-trigger:focus),
+.avatarWrapper :global(.ant-dropdown-trigger:focus-visible),
+.avatarWrapper :global(.ant-dropdown-trigger:active),
+.avatarWrapper :global(.ant-dropdown-trigger.ant-dropdown-open) {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove outline from avatar when inside dropdown trigger */
+.avatarWrapper :global(.ant-dropdown-trigger .ant-avatar),
+.avatarWrapper :global(.ant-dropdown-trigger.ant-dropdown-open .ant-avatar),
+.avatarWrapper :global(.ant-dropdown-trigger:focus .ant-avatar),
+.avatarWrapper :global(.ant-dropdown-trigger:focus-visible .ant-avatar) {
+  outline: none !important;
+  box-shadow: 0 2px 8px var(--color-shadow-primary) !important;
 }
 
 .menuButton {

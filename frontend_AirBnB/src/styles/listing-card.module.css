@@ -160,8 +160,21 @@
 .heartIcon {
   width: 24px;
   height: 24px;
-  color: var(--color-text);
-  fill: none;
+  font-size: 20px;
+}
+
+/* Heart filled (favorited) - red color */
+.favoriteButton:has(.anticon-heart[class*="anticon-heart-filled"]) .heartIcon,
+.favoriteButton .anticon-heart-filled {
+  color: #ff385c !important;
+  fill: #ff385c !important;
+}
+
+/* Heart outlined (not favorited) - black/gray color */
+.favoriteButton:has(.anticon-heart[class*="anticon-heart-outlined"]) .heartIcon,
+.favoriteButton .anticon-heart-outlined {
+  color: #222 !important;
+  fill: none !important;
   stroke: currentColor;
   stroke-width: 2;
 }

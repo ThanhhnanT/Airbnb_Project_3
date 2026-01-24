@@ -22,3 +22,6 @@ export class Review {
 }
 
 export const ReviewSchema = SchemaFactory.createForClass(Review);
+
+// Enforce: 1 review per booking
+ReviewSchema.index({ booking_id: 1 }, { unique: true });

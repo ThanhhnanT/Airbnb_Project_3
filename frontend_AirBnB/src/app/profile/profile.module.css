@@ -388,6 +388,111 @@
   outline: none;
 }
 
+.inputField :global(textarea) {
+  resize: vertical;
+  min-height: 80px;
+  border-radius: 8px !important;
+}
+
+.inputField :global(.ant-input) {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px !important;
+}
+
+.inputField :global(.ant-input:hover) {
+  border-color: #ff385c;
+}
+
+.inputField :global(.ant-input:focus),
+.inputField :global(.ant-input-focused) {
+  border-color: #ff385c;
+  box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.1);
+}
+
+/* Textarea wrapper styling */
+.inputField :global(.ant-input-affix-wrapper),
+.inputField :global(.ant-input-textarea-affix-wrapper) {
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.inputField :global(.ant-input-affix-wrapper:hover),
+.inputField :global(.ant-input-textarea-affix-wrapper:hover) {
+  border-color: #ff385c;
+}
+
+.inputField :global(.ant-input-affix-wrapper-focused),
+.inputField :global(.ant-input-textarea-affix-wrapper-focused) {
+  border-color: #ff385c;
+  box-shadow: 0 0 0 2px rgba(255, 56, 92, 0.1);
+}
+
+.inputField :global(.ant-input-affix-wrapper textarea.ant-input),
+.inputField :global(.ant-input-textarea-affix-wrapper textarea.ant-input) {
+  border-radius: 8px !important;
+  border: none !important;
+}
+
+/* Ensure the wrapper itself has rounded corners */
+.inputField :global(.ant-input-affix-wrapper),
+.inputField :global(.ant-input-textarea-affix-wrapper) {
+  border-radius: 8px !important;
+}
+
+.inputField :global(.ant-input-affix-wrapper > textarea),
+.inputField :global(.ant-input-textarea-affix-wrapper > textarea) {
+  border-radius: 8px !important;
+}
+
+/* More specific targeting for textarea with showCount */
+.formItem :global(.ant-input-textarea-affix-wrapper) {
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.formItem :global(.ant-input-textarea-affix-wrapper .ant-input) {
+  border-radius: 8px !important;
+}
+
+.formItem :global(.ant-input-textarea-affix-wrapper textarea) {
+  border-radius: 8px !important;
+}
+
+/* Direct textarea styling - most specific */
+.formItem :global(textarea#bio),
+.formItem :global(textarea.ant-input) {
+  border-radius: 8px !important;
+}
+
+/* Override Ant Design's default border-radius for textarea */
+.formItem :global(.ant-input-textarea-affix-wrapper),
+.formItem :global(.ant-input-textarea-affix-wrapper.ant-input-outlined) {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.formItem :global(.ant-input-textarea-affix-wrapper .ant-input),
+.formItem :global(.ant-input-textarea-affix-wrapper textarea) {
+  border-radius: 8px !important;
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+  border-bottom-left-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+}
+
+/* Global override for textarea in profile page */
+.profileContainer :global(.ant-input-textarea-affix-wrapper) {
+  border-radius: 8px !important;
+}
+
+.profileContainer :global(.ant-input-textarea-affix-wrapper textarea) {
+  border-radius: 8px !important;
+}
+
+.profileContainer :global(.ant-input-textarea-affix-wrapper .ant-input) {
+  border-radius: 8px !important;
+}
+
 .saveButtonContainer {
   display: flex;
   justify-content: flex-end;

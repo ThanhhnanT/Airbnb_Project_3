@@ -106,8 +106,61 @@ export class UsersService {
     }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    try {
+      // Validate input
+      if (!id) {
+        throw new BadRequestException('User ID is required');
+      }
+
+      // Find user first to check if exists
+      const user = await this.userModel.findById(id);
+      if (!user) {
+        throw new NotFoundException(`User with ID ${id} not found`);
+      }
+
+      // Prepare update object - only include fields that are provided
+      const updateData: any = {};
+      
+      if (updateUserDto.name !== undefined) {
+        updateData.name = updateUserDto.name.trim();
+      }
+      
+      if (updateUserDto.phone !== undefined) {
+        updateData.phone = updateUserDto.phone.trim();
+      }
+      
+      if (updateUserDto.avatar_url !== undefined) {
+        updateData.avatar_url = updateUserDto.avatar_url;
+      }
+      
+      if (updateUserDto.bio !== undefined) {
+        updateData.bio = updateUserDto.bio.trim();
+      }
+
+      // Note: We explicitly exclude password and email from updates
+      // Password should be updated through a separate endpoint
+      // Email should be updated through a separate verification process
+
+      // Update user
+      const updatedUser = await this.userModel.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true, runValidators: true }
+      ).select('-password'); // Exclude password from response
+
+      if (!updatedUser) {
+        throw new NotFoundException(`Failed to update user with ID ${id}`);
+      }
+
+      return updatedUser;
+    } catch (error) {
+      if (error instanceof BadRequestException || 
+          error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error updating user: ${error.message}`);
+    }
   }
 
   remove(id: number) {

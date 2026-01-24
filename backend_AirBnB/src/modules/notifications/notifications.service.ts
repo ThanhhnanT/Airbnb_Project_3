@@ -87,4 +87,37 @@ export class NotificationsService {
       throw new InternalServerErrorException(`Error deleting notification: ${error.message}`);
     }
   }
+
+  async createCheckoutNotification(
+    hostId: string,
+    bookingId: string,
+    guestName: string,
+    listingTitle: string,
+  ): Promise<Notification> {
+    try {
+      const notification = new this.notificationModel({
+        user_id: hostId,
+        type: 'checkout_completed',
+        message: `Chúc mừng! Chuyến đi của khách ${guestName} tại "${listingTitle}" đã hoàn thành. Vui lòng để lại đánh giá cho khách hàng.`,
+        link_action: `/reviews/write/${bookingId}`,
+        booking_id: bookingId,
+        is_read: false,
+      });
+      return await notification.save();
+    } catch (error) {
+      throw new InternalServerErrorException(`Error creating checkout notification: ${error.message}`);
+    }
+  }
+
+  async findCheckoutNotificationForBooking(userId: string, bookingId: string): Promise<Notification | null> {
+    try {
+      return await this.notificationModel.findOne({
+        user_id: userId,
+        booking_id: bookingId,
+        type: 'checkout_completed',
+      }).exec();
+    } catch (error) {
+      throw new InternalServerErrorException(`Error finding checkout notification: ${error.message}`);
+    }
+  }
 }

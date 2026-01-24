@@ -14,13 +14,23 @@ import {
   DollarOutlined,
   RightOutlined,
   LeftOutlined,
-  CloseOutlined
+  CloseOutlined,
+  DesktopOutlined,
+  SettingOutlined,
+  CloudOutlined,
+  LaptopOutlined,
+  GlobalOutlined,
+  FireOutlined,
+  TableOutlined,
+  TrophyOutlined,
+  BankOutlined
 } from "@ant-design/icons";
 import { getAccess, postAccess } from "@/helper/api";
 import dayjs, { Dayjs } from "dayjs";
 import DatePickerModal from "@/components/search/DatePickerModal";
 import GuestSelector, { GuestCounts } from "@/components/search/GuestSelector";
 import { useMessageApi } from "@/components/providers/Message";
+import ListingMap from "@/components/listings/ListingMap";
 import styles from "./listing-detail.module.css";
 
 const { Text } = Typography;
@@ -467,6 +477,54 @@ export default function ListingDetailPage() {
     return comment.substring(0, 200) + "...";
   };
 
+  // Get icon for amenity
+  const getAmenityIcon = (amenityKey: string) => {
+    const iconMap: { [key: string]: React.ReactNode } = {
+      wifi: <WifiOutlined />,
+      tv: <DesktopOutlined />,
+      kitchen: <HomeOutlined />,
+      washer: <SettingOutlined />,
+      free_parking: <CarOutlined />,
+      paid_parking: <DollarOutlined />,
+      air_conditioning: <CloudOutlined />,
+      workspace: <LaptopOutlined />,
+      pool: <GlobalOutlined />,
+      hot_tub: <FireOutlined />,
+      patio: <HomeOutlined />,
+      bbq: <FireOutlined />,
+      outdoor_dining: <TableOutlined />,
+      fire_pit: <FireOutlined />,
+      pool_table: <TrophyOutlined />,
+      fireplace: <FireOutlined />,
+      piano: <BankOutlined />,
+    };
+    return iconMap[amenityKey] || <HomeOutlined />;
+  };
+
+  // Get label for amenity
+  const getAmenityLabel = (amenityKey: string): string => {
+    const labelMap: { [key: string]: string } = {
+      wifi: "Wi-fi",
+      tv: "TV",
+      kitchen: "Bếp",
+      washer: "Máy giặt",
+      free_parking: "Chỗ đỗ xe miễn phí",
+      paid_parking: "Chỗ đỗ xe có thu phí",
+      air_conditioning: "Điều hòa nhiệt độ",
+      workspace: "Không gian làm việc",
+      pool: "Bể bơi",
+      hot_tub: "Bồn tắm nước nóng",
+      patio: "Sân",
+      bbq: "Lò nướng BBQ",
+      outdoor_dining: "Khu vực ăn uống ngoài trời",
+      fire_pit: "Bếp đốt lửa trại",
+      pool_table: "Bàn bi-da",
+      fireplace: "Lò sưởi trong nhà",
+      piano: "Đàn piano",
+    };
+    return labelMap[amenityKey] || amenityKey;
+  };
+
   return (
     <div className={styles.listingDetailContainer}>
       {/* Image Gallery */}
@@ -606,7 +664,9 @@ export default function ListingDetailPage() {
               <h2>Tiện nghi</h2>
               <div className={styles.amenitiesGrid}>
                 {listing.amenities.map((amenity, index) => (
-                  <Tag key={index} icon={<WifiOutlined />}>{amenity}</Tag>
+                  <Tag key={index} icon={getAmenityIcon(amenity)}>
+                    {getAmenityLabel(amenity)}
+                  </Tag>
                 ))}
               </div>
             </div>
@@ -826,6 +886,16 @@ export default function ListingDetailPage() {
             })}
           </div>
         </div>
+      )}
+
+      {/* Map Section */}
+      {listing.latitude && listing.longitude && (
+        <ListingMap
+          latitude={listing.latitude}
+          longitude={listing.longitude}
+          title={listing.title}
+          address={listing.street ? `${listing.street}, ${listing.city}, ${listing.country}` : `${listing.city}, ${listing.country}`}
+        />
       )}
     </div>
   );
