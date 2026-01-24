@@ -328,7 +328,77 @@ const MapView: React.FC<MapViewProps> = ({
 
   return (
     <div ref={containerRef} className={styles.mapContainer}>
-      <LoadScript
+      <LoadScript 
+        googleMapsApiKey={apiKey}
+        onLoad={handleScriptLoad}
+        onError={handleScriptError}
+        loadingElement={
+          <div className={styles.mapContainer}>
+            <Card className={styles.mapPlaceholder}>
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <Spin size="large" />
+                <p style={{ marginTop: 16, color: '#666' }}>Đang tải Google Maps...</p>
+              </div>
+            </Card>
+          </div>
+        }
+      >
+        <GoogleMap
+          mapContainerClassName={styles.map}
+          center={defaultCenter}
+          zoom={listingsWithCoords.length > 0 ? 12 : 10}
+          options={mapOptions}
+          onLoad={handleMapLoad}
+          onUnmount={() => {
+            if (mapRef.current) {
+              mapRef.current = null;
+            }
+            setIsMapLoaded(false);
+          }}
+        >
+          {listingsWithCoords.map((listing) => {
+            if (!listing.latitude || !listing.longitude) return null;
+
+            const isSelected = selectedListingId === listing._id;
+            const markerIcon = createMarkerIcon(listing.title, isSelected);
+
+            return (
+              <Marker
+                key={listing._id}
+                position={{ lat: listing.latitude, lng: listing.longitude }}
+                onClick={() => handleMarkerClick(listing)}
+                icon={markerIcon}
+                title={listing.title}
+                animation={isSelected && typeof google !== 'undefined' && google.maps ? google.maps.Animation.BOUNCE : undefined}
+              >
+                {selectedMarker?._id === listing._id && (
+                  <InfoWindow
+                    onCloseClick={() => setSelectedMarker(null)}
+                    position={{ lat: listing.latitude, lng: listing.longitude }}
+                  >
+                    <div className={styles.infoWindow}>
+                      <h3 className={styles.infoTitle}>{listing.title}</h3>
+                      <p className={styles.infoLocation}>
+                        {listing.city}, {listing.country}
+                      </p>
+                      {listing.avg_rating > 0 && (
+                        <p className={styles.infoRating}>
+                          ⭐ {listing.avg_rating.toFixed(1)} ({listing.review_count})
+                        </p>
+                      )}
+                      <p className={styles.infoPrice}>
+                        {formatPrice(listing.price_base, listing.currency)} / đêm
+                      </p>
+                    </div>
+                  </InfoWindow>
+                )}
+              </Marker>
+            );
+          })}
+        </GoogleMap>
+      </LoadScript>
+    </div>
+  );
 };
 
 export default MapView;
