@@ -309,7 +309,7 @@ export default function CreateListingPage() {
       console.log("Submitting listing data:", listingData);
       
       // Step 1: Upload images to Cloudinary first (sequentially to avoid 413 error)
-      let uploadedImageUrls: string[] = [];
+      const uploadedImageUrls: string[] = [];
       if (imageFiles.length > 0) {
         try {
           messageApi.loading({ content: `Đang upload ảnh (0/${imageFiles.length})...`, key: "upload" });

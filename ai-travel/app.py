@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from dotenv import dotenv_values
 from fastapi.middleware.cors import CORSMiddleware
-from src.features.ai_schedule.schedule_controller import GenSchedule
-from src.constant.ScheduleType import Schedule
 from src.config.connectDatabase import connect_db
 from src.features.consultation_chat.chatbot_router import router as chatbot_router
 
@@ -42,11 +40,6 @@ def root():
         "message": "Welcome to AI Travel & Consultation API",
         "services": {
             "chatbot": "/chatbot/ask_question - Ask questions about Airbnb",
-            "learning": "/generate_schedule - Generate learning schedules",
             "health": "/chatbot/health - Chatbot health check"
         }
     }
-
-@app.post("/generate_schedule")
-async def query_schedule(req: Schedule):
-    return GenSchedule(req)

@@ -375,8 +375,8 @@ export default function TripsPage() {
     router.push(`/bookings/${bookingId}`);
   };
 
-  const handleContactHost = (hostId: string) => {
-    router.push(`/messages?host=${hostId}`);
+  const handleContactHost = (bookingId: string) => {
+    router.push(`/messages?booking=${bookingId}`);
   };
 
   const canReviewBooking = (booking: Booking) => {
@@ -583,7 +583,7 @@ export default function TripsPage() {
                         </Button>
                         <Button
                           icon={<MessageOutlined />}
-                          onClick={() => handleContactHost(booking.host_id._id)}
+                          onClick={() => handleContactHost(booking._id)}
                         >
                           Liên hệ chủ nhà
                         </Button>

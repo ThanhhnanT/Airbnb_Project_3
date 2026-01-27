@@ -35,7 +35,9 @@ def load_json_faq(file_path: str) -> List[Document]:
                         "question": question,
                         "answer": answer,
                         "faq_id": faq_id,
-                        "domain": "airbnb"
+                        "domain": "airbnb",
+                        # Mặc định level=general để chatbot retrieval hoạt động đúng filter
+                        "level": "general",
                     }
                 )
                 documents.append(doc)

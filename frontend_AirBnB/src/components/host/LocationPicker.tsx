@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useCallback, useState, useRef, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import { Card, Alert, Input } from "antd";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+import { Card, Alert, Input, Spin } from "antd";
 import { EnvironmentOutlined, SearchOutlined } from "@ant-design/icons";
 
 // Define libraries as a constant outside component to avoid re-renders
@@ -35,6 +35,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   }>({ city: "", country: "" });
 
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [isScriptLoading, setIsScriptLoading] = useState(true);
   const [mapError, setMapError] = useState<string | null>(null);
   const [searchAddress, setSearchAddress] = useState("");
   const [placesLoaded, setPlacesLoaded] = useState(false);
@@ -42,17 +43,59 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const autocompleteInputRef = useRef<HTMLInputElement>(null);
 
-  // Check if Google Maps is already loaded
+  // Check if Google Maps is already loaded (from GoogleMapsProvider)
   useEffect(() => {
-    if (typeof window !== "undefined" && typeof google !== "undefined" && google.maps) {
-      setIsMapLoaded(true);
-      setTimeout(() => {
+    const checkGoogleMapsReady = () => {
+      if (typeof window !== "undefined" && typeof google !== "undefined" && google.maps) {
+        console.log("Google Maps already loaded, setting states");
+        setIsMapLoaded(true);
+        setIsScriptLoading(false);
+        
+        // Check for places library (loaded by GoogleMapsProvider)
         if (google.maps.places) {
+          console.log("Places library found");
           setPlacesLoaded(true);
+        } else {
+          console.warn("Places library not available yet, will check again");
+          // Check again after a short delay
+          setTimeout(() => {
+            if (google.maps.places) {
+              console.log("Places library found on retry");
+              setPlacesLoaded(true);
+            }
+          }, 500);
         }
-      }, 100);
+        return true;
+      }
+      return false;
+    };
+
+    // Check immediately
+    if (checkGoogleMapsReady()) {
+      return; // Already loaded, no need to check periodically
     }
-  }, []);
+
+    // Check periodically if not ready yet (GoogleMapsProvider might still be loading)
+    const interval = setInterval(() => {
+      if (checkGoogleMapsReady()) {
+        clearInterval(interval);
+      }
+    }, 100);
+    
+    // Stop checking after 10 seconds
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      if (!isMapLoaded) {
+        console.error("Google Maps failed to load after 10 seconds");
+        setMapError("Không thể tải Google Maps. Vui lòng kiểm tra API key.");
+      }
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [isMapLoaded]);
 
   // Update selectedLocation when initialLat/initialLng change
   useEffect(() => {
@@ -233,6 +276,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   const handleMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
     setIsMapLoaded(true);
+    setIsScriptLoading(false);
   }, []);
 
   const handleAddressChange = (field: string, value: string) => {
@@ -319,50 +363,56 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         <div style={{ marginBottom: 16, height: "400px", position: "relative" }}>
           {mapError ? (
             <Alert message={mapError} type="error" />
-          ) : (
-            <LoadScript
-              googleMapsApiKey={apiKey}
-              libraries={GOOGLE_MAPS_LIBRARIES}
-              onLoad={() => {
-                console.log("LoadScript onLoad triggered");
-                setIsMapLoaded(true);
-                // Wait a bit for places library to be fully loaded
-                setTimeout(() => {
-                  console.log("Checking for places library...", {
-                    hasGoogle: typeof google !== "undefined",
-                    hasMaps: typeof google !== "undefined" && !!google.maps,
-                    hasPlaces: typeof google !== "undefined" && !!google.maps?.places,
-                  });
-                  if (typeof google !== "undefined" && google.maps && google.maps.places) {
-                    console.log("Places library is available!");
-                    setPlacesLoaded(true);
-                  } else {
-                    console.warn("Places library not available yet");
-                  }
-                }, 500); // Increase timeout to ensure library is loaded
-              }}
-              onError={(error) => {
-                console.error("Google Maps script error:", error);
-                setMapError("Không thể tải Google Maps. Vui lòng kiểm tra API key.");
-              }}
-            >
-              <GoogleMap
-                mapContainerStyle={{ width: "100%", height: "100%" }}
-                center={defaultCenter}
-                zoom={selectedLocation ? 15 : 10}
-                options={mapOptions}
-                onLoad={handleMapLoad}
-                onClick={handleMapClick}
-              >
-                {selectedLocation && (
-                  <Marker
-                    position={selectedLocation}
-                    title="Vị trí đã chọn"
-                  />
-                )}
-              </GoogleMap>
-            </LoadScript>
-          )}
+          ) : (() => {
+            // Check if Google Maps is available (should be loaded by GoogleMapsProvider)
+            const isGoogleMapsReady = typeof window !== "undefined" && 
+                                     typeof google !== "undefined" && 
+                                     google.maps;
+            
+            console.log("Map render check:", {
+              isScriptLoading,
+              isMapLoaded,
+              isGoogleMapsReady,
+              hasGoogle: typeof google !== "undefined",
+              hasMaps: typeof google !== "undefined" && !!google.maps,
+            });
+
+            // Show map if Google Maps is ready (don't wait for Places library)
+            if (isGoogleMapsReady || isMapLoaded) {
+              return (
+                <GoogleMap
+                  mapContainerStyle={{ width: "100%", height: "100%" }}
+                  center={defaultCenter}
+                  zoom={selectedLocation ? 15 : 10}
+                  options={mapOptions}
+                  onLoad={handleMapLoad}
+                  onClick={handleMapClick}
+                >
+                  {selectedLocation && (
+                    <Marker
+                      position={selectedLocation}
+                      title="Vị trí đã chọn"
+                    />
+                  )}
+                </GoogleMap>
+              );
+            }
+
+            // Show loading indicator
+            return (
+              <div style={{ 
+                display: "flex", 
+                justifyContent: "center", 
+                alignItems: "center", 
+                height: "100%",
+                flexDirection: "column",
+                gap: "16px"
+              }}>
+                <Spin size="large" />
+                <div style={{ color: "#666", fontSize: "14px" }}>Đang tải bản đồ...</div>
+              </div>
+            );
+          })()}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>

@@ -107,7 +107,7 @@ export default function Navbar() {
           router.push('/trips');
           break;
         case '3':
-          messageApi.info('Tin nhắn của bạn');
+          router.push('/messages');
           break;
         case '4':
           router.push('/trips');
