@@ -39,7 +39,7 @@ export class BookingsController {
   @Get('host/my-bookings')
   @ApiOperation({ summary: 'Lấy danh sách bookings của host hiện tại' })
   getHostBookings(@Req() req: any, @Query('status') status?: string) {
-    const userId = req.user?.id || req.user?.user_id;
+    const userId = req.user?._id || req.user?.id || req.user?.user_id;
     return this.bookingsService.findHostBookings(userId, status);
   }
 

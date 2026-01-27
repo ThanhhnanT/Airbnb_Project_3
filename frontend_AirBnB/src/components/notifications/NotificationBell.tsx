@@ -13,7 +13,15 @@ const { Text } = Typography;
 
 interface Notification {
   id: string;
-  type: "payout_pending" | "payout_paid" | "bank_account_required" | "payment_new" | "booking_new" | "checkout_completed" | "message_new";
+  type:
+    | "payout_pending"
+    | "payout_paid"
+    | "bank_account_required"
+    | "payment_new"
+    | "booking_new"
+    | "checkout_completed"
+    | "message_new"
+    | "listing_updated";
   title: string;
   message: string;
   timestamp: Date;
@@ -66,9 +74,9 @@ export default function NotificationBell() {
 
     console.log(`[NotificationBell] Setting up listeners for role: ${userRole}`);
 
-    // Admin notifications: payout_pending, payment_new, booking_new
+    // Admin notifications: payout_pending, payment_new, booking_new, listing_updated
     if (userRole === 'admin') {
-      console.log('[NotificationBell] Registering admin listeners: payout_pending, payment_new, booking_new');
+      console.log('[NotificationBell] Registering admin listeners: payout_pending, payment_new, booking_new, listing_updated');
       
       // Listen for payout_pending notifications (for admin only)
       socket.on("payout_pending", (data: any) => {
@@ -113,6 +121,23 @@ export default function NotificationBell() {
           timestamp: new Date(),
           read: false,
           data: data,
+        };
+        setNotifications((prev) => [newNotification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+      });
+
+      // Listen for listing_updated notifications (listing host chỉnh sửa, cần admin duyệt lại)
+      socket.on("listing_updated", (data: any) => {
+        console.log('[NotificationBell] Received listing_updated notification:', data);
+        const newNotification: Notification = {
+          id: `listing_${data.listing_id}_${Date.now()}`,
+          type: "listing_updated",
+          title: "Listing cần duyệt lại",
+          message: data.message || `Listing "${data.listing_title || ''}" đã được chỉnh sửa và cần được duyệt lại`,
+          timestamp: new Date(),
+          read: false,
+          data: data,
+          link_action: data.link_action || (data.listing_id ? `/admin/listings/${data.listing_id}` : undefined),
         };
         setNotifications((prev) => [newNotification, ...prev]);
         setUnreadCount((prev) => prev + 1);
@@ -198,6 +223,7 @@ export default function NotificationBell() {
       socket.off("payout_pending");
       socket.off("payment_new");
       socket.off("booking_new");
+      socket.off("listing_updated");
       socket.off("bank_account_required");
       socket.off("checkout_completed");
       socket.off("message_new");

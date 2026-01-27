@@ -9,7 +9,9 @@ import { Review, ReviewDocument } from '../reviews/schemas/review.schema';
 import { ListingImage, ListingImageDocument } from '../listing_images/schemas/listing_image.schema';
 import { Calendar, CalendarDocument } from '../calendars/schemas/calendar.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
+import { Notification, NotificationDocument } from '../notifications/schemas/notification.schema';
 import { Model, Types } from 'mongoose';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
 
 @Injectable()
 export class ListingsService {
@@ -20,6 +22,8 @@ export class ListingsService {
     @InjectModel(ListingImage.name) private listingImageModel: Model<ListingImageDocument>,
     @InjectModel(Calendar.name) private calendarModel: Model<CalendarDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Notification.name) private notificationModel: Model<NotificationDocument>,
+    private notificationsGateway: NotificationsGateway,
   ) {}
 
   async create(createListingDto: CreateListingDto): Promise<Listing> {
@@ -237,12 +241,86 @@ export class ListingsService {
 
   async update(id: string, updateListingDto: UpdateListingDto): Promise<Listing> {
     try {
+      // Get current listing to check if status was active
+      const currentListing = await this.listingModel.findById(id).exec();
+      if (!currentListing) {
+        throw new NotFoundException(`Listing with ID ${id} not found`);
+      }
+
+      console.log(`[ListingsService] update - Current status: ${currentListing.status}, Update DTO:`, updateListingDto);
+
+      // If listing was active and is being updated, set to inactive for re-approval
+      const wasActive = currentListing.status === 'active';
+      const hasStatusInDto = 'status' in updateListingDto && updateListingDto.status !== undefined;
+      
+      const updateData: any = {
+        ...updateListingDto,
+      };
+      
+      // Force set to inactive if listing was active and status is not explicitly provided
+      if (wasActive && !hasStatusInDto) {
+        updateData.status = 'inactive';
+        console.log(`[ListingsService] update - Setting status to inactive for listing ${id}`);
+      }
+
+      console.log(`[ListingsService] update - Update data:`, updateData);
+
       const updatedListing = await this.listingModel
-        .findByIdAndUpdate(id, updateListingDto, { new: true })
+        .findByIdAndUpdate(id, updateData, { new: true })
         .exec();
+
       if (!updatedListing) {
         throw new NotFoundException(`Listing with ID ${id} not found`);
       }
+
+      console.log(`[ListingsService] update - Updated listing status: ${updatedListing.status}`);
+
+      // If listing was active and is now inactive, notify admins
+      if (wasActive && updatedListing.status === 'inactive') {
+        console.log(`[ListingsService] update - Notifying admins about listing ${id}`);
+        try {
+          // Get all admin users
+          const adminUsers = await this.userModel
+            .find({ 'role.type': 'admin' })
+            .select('_id name')
+            .exec();
+
+          console.log(`[ListingsService] update - Found ${adminUsers.length} admin users`);
+
+          // Send real-time notification to admin room
+          if (this.notificationsGateway) {
+            this.notificationsGateway.sendToAdmin('listing_updated', {
+              listing_id: id,
+              listing_title: updatedListing.title,
+              message: `Listing "${updatedListing.title}" đã được chỉnh sửa và cần được duyệt lại`,
+              link_action: `/admin/listings/${id}`,
+            });
+            console.log(`[ListingsService] update - Sent WebSocket notification to admin room`);
+          } else {
+            console.error('[ListingsService] update - NotificationsGateway is not injected!');
+          }
+
+          // Create notification records for each admin
+          if (adminUsers.length > 0) {
+            const notificationPromises = adminUsers.map((admin) =>
+              this.notificationModel.create({
+                user_id: admin._id,
+                type: 'listing_updated',
+                message: `Listing "${updatedListing.title}" đã được chỉnh sửa và cần được duyệt lại`,
+                link_action: `/admin/listings/${id}`,
+                is_read: false,
+              }),
+            );
+
+            await Promise.all(notificationPromises);
+            console.log(`[ListingsService] update - Created ${adminUsers.length} notification records`);
+          }
+        } catch (notifError) {
+          console.error('[ListingsService] update - Error sending notification to admin:', notifError);
+          // Don't throw - listing update was successful
+        }
+      }
+
       return updatedListing;
     } catch (error) {
       if (error instanceof NotFoundException) {

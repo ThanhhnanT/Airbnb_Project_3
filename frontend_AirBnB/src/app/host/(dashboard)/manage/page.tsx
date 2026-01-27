@@ -44,6 +44,7 @@ export default function HostManagePage() {
   const [searchText, setSearchText] = useState("");
   const [filters, setFilters] = useState<FilterValues>({});
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+  const [refundTotal, setRefundTotal] = useState(0);
 
   useEffect(() => {
     fetchListings();
@@ -52,9 +53,10 @@ export default function HostManagePage() {
   const fetchListings = async () => {
     try {
       setLoading(true);
-      const [listingsData, bookingStatsData] = await Promise.all([
+      const [listingsData, bookingStatsData, refundsData] = await Promise.all([
         getAccess("listings/host/my-listings"),
         getAccess("bookings/host/stats").catch(() => []),
+        getAccess("refunds/host/my-refunds").catch(() => []),
       ]);
 
       const bookingStatsMap = new Map<string, BookingStats>();
@@ -78,6 +80,13 @@ export default function HostManagePage() {
       });
 
       setListings(enrichedListings);
+
+      // Tính tổng số tiền hoàn đã được host xác nhận (confirmed_by_host)
+      const refundsArray = Array.isArray(refundsData) ? refundsData : [];
+      const confirmedRefundTotal = refundsArray
+        .filter((r: any) => r.status === "confirmed_by_host")
+        .reduce((sum: number, r: any) => sum + (r.amount || 0), 0);
+      setRefundTotal(confirmedRefundTotal);
     } catch (error: any) {
       console.error("Error fetching listings:", error);
       message.error("Không thể tải danh sách chỗ ở");
@@ -358,7 +367,7 @@ export default function HostManagePage() {
         totalListings={listings.length}
         activeListings={activeCount}
         inactiveListings={inactiveCount}
-        totalRevenue={totalRevenue}
+        totalRevenue={Math.max(0, totalRevenue - refundTotal)}
         totalBookings={totalBookings}
         avgRating={avgRating}
       />

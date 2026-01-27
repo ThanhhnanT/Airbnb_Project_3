@@ -410,16 +410,48 @@ export class BookingsService {
 
   async findHostBookings(hostId: string, status?: string): Promise<Booking[]> {
     try {
-      const filter: any = { host_id: hostId };
+      if (!hostId) {
+        throw new BadRequestException('Không tìm thấy thông tin host');
+      }
+
+      // Chuẩn hóa hostId để hỗ trợ cả dạng string và ObjectId
+      const hostIdString = typeof hostId === 'string' ? hostId : String(hostId);
+      const hostObjectId = Types.ObjectId.isValid(hostIdString)
+        ? new Types.ObjectId(hostIdString)
+        : new Types.ObjectId(hostIdString);
+
+      const filter: any = {
+        $or: [
+          { host_id: hostIdString },
+          { host_id: hostObjectId },
+        ],
+      };
+
       if (status) {
         filter.status = status;
       }
-      return await this.bookingModel
+
+      const bookings = await this.bookingModel
         .find(filter)
         .populate('listing_id guest_id')
         .sort({ createdAt: -1 })
         .exec();
+
+      // Ẩn các booking pending đã quá 5 phút
+      const now = Date.now();
+      const fiveMinutesAgo = now - 5 * 60 * 1000;
+
+      const filtered = bookings.filter((booking: any) => {
+        if (booking.status !== 'pending') return true;
+        const createdTime = new Date(booking.createdAt).getTime();
+        return isNaN(createdTime) || createdTime >= fiveMinutesAgo;
+      });
+
+      return filtered;
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(`Error finding host bookings: ${error.message}`);
     }
   }

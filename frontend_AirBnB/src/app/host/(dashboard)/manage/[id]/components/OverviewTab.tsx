@@ -64,10 +64,17 @@ const amenityLabels: Record<string, string> = {
 
 interface OverviewTabProps {
   listing: Listing;
-  onEdit?: () => void;
+  isEditing?: boolean;
+  editDescription?: string;
+  onDescriptionChange?: (value: string) => void;
 }
 
-export default function OverviewTab({ listing, onEdit }: OverviewTabProps) {
+export default function OverviewTab({
+  listing,
+  isEditing = false,
+  editDescription,
+  onDescriptionChange,
+}: OverviewTabProps) {
   if (!listing) {
     return <Empty description="Chưa tải thông tin listing" />;
   }
@@ -78,57 +85,6 @@ export default function OverviewTab({ listing, onEdit }: OverviewTabProps) {
 
   return (
     <>
-      {/* Images Gallery */}
-      {listing.images && listing.images.length > 0 && (
-        <Card style={{ marginBottom: 16 }} title="Hình Ảnh Phòng">
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
-            {listing.images.map((imageSet, idx) =>
-              imageSet.image_url.map((url, imgIdx) => (
-                <div
-                  key={`${idx}-${imgIdx}`}
-                  style={{
-                    position: "relative",
-                    paddingBottom: "100%",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    backgroundColor: "#f0f0f0",
-                  }}
-                >
-                  <img
-                    src={url}
-                    alt={`${listing.title} - ${idx + 1}-${imgIdx + 1}`}
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                  {imageSet.is_cover && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "8px",
-                        right: "8px",
-                        backgroundColor: "#1890ff",
-                        color: "white",
-                        padding: "4px 8px",
-                        borderRadius: "4px",
-                        fontSize: "12px",
-                      }}
-                    >
-                      Cover
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </Card>
-      )}
-
       {/* Basic Info */}
       <Card style={{ marginBottom: 16 }} title="Thông Tin Cơ Bản">
         <Row gutter={[16, 16]}>
@@ -154,7 +110,18 @@ export default function OverviewTab({ listing, onEdit }: OverviewTabProps) {
           <Col xs={24}>
             <div>
               <Text strong>Mô Tả</Text>
-              <Paragraph>{listing.description}</Paragraph>
+              {isEditing ? (
+                <Input.TextArea
+                  value={editDescription}
+                  onChange={(e) => onDescriptionChange?.(e.target.value)}
+                  rows={4}
+                  maxLength={1000}
+                  showCount
+                  placeholder="Nhập mô tả chỗ ở của bạn"
+                />
+              ) : (
+                <Paragraph>{listing.description}</Paragraph>
+              )}
             </div>
           </Col>
         </Row>

@@ -8,7 +8,9 @@ import { Review, ReviewSchema } from '../reviews/schemas/review.schema';
 import { ListingImage, ListingImageSchema } from '../listing_images/schemas/listing_image.schema';
 import { Calendar, CalendarSchema } from '../calendars/schemas/calendar.schema';
 import { User, UserSchema } from '../users/schemas/user.schema';
+import { Notification, NotificationSchema } from '../notifications/schemas/notification.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -37,7 +39,12 @@ import { MongooseModule } from '@nestjs/mongoose';
         name: User.name,
         schema: UserSchema,
       },
+      {
+        name: Notification.name,
+        schema: NotificationSchema,
+      },
     ]),
+    NotificationsModule,
   ],
   controllers: [ListingsController, AdminListingsController],
   providers: [ListingsService, ListingsStatsService],
