@@ -39,7 +39,7 @@ export class BookingsController {
   @Get('host/my-bookings')
   @ApiOperation({ summary: 'Lấy danh sách bookings của host hiện tại' })
   getHostBookings(@Req() req: any, @Query('status') status?: string) {
-    const userId = req.user?.id || req.user?.user_id;
+    const userId = req.user?._id || req.user?.id || req.user?.user_id;
     return this.bookingsService.findHostBookings(userId, status);
   }
 
@@ -48,6 +48,15 @@ export class BookingsController {
   getListingCounts(@Req() req: any) {
     const userId = req.user?.id || req.user?.user_id;
     return this.bookingsService.countBookingsByListingForHost(userId);
+  }
+
+  @Get('host/stats')
+  @ApiOperation({ summary: 'Lấy thống kê doanh thu theo listing cho host' })
+  getListingStats(@Req() req: any) {
+    const userId = req.user?.id || req.user?.user_id;
+    console.log('[BookingsController] getListingStats - req.user:', JSON.stringify(req.user, null, 2));
+    console.log('[BookingsController] getListingStats - userId:', userId);
+    return this.bookingsService.getBookingStatsForHost(userId);
   }
 
   @Get(':id')

@@ -1,0 +1,18 @@
+[
+  {
+    "subskill": "Introduction to NLP and Applications",
+    "youtube_link": "https://www.youtube.com/watch?v=zlUpTlaxAKI"
+  },
+  {
+    "subskill": "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+    "youtube_link": "https://www.youtube.com/watch?v=5d6Q2doeMxk"
+  },
+  {
+    "subskill": "Tokenization (Word, Subword, Sentence)",
+    "youtube_link": "https://www.youtube.com/watch?v=qxFntSlj4TM"
+  },
+  {
+    "subskill": "Stemming and Lemmatization",
+    "youtube_link": "https://www.youtube.com/watch?v=HHAilAC3cXw"
+  }
+]

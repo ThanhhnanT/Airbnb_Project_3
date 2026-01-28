@@ -1,0 +1,215 @@
+[
+  {
+  "_id": {
+    "$oid": "691a9f6183e1d30f0d70167e"
+  },
+  "host_id": {
+    "$oid": "691a9f6183e1d30f0d701677"
+  },
+  "title": "Căn hộ hiện đại tại trung tâm TP.HCM",
+  "description": "Căn hộ đẹp, thoáng mát, gần các điểm du lịch nổi tiếng. Phù hợp cho gia đình và nhóm bạn. Căn hộ được trang bị đầy đủ nội thất mới, có ban công đón gió và ánh sáng tự nhiên. Chỉ vài phút đi bộ tới phố đi bộ Nguyễn Huệ và trung tâm thương mại, thuận tiện cho công tác và du lịch.",
+  "street": "123 Nguyễn Huệ",
+  "city": "Ho Chi Minh City",
+  "country": "Vietnam",
+  "postal_code": "70000",
+  "latitude": 10.7769,
+  "longitude": 106.7009,
+  "price_base": 50,
+  "currency": "USD",
+  "cleaning_fee": 10,
+  "extra_guest_fee": 5,
+  "guests": 4,
+  "bedrooms": 2,
+  "beds": 2,
+  "bathrooms": 1,
+  "amenities": [
+    "WiFi",
+    "Air Conditioning",
+    "Kitchen",
+    "TV",
+    "Washer"
+  ],
+  "house_rules": "Không hút thuốc, không tiệc tùng sau 22h. Giữ gìn vệ sinh khu vực chung, tắt điện nước khi ra ngoài. Vui lòng thông báo trước nếu check-in sau 22h để sắp xếp nhận phòng.",
+  "cancellation_policy": "moderate",
+  "avg_rating": 4.8,
+  "review_count": 25,
+  "status": "active",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-11-17T04:06:57.573Z"
+  },
+  "updatedAt": {
+    "$date": "2025-11-17T04:06:57.573Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "691a9f6183e1d30f0d70167f"
+  },
+  "host_id": {
+    "$oid": "691a9f6183e1d30f0d701677"
+  },
+  "title": "Biệt thự ven biển Vũng Tàu",
+  "description": "Biệt thự sang trọng với view biển tuyệt đẹp. Có hồ bơi riêng và sân vườn rộng. Phòng khách trần cao, cửa kính toàn cảnh hướng biển, bếp lớn có đảo, khu BBQ ngoài trời và bãi đỗ xe riêng. Thích hợp cho gia đình nhiều thế hệ hoặc nhóm bạn tổ chức nghỉ dưỡng cuối tuần.",
+  "street": "456 Đường Trần Phú",
+  "city": "Vung Tau",
+  "country": "Vietnam",
+  "postal_code": "79000",
+  "latitude": 10.346,
+  "longitude": 107.0843,
+  "price_base": 150,
+  "currency": "USD",
+  "cleaning_fee": 25,
+  "extra_guest_fee": 10,
+  "guests": 8,
+  "bedrooms": 4,
+  "beds": 5,
+  "bathrooms": 3,
+  "amenities": [
+    "WiFi",
+    "Air Conditioning",
+    "Kitchen",
+    "TV",
+    "Washer",
+    "Pool",
+    "Parking"
+  ],
+  "house_rules": "Giữ gìn vệ sinh, không nuôi thú cưng. Không tổ chức sự kiện quá 20 người nếu chưa được xác nhận. Sau khi dùng hồ bơi vui lòng tráng người, không ăn uống tại khu vực phòng ngủ.",
+  "cancellation_policy": "strict",
+  "avg_rating": 4.9,
+  "review_count": 42,
+  "status": "active",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-11-17T04:06:57.573Z"
+  },
+  "updatedAt": {
+    "$date": "2025-11-17T04:06:57.573Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "691a9f6183e1d30f0d701680"
+  },
+  "host_id": {
+    "$oid": "691a9f6183e1d30f0d701678"
+  },
+  "title": "Nhà phố cổ điển tại Hà Nội",
+  "description": "Nhà phố cổ điển được cải tạo, giữ nguyên nét đẹp truyền thống. Gần phố cổ và các điểm tham quan. Nội thất gỗ, trang trí đèn vàng ấm, có giếng trời đón gió. Chỉ 5 phút đi bộ tới hồ Hoàn Kiếm và chợ đêm, phù hợp khách thích trải nghiệm văn hóa địa phương.",
+  "street": "789 Phố Hàng Bông",
+  "city": "Hanoi",
+  "country": "Vietnam",
+  "postal_code": "10000",
+  "latitude": 21.0285,
+  "longitude": 105.8542,
+  "price_base": 40,
+  "currency": "USD",
+  "cleaning_fee": 8,
+  "extra_guest_fee": 3,
+  "guests": 3,
+  "bedrooms": 1,
+  "beds": 2,
+  "bathrooms": 1,
+  "amenities": [
+    "WiFi",
+    "Kitchen",
+    "TV"
+  ],
+  "house_rules": "Tôn trọng văn hóa địa phương. Hạn chế tiếng ồn sau 22h, không hút thuốc trong nhà. Vui lòng tháo giày tại cửa và khóa cửa cẩn thận khi ra ngoài.",
+  "cancellation_policy": "flexible",
+  "avg_rating": 4.7,
+  "review_count": 18,
+  "status": "active",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-11-17T04:06:57.573Z"
+  },
+  "updatedAt": {
+    "$date": "2025-11-17T04:06:57.573Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "691a9f6183e1d30f0d701681"
+  },
+  "host_id": {
+    "$oid": "691a9f6183e1d30f0d701678"
+  },
+  "title": "Studio nhỏ gọn tại Đà Lạt",
+  "description": "Studio ấm cúng, view núi rừng. Phù hợp cho cặp đôi hoặc người đi một mình. Có bếp nhỏ, cửa sổ lớn nhìn thung lũng, chăn ấm và máy sưởi. Cách trung tâm Đà Lạt khoảng 10 phút chạy xe, gần quán café và điểm ngắm hoàng hôn.",
+  "street": "321 Đường Trần Hưng Đạo",
+  "city": "Da Lat",
+  "country": "Vietnam",
+  "postal_code": "67000",
+  "latitude": 11.9404,
+  "longitude": 108.4583,
+  "price_base": 30,
+  "currency": "USD",
+  "cleaning_fee": 5,
+  "extra_guest_fee": 0,
+  "guests": 2,
+  "bedrooms": 1,
+  "beds": 1,
+  "bathrooms": 1,
+  "amenities": [
+    "WiFi",
+    "Kitchen",
+    "Heating"
+  ],
+  "house_rules": "Giữ yên tĩnh, không mở nhạc to sau 21h. Không hút thuốc trong phòng, có khu vực hút thuốc ngoài ban công. Vui lòng đóng cửa sổ khi ra ngoài để tránh ẩm và côn trùng.",
+  "cancellation_policy": "flexible",
+  "avg_rating": 4.6,
+  "review_count": 12,
+  "status": "active",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-11-17T04:06:57.574Z"
+  },
+  "updatedAt": {
+    "$date": "2025-11-17T04:06:57.574Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "691a9f6183e1d30f0d701682"
+  },
+  "host_id": {
+    "$oid": "691a9f6183e1d30f0d701679"
+  },
+  "title": "Căn hộ cao cấp tại Quận 1",
+  "description": "Căn hộ view thành phố, nội thất hiện đại. Gần các trung tâm mua sắm và nhà hàng. Phòng khách kính toàn cảnh, bếp mở với đầy đủ thiết bị, bàn làm việc riêng cho khách công tác. Tòa nhà có gym, thang máy và bãi gửi xe, bảo vệ 24/7.",
+  "street": "555 Đường Lê Lợi",
+  "city": "Ho Chi Minh City",
+  "country": "Vietnam",
+  "postal_code": "70000",
+  "latitude": 10.7769,
+  "longitude": 106.7009,
+  "price_base": 80,
+  "currency": "USD",
+  "cleaning_fee": 15,
+  "extra_guest_fee": 8,
+  "guests": 6,
+  "bedrooms": 3,
+  "beds": 3,
+  "bathrooms": 2,
+  "amenities": [
+    "WiFi",
+    "Air Conditioning",
+    "Kitchen",
+    "TV",
+    "Washer",
+    "Gym"
+  ],
+  "house_rules": "Không hút thuốc. Không thú cưng. Giữ trật tự khu vực hành lang, xuất trình thẻ từ khi ra vào. Vui lòng báo trước nếu check-in sớm hoặc check-out muộn để sắp xếp.",
+  "cancellation_policy": "moderate",
+  "avg_rating": 4.5,
+  "review_count": 30,
+  "status": "active",
+  "__v": 0,
+  "createdAt": {
+    "$date": "2025-11-17T04:06:57.574Z"
+  },
+  "updatedAt": {
+    "$date": "2025-11-17T04:06:57.574Z"
+  }
+}]

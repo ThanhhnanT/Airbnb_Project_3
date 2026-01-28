@@ -13,7 +13,15 @@ const { Text } = Typography;
 
 interface Notification {
   id: string;
-  type: "payout_pending" | "payout_paid" | "bank_account_required" | "payment_new" | "booking_new" | "checkout_completed";
+  type:
+    | "payout_pending"
+    | "payout_paid"
+    | "bank_account_required"
+    | "payment_new"
+    | "booking_new"
+    | "checkout_completed"
+    | "message_new"
+    | "listing_updated";
   title: string;
   message: string;
   timestamp: Date;
@@ -66,9 +74,9 @@ export default function NotificationBell() {
 
     console.log(`[NotificationBell] Setting up listeners for role: ${userRole}`);
 
-    // Admin notifications: payout_pending, payment_new, booking_new
+    // Admin notifications: payout_pending, payment_new, booking_new, listing_updated
     if (userRole === 'admin') {
-      console.log('[NotificationBell] Registering admin listeners: payout_pending, payment_new, booking_new');
+      console.log('[NotificationBell] Registering admin listeners: payout_pending, payment_new, booking_new, listing_updated');
       
       // Listen for payout_pending notifications (for admin only)
       socket.on("payout_pending", (data: any) => {
@@ -117,11 +125,28 @@ export default function NotificationBell() {
         setNotifications((prev) => [newNotification, ...prev]);
         setUnreadCount((prev) => prev + 1);
       });
+
+      // Listen for listing_updated notifications (listing host chỉnh sửa, cần admin duyệt lại)
+      socket.on("listing_updated", (data: any) => {
+        console.log('[NotificationBell] Received listing_updated notification:', data);
+        const newNotification: Notification = {
+          id: `listing_${data.listing_id}_${Date.now()}`,
+          type: "listing_updated",
+          title: "Listing cần duyệt lại",
+          message: data.message || `Listing "${data.listing_title || ''}" đã được chỉnh sửa và cần được duyệt lại`,
+          timestamp: new Date(),
+          read: false,
+          data: data,
+          link_action: data.link_action || (data.listing_id ? `/admin/listings/${data.listing_id}` : undefined),
+        };
+        setNotifications((prev) => [newNotification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+      });
     }
 
     // Host notifications: bank_account_required, checkout_completed
     if (userRole === 'host') {
-      console.log('[NotificationBell] Registering host listeners: bank_account_required, checkout_completed');
+      console.log('[NotificationBell] Registering host listeners: bank_account_required, checkout_completed, message_new');
       
       // Listen for bank_account_required notifications (for host only)
       socket.on("bank_account_required", (data: any) => {
@@ -155,11 +180,41 @@ export default function NotificationBell() {
         setNotifications((prev) => [newNotification, ...prev]);
         setUnreadCount((prev) => prev + 1);
       });
+
+      // Listen for message_new notifications (for host)
+      socket.on("message_new", (data: any) => {
+        const newNotification: Notification = {
+          id: `message_${data.conversation_id}_${Date.now()}`,
+          type: "message_new",
+          title: "Tin nhắn mới từ khách",
+          message: data.message_preview || "Bạn có tin nhắn mới",
+          timestamp: new Date(),
+          read: false,
+          data: data,
+          link_action: data.link_action || "/host/(dashboard)/messages",
+        };
+        setNotifications((prev) => [newNotification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+      });
     }
 
-    // Guest: không lắng nghe notification nào (có thể thêm booking confirmation sau)
     if (userRole === 'guest') {
-      console.log('[NotificationBell] Guest role - no notifications to listen for');
+      console.log('[NotificationBell] Registering guest listeners: message_new');
+
+      socket.on("message_new", (data: any) => {
+        const newNotification: Notification = {
+          id: `message_${data.conversation_id}_${Date.now()}`,
+          type: "message_new",
+          title: "Tin nhắn mới từ host",
+          message: data.message_preview || "Bạn có tin nhắn mới",
+          timestamp: new Date(),
+          read: false,
+          data: data,
+          link_action: data.link_action || "/messages",
+        };
+        setNotifications((prev) => [newNotification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+      });
     }
 
     return () => {
@@ -168,8 +223,10 @@ export default function NotificationBell() {
       socket.off("payout_pending");
       socket.off("payment_new");
       socket.off("booking_new");
+      socket.off("listing_updated");
       socket.off("bank_account_required");
       socket.off("checkout_completed");
+      socket.off("message_new");
     };
   }, [socket, connected, userRole]);
 
@@ -197,6 +254,8 @@ export default function NotificationBell() {
       router.push(notification.data.action_url);
     } else if (notification.type === "checkout_completed" && notification.data?.booking_id) {
       router.push(`/reviews/write/${notification.data.booking_id}`);
+    } else if (notification.type === "message_new" && notification.link_action) {
+      router.push(notification.link_action);
     }
   };
 

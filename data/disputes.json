@@ -1,0 +1,21 @@
+[
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d707700" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702709" },
+    "reporter_id": { "$oid": "691aa00183e1d30f0d703709" },
+    "description": "Khách đến trễ nhưng phòng chưa dọn kịp, yêu cầu hoàn một phần phí vệ sinh.",
+    "status": "open",
+    "createdAt": { "$date": "2025-12-01T10:00:00.000Z" },
+    "updatedAt": { "$date": "2025-12-01T10:00:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d707701" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d70270b" },
+    "reporter_id": { "$oid": "691aa00183e1d30f0d70370b" },
+    "description": "Khác với mô tả về chỗ đậu xe, host đã hỗ trợ chuyển bãi nên muốn giảm giá đêm đầu.",
+    "status": "resolved",
+    "createdAt": { "$date": "2025-11-21T09:30:00.000Z" },
+    "updatedAt": { "$date": "2025-11-22T08:00:00.000Z" }
+  }
+]
+

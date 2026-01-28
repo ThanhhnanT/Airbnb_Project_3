@@ -1,0 +1,77 @@
+{
+  "category": "host",
+  "name": "Hướng dẫn cho Chủ nhà",
+  "description": "Hướng dẫn toàn diện cho chủ nhà Airbnb về cách tạo danh sách, quản lý đặt phòng, thanh toán và thu hút khách",
+  "faqs": [
+    {
+      "id": "host_001",
+      "question": "Làm thế nào để tạo danh sách trên Airbnb?",
+      "answer": "Để tạo danh sách: 1. Đi đến 'Trở thành chủ nhà' và chọn 'Tạo danh sách'. 2. Chọn loại bất động sản (nhà, căn hộ, phòng riêng, v.v.). 3. Nhập vị trí của bất động sản. 4. Mô tả loại không gian bạn cung cấp. 5. Thêm ảnh chất lượng cao (tối thiểu 5 ảnh). 6. Đặt giá phòng và chính sách hủy. 7. Thêm tiện nghi và quy tắc nhà. 8. Xem lại và xuất bản danh sách."
+    },
+    {
+      "id": "host_002",
+      "question": "Những ảnh nào tốt cho danh sách?",
+      "answer": "Ảnh chất lượng cao rất quan trọng cho danh sách: 1. Chụp ảnh trong ánh sáng tự nhiên tốt. 2. Bao gồm ảnh toàn cảnh các phòng chính (phòng khách, phòng ngủ, phòng tắm, bếp). 3. Thêm ảnh chi tiết của tiện nghi và tính năng độc đáo. 4. Đặt ảnh đẹp nhất làm ảnh bìa. 5. Tránh ảnh bị mờ, bóng đen hoặc lộn xộn. 6. Sử dụng các thiết bị chuyên nghiệp nếu có thể. Ảnh tốt tăng tỷ lệ đặt phòng lên 30%."
+    },
+    {
+      "id": "host_003",
+      "question": "Làm thế nào để đặt giá phòng hợp lý?",
+      "answer": "Để đặt giá phòng: 1. Nghiên cứu các danh sách tương tự trong khu vực của bạn. 2. Xem xét mùa: mùa cao điểm có thể có giá cao hơn. 3. Sử dụng công cụ định giá của Airbnb để được gợi ý. 4. Bắt đầu với giá cạnh tranh để nhận được các bài đánh giá đầu tiên. 5. Điều chỉnh giá dựa trên nhu cầu và mùa. 6. Cung cấp chiết khấu cho kỳ lưu trú dài. 7. Xem lại và thay đổi giá hàng tháng dựa trên tính sẵn có."
+    },
+    {
+      "id": "host_004",
+      "question": "Chính sách hủy nào tốt nhất?",
+      "answer": "Lựa chọn chính sách hủy dựa trên bất động sản của bạn: Linh hoạt - Hủy miễn phí lên đến 24 giờ trước nhận phòng, được khách hàng ưa thích. Vừa phải - Hủy miễn phí lên đến 5 ngày trước nhận phòng, cân bằng tốt. Nghiêm ngặt - Hủy miễn phí lên đến 30 ngày trước nhận phòng, giảm hủy nhưng ít thu hút khách. Chính sách linh hoạt thường có tỷ lệ đặt phòng cao hơn."
+    },
+    {
+      "id": "host_005",
+      "question": "Làm thế nào để quản lý đặt phòng?",
+      "answer": "Để quản lý đặt phòng: 1. Vào bảng điều khiển 'Danh sách' trong Tài khoản chủ nhà. 2. Xem lịch của bất động sản để theo dõi các ngày được đặt. 3. Chấp nhận hoặc từ chối yêu cầu đặt phòng. 4. Gửi tin nhắn chào mừng cho khách khi họ đặt. 5. Xác nhận nhận phòng và trả phòng. 6. Theo dõi các vấn đề trong kỳ lưu trú. 7. Yêu cầu thanh toán nếu có thiệt hại thêm."
+    },
+    {
+      "id": "host_006",
+      "question": "Làm thế nào để giao tiếp với khách hàng?",
+      "answer": "Giao tiếp tốt là chìa khóa: 1. Trả lời tin nhắn trong vòng 1 giờ nếu có thể. 2. Mô tả chi tiết hướng dẫn nhận phòng. 3. Cung cấp số điện thoại khẩn cấp của bạn. 4. Gửi các hướng dẫn về WiFi, TV, thiết bị, v.v. 5. Kiểm tra khách trong ngày đầu tiên. 6. Yêu cầu phản hồi sau kỳ lưu trú. 7. Giải quyết các vấn đề nhanh chóng. Giao tiếp tốt dẫn đến đánh giá cao."
+    },
+    {
+      "id": "host_007",
+      "question": "Tôi sẽ nhận được thanh toán khi nào?",
+      "answer": "Thanh toán được xử lý như sau: 1. Khách thanh toán trước khi nhận phòng. 2. Airbnb giữ thanh toán trong 24 giờ sau nhận phòng. 3. Nếu không có vấn đề, thanh toán được phát hành cho tài khoản ngân hàng của bạn. 4. Thanh toán thường đến trong 5-10 ngày làm việc. 5. Bạn có thể xem lịch sử thanh toán trong phần Tài khoản. 6. Airbnb trừ một khoản phí dịch vụ trước khi gửi tiền cho bạn."
+    },
+    {
+      "id": "host_008",
+      "question": "Tôi nên chuẩn bị gì cho khách?",
+      "answer": "Để có trải nghiệm tuyệt vời: 1. Đảm bảo mọi thứ sạch sẽ và được bảo trì tốt. 2. Cung cấp giấy vệ sinh, khăn, áo nệm sạch và gối. 3. Cung cấp đồ dùng phòng tắm cơ bản (xà phòng, dầu gội, dầu xả). 4. Có một kit đầu tiên để điều trị. 5. Cung cấp WiFi hoạt động tốt và hướng dẫn kết nối. 6. Để lại những thứ đặc biệt như trà miễn phí, bánh quy. 7. Để một tin nhắn hoan nghênh thân thiện."
+    },
+    {
+      "id": "host_009",
+      "question": "Làm thế nào để nhận được đánh giá tốt từ khách?",
+      "answer": "Để khuyến khích đánh giá tích cực: 1. Vượt quá kỳ vọng với sạch sẽ và tiếp vọc. 2. Giao tiếp trở thành chủ động và tỉa. 3. Giải quyết bất kỳ vấn đề nào ngay lập tức. 4. Để lại ghi chú thân thiện cảm ơn. 5. Hỏi khách về trải nghiệm của họ khi họ rời đi. 6. Cập nhật danh sách dựa trên phản hồi. 7. Gửi tin nhắn theo dõi sau kỳ lưu trú. Chủ nhà có đánh giá cao hơn 4,8 sao nhận được nhiều đặt phòng hơn."
+    },
+    {
+      "id": "host_010",
+      "question": "Quy tắc nhà nào tôi nên đặt?",
+      "answer": "Quy tắc nhà phổ biến bao gồm: 1. Không được đón tiếp các vật nuôi hoặc cho phép chúng. 2. Không được hút thuốc lá (bên trong hoặc ngoài). 3. Không được tạo tiếng ồn lớn sau một giờ cụ thể. 4. Không được tổ chức bữa tiệc hoặc tập hợp lớn. 5. Không được sử dụng đồ dùng nhà bếp hoặc các tài sản chia sẻ khác. 6. Giữ gìn sạch sẽ trong suốt cuộc lưu trú. 7. Trả lại chìa khóa khi rời đi. Hãy rõ ràng và công bằng trong các quy tắc của bạn."
+    },
+    {
+      "id": "host_011",
+      "question": "Tôi có thể yêu cầu tiền bảo hiểm hoặc tiền phí hủy không?",
+      "answer": "Theo chính sách của Airbnb: 1. Bạn không thể yêu cầu tiền bảo hiểm trước kỳ lưu trú. 2. Nếu có thiệt hại, bạn có thể yêu cầu qua Chương trình Bảo vệ Chủ nhà. 3. Khách phải báo cáo thiệt hại trong 24 giờ sau rời đi. 4. Airbnb xem xét các khiếu nại của bạn và có thể hỗ trợ bồi thường. 5. Quản lý hành vi khách bằng cách kiểm tra hồ sơ và yêu cầu. 6. Có thể từ chối khách có hồ sơ đáng lo ngại."
+    },
+    {
+      "id": "host_012",
+      "question": "Làm thế nào để cải thiện xếp hạng danh sách của tôi?",
+      "answer": "Để cải thiện xếp hạng: 1. Cập nhật ảnh danh sách thường xuyên. 2. Cập nhật tiêu đề và mô tả với các từ khóa tốt. 3. Giữ giá cạnh tranh so với các danh sách tương tự. 4. Duy trì tỷ lệ phản hồi cao (trả lời tin nhắn nhanh). 5. Nhắm mục tiêu khách phù hợp (gia đình, cặp vợ chồng, công nhân). 6. Yêu cầu đánh giá sau kỳ lưu trú. 7. Tham gia chương trình Superhost Airbnb. 8. Tạo ngoại hình tốt và quy tắc rõ ràng."
+    },
+    {
+      "id": "host_013",
+      "question": "Làm sao để khách hàng biết đến danh sách của tôi nhiều hơn?",
+      "answer": "Để tăng độ hiển thị và thu hút thêm khách: 1. Tối ưu ảnh bìa và tiêu đề với từ khóa rõ ràng (ví dụ: gần biển, gần trung tâm, có bếp riêng). 2. Hoàn thiện 100% hồ sơ chủ nhà và mô tả danh sách chi tiết, tập trung vào lợi ích cho khách. 3. Duy trì giá cạnh tranh so với các danh sách tương tự trong khu vực. 4. Bật giảm giá cho đặt phòng dài ngày và đặt sớm. 5. Phản hồi nhanh tin nhắn và yêu cầu đặt phòng để tăng chỉ số phản hồi. 6. Khuyến khích khách để lại đánh giá tích cực sau kỳ lưu trú. 7. Chia sẻ link danh sách trên mạng xã hội, hội nhóm du lịch hoặc gửi cho bạn bè giới thiệu."
+    },
+    {
+      "id": "host_014",
+      "question": "Bạn – trợ lý tư vấn Airbnb – có thể giúp tôi những gì với vai trò chủ nhà?",
+      "answer": "Với vai trò trợ lý tư vấn Airbnb cho chủ nhà, tôi có thể: 1. Giải thích các khái niệm và tính năng chính của Airbnb như danh sách, đặt phòng, chính sách hủy, thanh toán. 2. Hướng dẫn từng bước cách tạo, tối ưu và cập nhật danh sách để tăng tỉ lệ đặt phòng. 3. Gợi ý chiến lược giá, khuyến mãi và cách xử lý mùa cao/ thấp điểm. 4. Tư vấn cách giao tiếp với khách – từ tin nhắn chào mừng, xử lý phàn nàn đến nhờ khách đánh giá sau lưu trú. 5. Gợi ý các chuẩn bị trong nhà (tiện nghi tối thiểu, trải nghiệm cộng thêm) để tăng sự hài lòng. 6. Giải thích ý nghĩa các chỉ số như tỉ lệ phản hồi, tỉ lệ chấp nhận, xếp hạng và cách cải thiện chúng. Tôi không thay thế được bộ phận hỗ trợ chính thức của Airbnb, nhưng có thể giúp bạn hiểu nhanh và áp dụng các thực hành tốt nhất."
+    }
+  ]
+}

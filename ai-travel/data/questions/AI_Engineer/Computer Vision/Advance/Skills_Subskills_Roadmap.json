@@ -1,0 +1,43 @@
+[
+  {
+    "Roadmap for Computer Vision Advanced": {
+      "Efficient Training and Scaling": [
+        "Mixed Precision Training",
+        "Distributed Training with PyTorch/TF",
+        "Gradient Accumulation and Checkpointing",
+        "Model Parallelism and Data Parallelism",
+        "Neural Architecture Search",
+        "Model Compression and Pruning"
+      ],
+      "Advanced Architectures": [
+        "Vision Transformer Variants (Swin, DeiT)",
+        "Hybrid CNN-Transformer Models",
+        "Graph Neural Networks in Vision",
+        "3D Vision Transformers",
+        "Diffusion Models in Vision"
+      ],
+      "Advanced Representation Learning": [
+        "Few-shot and Zero-shot Adaptation",
+        "Continual Learning in Vision",
+        "Uncertainty Estimation in Vision Models",
+        "Adversarial Robustness",
+        "Ethics and Bias in Computer Vision"
+      ],
+      "Multimodal and Generative Models": [
+        "CLIP and Vision-Language Pretraining",
+        "Segment Anything Model (SAM)",
+        "Text-to-Image Models (DALL·E, Stable Diffusion)",
+        "Neural Radiance Fields (NeRF)",
+        "3D Generative Models"
+      ],
+      "Advanced Applications": [
+        "Autonomous Vehicles with Multi-Sensor Fusion",
+        "Medical Diagnostics with Explainable AI",
+        "Surveillance with Re-ID Systems",
+        "Robotics with Visual Servoing and SLAM",
+        "Augmented and Virtual Reality at Scale",
+        "Industrial Inspection with Edge AI"
+      ]
+    }
+  }
+]

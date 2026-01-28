@@ -1,0 +1,722 @@
+[
+  {
+    "id": "MTT-001",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "Kỹ thuật data augmentation nào sau đây thường dùng cho ảnh để tăng tính đa dạng dữ liệu?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Lật ngang (horizontal flip)",
+      "B. Thay đổi encoding văn bản",
+      "C. Tách từ (tokenization)",
+      "D. Nén dữ liệu lossless"
+    ],
+    "correct_answer": "A",
+    "explanation": "Lật ngang (horizontal flip) là kỹ thuật augmentation phổ biến cho ảnh; các lựa chọn B/C/D không phải augmentation ảnh chuẩn.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-002",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "Mixup là kỹ thuật augmentation làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Pha trộn hai ảnh và nhãn tương ứng để tạo mẫu mới",
+      "B. Cắt nhỏ ảnh thành nhiều patch rồi ghép lại",
+      "C. Thay thế từ đồng nghĩa trong câu",
+      "D. Chuẩn hóa kích thước batch"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixup kết hợp hai ảnh (hoặc hai vector đầu vào) theo tỉ lệ và pha trộn nhãn, giúp regularize mô hình.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-003",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "CutMix khác với Cutout ở điểm nào chính?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. CutMix chèn phần ảnh từ ảnh khác và kết hợp nhãn; Cutout chỉ che vùng ảnh bằng mask",
+      "B. CutMix là xử lý văn bản; Cutout là xử lý ảnh",
+      "C. CutMix chỉ dùng cho audio; Cutout dùng cho ảnh",
+      "D. CutMix giảm kích thước ảnh; Cutout tăng kích thước ảnh"
+    ],
+    "correct_answer": "A",
+    "explanation": "CutMix thay thế một vùng bằng phần cắt từ ảnh khác và pha trộn nhãn; Cutout chỉ che vùng bằng mask (không thay nhãn).",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-004",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "Trong nhận dạng giọng nói (speech), augmentation nào sau đây hữu ích?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Thêm nhiễu nền (background noise)",
+      "B. Xoay ảnh 90 độ",
+      "C. Thay đổi font chữ",
+      "D. Ghép nhãn sai"
+    ],
+    "correct_answer": "A",
+    "explanation": "Thêm nhiễu nền, thay đổi tốc độ (speed), time-stretching là các augmentation phù hợp cho audio; các lựa chọn khác không liên quan.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-005",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "Tác hại có thể xảy ra khi dùng augmentation không phù hợp là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tạo ra dữ liệu không thực tế và gây bias",
+      "B. Luôn luôn cải thiện accuracy trên test thật",
+      "C. Giảm thời gian huấn luyện",
+      "D. Giảm kích thước mô hình"
+    ],
+    "correct_answer": "A",
+    "explanation": "Augmentation không phù hợp có thể tạo dữ liệu không phản ánh phân phối thực và gây bias; không phải lúc nào augmentation đều cải thiện kết quả.",
+    "level": "hard"
+  },
+  {
+    "id": "MTT-006",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "Albumentations và torchvision.transforms thường được dùng để làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Thực hiện các phép biến đổi và augmentation cho ảnh",
+      "B. Huấn luyện mô hình trên GPU",
+      "C. Chuyển đổi model sang ONNX",
+      "D. Ghi log huấn luyện"
+    ],
+    "correct_answer": "A",
+    "explanation": "Albumentations và torchvision.transforms là thư viện hỗ trợ nhiều phép biến đổi ảnh (crop, flip, noise, color jitter...).",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-007",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "Khi áp dụng augmentation cho dataset cần chú ý điều gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Đảm bảo augmentation không làm thay đổi nhãn thực tế",
+      "B. Áp dụng augmentation chỉ trên tập test",
+      "C. Luôn tăng hoàn toàn kích thước batch",
+      "D. Chỉ dùng augmentation cho mô hình linear"
+    ],
+    "correct_answer": "A",
+    "explanation": "Augmentation phải giữ tính nhất quán với nhãn; không áp dụng cho tập test; các lựa chọn khác sai lệch.",
+    "level": "medium"
+  },
+
+  {
+    "id": "MTT-008",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Learning rate là loại hyperparameter kiểm soát điều gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Kích thước bước cập nhật trọng số mỗi lần optimizer chạy",
+      "B. Số lượng layer trong mô hình",
+      "C. Độ lớn batch",
+      "D. Kiểu hàm mất mát"
+    ],
+    "correct_answer": "A",
+    "explanation": "Learning rate quyết định độ lớn bước gradient khi cập nhật trọng số; các lựa chọn khác không phải bản chất của learning rate.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-009",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Điểm khác biệt chính giữa Grid Search và Random Search là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Grid Search duyệt toàn bộ tổ hợp; Random Search chọn mẫu ngẫu nhiên trong không gian",
+      "B. Grid Search chỉ dùng cho neural network; Random Search chỉ cho SVM",
+      "C. Grid Search luôn hiệu quả hơn Random Search",
+      "D. Grid Search giảm overfitting; Random Search tăng overfitting"
+    ],
+    "correct_answer": "A",
+    "explanation": "Grid Search thử mọi tổ hợp được định nghĩa; Random Search mẫu ngẫu nhiên và thường hiệu quả hơn khi không gian lớn.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-010",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Bayesian Optimization giúp tối ưu hyperparameter bằng cách nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Dự đoán vùng hứa hẹn dựa trên kết quả thử nghiệm trước đó",
+      "B. Thử tất cả tổ hợp có thể",
+      "C. Chỉ dùng gradient descent trên hyperparameter",
+      "D. Chạy mô phỏng Monte Carlo cho mô hình"
+    ],
+    "correct_answer": "A",
+    "explanation": "Bayesian Optimization xây dựng mô hình xác suất (surrogate) để dự đoán vùng tốt và chọn điểm thử tiếp theo một cách thông minh.",
+    "level": "hard"
+  },
+  {
+    "id": "MTT-011",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Early stopping được coi là kỹ thuật gì trong quá trình huấn luyện?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Một dạng regularization và phương pháp tiết kiệm tài nguyên",
+      "B. Một optimizer mới",
+      "C. Một cách tăng kích thước batch",
+      "D. Một kiểu data augmentation"
+    ],
+    "correct_answer": "A",
+    "explanation": "Early stopping dừng huấn luyện khi hiệu năng trên validation không cải thiện, giúp tránh overfitting và tiết kiệm thời gian.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-012",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Khi tuning learning rate, chiến lược 'learning rate scheduler' thường làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Điều chỉnh learning rate theo epoch hoặc bước để cải thiện hội tụ",
+      "B. Thay đổi kiến trúc mô hình tự động",
+      "C. Tăng số lượng tham số mô hình",
+      "D. Thay đổi batch normalization sang layer khác"
+    ],
+    "correct_answer": "A",
+    "explanation": "Scheduler điều chỉnh learning rate (ví dụ giảm dần) để giúp tối ưu hoá và hội tụ ổn định hơn.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-013",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Cross-validation K-fold giúp ích gì khi tuning hyperparameters?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Đánh giá ổn định hơn của hyperparameter trên nhiều phân chia dữ liệu",
+      "B. Tăng kích thước mô hình",
+      "C. Tăng tốc inference",
+      "D. Xóa nhiễu trong hình ảnh"
+    ],
+    "correct_answer": "A",
+    "explanation": "K-fold cross-validation cung cấp ước lượng hiệu năng ổn định hơn cho việc chọn hyperparameter bằng cách dùng nhiều fold.",
+    "level": "medium"
+  },
+
+  {
+    "id": "MTT-014",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Fine-tuning Pretrained Models",
+    "question_text": "Fine-tuning pretrained model là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Huấn luyện lại hoàn toàn từ đầu với random init",
+      "B. Tiếp tục huấn luyện một mô hình đã được pretrain trên dataset khác để thích nghi task mới",
+      "C. Chỉ dùng mô hình làm feature extractor mà không train gì cả",
+      "D. Áp dụng augmentation lên mô hình"
+    ],
+    "correct_answer": "B",
+    "explanation": "Fine-tuning là điều chỉnh trọng số của mô hình đã pretrain để phù hợp với bài toán mới, không phải train từ đầu.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-015",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Fine-tuning Pretrained Models",
+    "question_text": "Khi dữ liệu target nhỏ, chiến lược thường dùng là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Freeze phần lớn layer và chỉ train head classifier",
+      "B. Fine-tune toàn bộ mô hình ngay lập tức",
+      "C. Loại bỏ pretrained và train từ đầu",
+      "D. Chỉ dùng augmentation mà không dùng pretrained"
+    ],
+    "correct_answer": "A",
+    "explanation": "Với dữ liệu nhỏ, thường freeze backbone pretrained và chỉ huấn luyện phần head để tránh overfitting.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-016",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Fine-tuning Pretrained Models",
+    "question_text": "Feature extraction khác fine-tuning ở điểm nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Feature extraction chỉ dùng pretrained để trích đặc trưng và không cập nhật trọng số backbone",
+      "B. Fine-tuning luôn giữ nguyên mọi trọng số",
+      "C. Feature extraction là một optimizer",
+      "D. Không có khác biệt"
+    ],
+    "correct_answer": "A",
+    "explanation": "Feature extraction dùng mô hình pretrained để lấy feature rồi train classifier riêng, trong khi fine-tuning có thể cập nhật trọng số backbone.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-017",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Fine-tuning Pretrained Models",
+    "question_text": "Điều gì cần lưu ý khi chọn learning rate cho fine-tuning?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Thường dùng learning rate nhỏ hơn so với training từ đầu để tránh phá hủy weights đã học",
+      "B. Nên dùng learning rate rất lớn để nhanh hội tụ",
+      "C. Learning rate không quan trọng",
+      "D. Luôn đặt lr = 1"
+    ],
+    "correct_answer": "A",
+    "explanation": "Khi fine-tune, thường chọn lr nhỏ (ví dụ 1e-5 → 1e-4) để tinh chỉnh thay vì phá hủy kiến thức đã học trước đó.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-018",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Fine-tuning Pretrained Models",
+    "question_text": "Kỹ thuật gradual unfreezing (mở khóa dần) là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Mở khóa và fine-tune các layer từ cuối lên đầu theo từng bước",
+      "B. Freeze toàn bộ mô hình mãi mãi",
+      "C. Chỉ dùng batch normalization",
+      "D. Một dạng data augmentation"
+    ],
+    "correct_answer": "A",
+    "explanation": "Gradual unfreezing là chiến lược mở khóa các layer dần dần (thường từ layer cuối) để fine-tune, giúp ổn định huấn luyện.",
+    "level": "hard"
+  },
+
+  {
+    "id": "MTT-019",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Regularization Methods (Dropout, BatchNorm)",
+    "question_text": "Dropout hoạt động như thế nào trong training?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Ngẫu nhiên tắt (drop) một số neuron trong mỗi bước huấn luyện",
+      "B. Thêm regularization L2 vào loss",
+      "C. Chuẩn hóa batch đầu vào",
+      "D. Tăng learning rate"
+    ],
+    "correct_answer": "A",
+    "explanation": "Dropout randomly disables neurons during training để giảm phụ thuộc giữa các neuron và giảm overfitting.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-020",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Regularization Methods (Dropout, BatchNorm)",
+    "question_text": "Batch Normalization (BatchNorm) chủ yếu nhằm mục đích gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Ổn định phân phối input cho mỗi layer và giúp huấn luyện nhanh hơn",
+      "B. Tăng kích thước dataset",
+      "C. Thay thế dropout hoàn toàn",
+      "D. Giảm số lượng tham số"
+    ],
+    "correct_answer": "A",
+    "explanation": "BatchNorm chuẩn hóa activations trên batch, giúp giảm internal covariate shift và thường tăng tốc hội tụ.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-021",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Regularization Methods (Dropout, BatchNorm)",
+    "question_text": "L2 regularization (weight decay) có tác dụng như thế nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Phạt các trọng số lớn bằng cách cộng thêm term tỉ lệ với bình phương trọng số vào loss",
+      "B. Tăng learning rate",
+      "C. Là một loại augmentation",
+      "D. Là một optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "L2 thêm penalty λ * ||w||^2 vào loss để khuyến khích trọng số nhỏ hơn, giảm overfitting.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-022",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Regularization Methods (Dropout, BatchNorm)",
+    "question_text": "Khi dùng dropout trong inference (kiểm tra), ta nên làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Tắt dropout (không drop) và điều chỉnh poids (scale) nếu cần",
+      "B. Bật dropout như lúc training",
+      "C. Tăng tỉ lệ dropout gấp đôi",
+      "D. Chạy dropout trên tập test"
+    ],
+    "correct_answer": "A",
+    "explanation": "Trong inference, dropout thường tắt; nếu dùng inverted dropout thì training đã scale weights, nên inference dùng toàn bộ neurons.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-023",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Regularization Methods (Dropout, BatchNorm)",
+    "question_text": "Layer normalization khác batch normalization ở điểm nào chính?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. LayerNorm chuẩn hóa theo features trong một sample; BatchNorm chuẩn hóa theo batch",
+      "B. LayerNorm chỉ dùng cho ảnh; BatchNorm chỉ cho văn bản",
+      "C. LayerNorm tăng kích thước batch; BatchNorm giảm batch",
+      "D. Không có khác biệt"
+    ],
+    "correct_answer": "A",
+    "explanation": "LayerNorm chuẩn hóa trên các features của từng sample (thích hợp cho RNN/transformer), còn BatchNorm chuẩn hóa theo batch.",
+    "level": "hard"
+  },
+
+  {
+    "id": "MTT-024",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Transfer Learning in Practice",
+    "question_text": "Transfer learning thường hữu ích khi nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Khi ta có dataset nhỏ cho task mới nhưng có model pretrain trên dataset lớn",
+      "B. Khi muốn train từ đầu mà không sử dụng pretrained",
+      "C. Khi không có dữ liệu nào cả",
+      "D. Khi sử dụng linear regression đơn giản"
+    ],
+    "correct_answer": "A",
+    "explanation": "Transfer learning tận dụng kiến thức từ dataset lớn để cải thiện hiệu năng trên task có ít dữ liệu.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-025",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Transfer Learning in Practice",
+    "question_text": "Domain adaptation trong transfer learning nhằm mục đích gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm khoảng cách phân phối giữa source và target domain để model generalize tốt hơn",
+      "B. Tăng số lượng tham số mô hình",
+      "C. Chỉ dùng cho bài toán clustering",
+      "D. Luôn làm mô hình nhỏ hơn"
+    ],
+    "correct_answer": "A",
+    "explanation": "Domain adaptation điều chỉnh mô hình để xử lý khác biệt phân phối giữa source và target domain.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-026",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Transfer Learning in Practice",
+    "question_text": "Feature reuse là thuật ngữ nào trong transfer learning?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Sử dụng lại các đặc trưng (features) đã học ở mô hình pretrain cho task mới",
+      "B. Thay đổi nhãn dữ liệu",
+      "C. Tăng batch size",
+      "D. Chia dataset thành nhiều part"
+    ],
+    "correct_answer": "A",
+    "explanation": "Feature reuse tận dụng biểu diễn chung học được (ví dụ conv features) để giảm nhu cầu data cho task mới.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-027",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Transfer Learning in Practice",
+    "question_text": "Khi nào nên fine-tune toàn bộ model thay vì chỉ train head?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Khi dataset target lớn và khác biệt nhiều so với source",
+      "B. Khi dataset target quá nhỏ",
+      "C. Khi không có GPU",
+      "D. Khi dùng logistic regression"
+    ],
+    "correct_answer": "A",
+    "explanation": "Nếu dữ liệu target lớn và domain khác biệt, fine-tune toàn bộ giúp model thích nghi sâu hơn với đặc trưng mới.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-028",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Transfer Learning in Practice",
+    "question_text": "Một nhược điểm tiềm tàng của transfer learning là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Có thể gây negative transfer nếu source và target quá khác nhau",
+      "B. Luôn cải thiện hiệu năng không cần kiểm tra",
+      "C. Giảm độ phức tạp mô hình miễn phí",
+      "D. Loại bỏ nhu cầu chuẩn hoá dữ liệu"
+    ],
+    "correct_answer": "A",
+    "explanation": "Negative transfer xảy ra khi kiến thức từ source gây hại cho task target do khác biệt lớn giữa domains.",
+    "level": "hard"
+  },
+
+  {
+    "id": "MTT-029",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "Điều gì giúp tận dụng GPU hiệu quả khi huấn luyện mô hình deep learning?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Sử dụng batch size lớn (tùy khả năng bộ nhớ)",
+      "B. Luôn dùng batch size = 1",
+      "C. Không dùng DataLoader",
+      "D. Luôn chuyển dữ liệu sang CPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "Batch size lớn hơn (trong giới hạn bộ nhớ) giúp tăng utilization của GPU; các lựa chọn khác làm giảm hiệu suất.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-030",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "Mixed precision training (FP16) có lợi gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm bộ nhớ và tăng tốc tính toán trên GPU hỗ trợ",
+      "B. Luôn cải thiện accuracy",
+      "C. Thay thế batch normalization",
+      "D. Là một kỹ thuật augmentation"
+    ],
+    "correct_answer": "A",
+    "explanation": "Mixed precision dùng FP16 để giảm memory footprint và tăng throughput; cần quan tâm loss scaling để ổn định.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-031",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "Data pipeline chậm sẽ gây ảnh hưởng gì đến training trên GPU?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. GPU bị idle chờ data, dẫn đến underutilization",
+      "B. GPU chạy nhanh hơn bình thường",
+      "C. Không ảnh hưởng vì GPU tự sinh data",
+      "D. Chỉ ảnh hưởng tới inference"
+    ],
+    "correct_answer": "A",
+    "explanation": "Nếu pipeline (loading, augmentation) chậm, GPU phải chờ dữ liệu, gây lãng phí tài nguyên và chậm tiến độ huấn luyện.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-032",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "Distributed training theo data-parallel làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Chia dữ liệu giữa nhiều GPU và đồng bộ gradients sau mỗi bước",
+      "B. Chia mô hình thành nhiều phần để mỗi GPU xử lý một phần khác nhau của mạng",
+      "C. Chỉ dùng cho CPU",
+      "D. Là một dạng augmentation"
+    ],
+    "correct_answer": "A",
+    "explanation": "Data-parallel replicate model trên nhiều GPU, mỗi GPU xử lý một mini-batch khác nhau, rồi aggregate gradients để cập nhật chung.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-033",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "Gradient accumulation hữu ích khi nào?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Khi bộ nhớ GPU hạn chế nhưng muốn mô phỏng batch lớn bằng nhiều bước accumulation",
+      "B. Khi muốn giảm batch size thật sự",
+      "C. Khi không dùng optimizer",
+      "D. Khi chỉ train trên CPU"
+    ],
+    "correct_answer": "A",
+    "explanation": "Gradient accumulation cộng dồn gradients qua nhiều bước trước khi cập nhật để mô phỏng batch lớn mà không cần memory cho batch lớn.",
+    "level": "medium"
+  },
+
+  {
+    "id": "MTT-034",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "Color jitter (thay đổi độ sáng/độ tương phản) giúp mô hình học được gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giúp mô hình bền với biến đổi màu sắc và điều kiện ánh sáng",
+      "B. Tăng độ phân giải ảnh",
+      "C. Chuyển đổi ảnh sang văn bản",
+      "D. Tự động đánh nhãn dữ liệu"
+    ],
+    "correct_answer": "A",
+    "explanation": "Color jitter làm mô hình robust với khác biệt ánh sáng/màu; không liên quan đến tăng độ phân giải hay chuyển sang text.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-035",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Scheduler 'Cosine Annealing' thường làm gì với learning rate?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Giảm learning rate theo cosine schedule để tăng khả năng thoát local minima",
+      "B. Tăng learning rate theo epoch",
+      "C. Giữ learning rate cố định",
+      "D. Loại bỏ optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Cosine annealing giảm lr theo hàm cosine, đôi khi kèm restarts, giúp hội tụ tốt hơn.",
+    "level": "hard"
+  },
+  {
+    "id": "MTT-036",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Fine-tuning Pretrained Models",
+    "question_text": "Transfer learning từ ImageNet sang task y tế cần lưu ý gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Domain khác biệt lớn có thể cần fine-tune nhiều layer hơn",
+      "B. Luôn dùng nguyên bản pretrain mà không thay đổi gì",
+      "C. ImageNet là dataset y tế nên luôn tương thích",
+      "D. Không cần validate mô hình"
+    ],
+    "correct_answer": "A",
+    "explanation": "ImageNet khác domain y tế (x-quang, MRI), có thể cần fine-tune sâu hơn hoặc dùng domain-specific pretraining.",
+    "level": "hard"
+  },
+  {
+    "id": "MTT-037",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Regularization Methods (Dropout, BatchNorm)",
+    "question_text": "Label smoothing là kỹ thuật regularization làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Thay nhãn one-hot thành phân bố mềm để giảm overconfidence",
+      "B. Là một loại optimizer",
+      "C. Tăng độ lớn của gradient",
+      "D. Thay đổi kiến trúc mạng"
+    ],
+    "correct_answer": "A",
+    "explanation": "Label smoothing thay nhãn cứng bằng phân bố nhẹ để giảm overconfidence và giúp generalize tốt hơn.",
+    "level": "medium"
+  },
+  {
+    "id": "MTT-038",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Transfer Learning in Practice",
+    "question_text": "Trong transfer learning, thuật ngữ 'source domain' nghĩa là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Domain mà mô hình được pretrain ban đầu",
+      "B. Domain của tập test cuối cùng",
+      "C. Domain không liên quan tới bài toán",
+      "D. Một optimizer"
+    ],
+    "correct_answer": "A",
+    "explanation": "Source domain là nơi mô hình được pretrain (ví dụ ImageNet); target domain là nơi áp dụng fine-tune.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-039",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "Checkpointing trong training dùng để làm gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Lưu trạng thái model/optimizer để có thể resume khi bị ngắt",
+      "B. Tăng kích thước batch tự động",
+      "C. Là một dạng normalization",
+      "D. Không cần thiết cho distributed training"
+    ],
+    "correct_answer": "A",
+    "explanation": "Checkpointing lưu weights và optimizer state để phục hồi huấn luyện khi cần; rất hữu ích cho quá trình dài hoặc lỗi hệ thống.",
+    "level": "easy"
+  },
+  {
+    "id": "MTT-040",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Data Augmentation Techniques",
+    "question_text": "AutoAugment và RandAugment là gì?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Các phương pháp tự động tìm policy augmentation tốt cho dataset",
+      "B. Thư viện optimizer",
+      "C. Framework distributed training",
+      "D. Các loại loss function"
+    ],
+    "correct_answer": "A",
+    "explanation": "AutoAugment/RandAugment tự động tìm hoặc sinh các policy augmentation để cải thiện hiệu năng mô hình.",
+    "level": "hard"
+  },
+  {
+    "id": "MTT-041",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Hyperparameter Optimization",
+    "question_text": "Hyperband là phương pháp gì trong tuning?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Một thuật toán kết hợp random search và successive halving để tiết kiệm chi phí",
+      "B. Một loại data augmentation",
+      "C. Một kiến trúc mạng mới",
+      "D. Là một hàm loss"
+    ],
+    "correct_answer": "A",
+    "explanation": "Hyperband tận dụng successive halving để loại nhanh các cấu hình kém và tập tài nguyên nhiều cho cấu hình tốt, tiết kiệm thời gian.",
+    "level": "hard"
+  },
+  {
+    "id": "MTT-042",
+    "target": "AI Engineer",
+    "skill_name": "Model Training and Tuning",
+    "subskill_name": "Efficient Training with GPUs/TPUs",
+    "question_text": "FP16 training cần lưu ý điều gì để duy trì độ ổn định số học?",
+    "answer_type": "multiple_choice",
+    "options": [
+      "A. Dùng loss scaling để tránh underflow gradient",
+      "B. Không cần thay đổi gì cả",
+      "C. Chỉ chạy trên CPU",
+      "D. Giảm batch size về 1"
+    ],
+    "correct_answer": "A",
+    "explanation": "Khi dùng FP16, cần loss scaling để tránh gradient quá nhỏ bị làm tròn thành 0; đây là bước quan trọng để training ổn định.",
+    "level": "medium"
+  }
+]

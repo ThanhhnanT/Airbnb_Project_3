@@ -1,0 +1,22 @@
+[
+  {
+    "subskill": "Contextual Word Embeddings (ELMo, BERT)",
+    "theory": "Contextual Word Embeddings là phương pháp biểu diễn từ phụ thuộc vào ngữ cảnh. Khác với Word2Vec hay GloVe (cho cùng một vector cho từ trong mọi ngữ cảnh), ELMo và BERT sinh vector khác nhau tùy thuộc vào câu. ELMo dùng BiLSTM để tạo embedding hai chiều, còn BERT sử dụng kiến trúc Transformer và cơ chế Attention để hiểu ngữ cảnh từ cả hai phía (trái và phải). Nhờ vậy, các mô hình này cải thiện đáng kể độ chính xác trong nhiều bài toán NLP như Question Answering, Sentiment Analysis."
+  },
+  {
+    "subskill": "Subword Tokenization (BPE, WordPiece)",
+    "theory": "Subword Tokenization chia từ thành các đơn vị nhỏ hơn gọi là subword, giúp mô hình xử lý từ hiếm và từ mới xuất hiện. Byte Pair Encoding (BPE) hoạt động bằng cách thay thế các cặp ký tự/từ con xuất hiện thường xuyên bằng một token mới. WordPiece (dùng trong BERT) và SentencePiece (dùng trong T5, GPT) cũng là các thuật toán phổ biến. Ví dụ, từ 'unhappiness' có thể được chia thành ['un', 'happiness'], còn 'playing' thành ['play', '##ing']. Subword Tokenization cân bằng giữa độ dài từ vựng và khả năng bao phủ ngôn ngữ."
+  },
+  {
+    "subskill": "Transformer Encoder-Decoder Models",
+    "theory": "Transformer Encoder-Decoder là kiến trúc tiêu chuẩn trong nhiều mô hình NLP như Google Translate, T5. Encoder tiếp nhận câu đầu vào và mã hóa thành vector ngữ cảnh. Decoder sử dụng vector này cùng với cơ chế Attention để sinh ra đầu ra (ví dụ dịch sang ngôn ngữ khác). Ưu điểm của Transformer là loại bỏ hoàn toàn RNN/CNN, thay bằng Self-Attention giúp học được quan hệ xa giữa các từ và train song song hiệu quả. Đây là nền tảng cho các mô hình Seq2Seq hiện đại."
+  },
+  {
+    "subskill": "Self-Attention Mechanism",
+    "theory": "Self-Attention là cơ chế cho phép mỗi từ trong câu 'chú ý' đến các từ khác để xây dựng biểu diễn ngữ cảnh. Với mỗi token, mô hình tính toán Query, Key và Value, sau đó tính trọng số Attention bằng công thức softmax(QK^T / √d). Nhờ vậy, mỗi từ không chỉ phụ thuộc vào chính nó mà còn học được mối quan hệ với toàn bộ câu. Self-Attention là nền tảng của Transformer, giúp xử lý quan hệ dài hạn hiệu quả hơn so với RNN/LSTM."
+  },
+  {
+    "subskill": "Pretraining vs Fine-tuning",
+    "theory": "Pretraining và Fine-tuning là hai giai đoạn huấn luyện mô hình NLP hiện đại. Pretraining huấn luyện trên tập dữ liệu lớn, thường dùng nhiệm vụ tự giám sát như Masked Language Modeling (BERT) hoặc Next Word Prediction (GPT). Mục tiêu là học biểu diễn ngôn ngữ tổng quát. Sau đó, Fine-tuning điều chỉnh mô hình pretrained cho một tác vụ cụ thể (như sentiment analysis, QA) với dữ liệu nhỏ hơn. Cách tiếp cận này giúp tiết kiệm tài nguyên, nâng cao hiệu quả và trở thành chuẩn mực trong NLP."
+  }
+]

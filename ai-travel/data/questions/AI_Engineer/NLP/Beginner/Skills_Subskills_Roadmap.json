@@ -1,0 +1,34 @@
+[
+  {
+    "Roadmap for NLP Beginner": {
+      "Fundamentals": [
+        "Introduction to NLP and Applications",
+        "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+        "Tokenization (Word, Subword, Sentence)",
+        "Stemming and Lemmatization",
+        "n-gram Language Models",
+        "TF-IDF and Bag-of-Words"
+      ],
+      "Core Concepts": [
+        "Word Embeddings (Word2Vec, GloVe, FastText)",
+        "Similarity Measures (Cosine, Euclidean)",
+        "Basic Neural Networks for Text",
+        "Recurrent Neural Networks (RNNs)",
+        "Evaluation Metrics for NLP (Precision, Recall, F1, BLEU)"
+      ],
+      "Essential NLP Tasks": [
+        "Text Classification (Spam, Sentiment)",
+        "Named Entity Recognition (NER)",
+        "Part-of-Speech Tagging",
+        "Text Summarization (Extractive)",
+        "Topic Modeling (LDA, NMF)"
+      ],
+      "Tools and Libraries": [
+        "NLTK Basics",
+        "spaCy Basics",
+        "scikit-learn for NLP",
+        "Intro to Hugging Face Transformers"
+      ]
+    }
+  }
+]

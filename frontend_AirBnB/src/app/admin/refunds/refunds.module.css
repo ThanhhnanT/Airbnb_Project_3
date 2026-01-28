@@ -1,0 +1,63 @@
+.container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.statsCard {
+  border-radius: 8px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.infoSection {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 16px;
+}
+
+.infoSection:last-child {
+  border-bottom: none;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.infoLabel {
+  font-weight: 500;
+  min-width: 120px;
+  color: #666;
+}
+
+.infoValue {
+  color: #333;
+  flex: 1;
+  text-align: right;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.actionButtons button {
+  flex: 1;
+}

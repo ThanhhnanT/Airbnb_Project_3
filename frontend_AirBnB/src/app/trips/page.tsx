@@ -15,6 +15,7 @@ import {
   Modal,
   Rate,
   Input,
+  Select,
 } from "antd";
 import {
   CalendarOutlined,
@@ -26,6 +27,8 @@ import {
   CheckCircleOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
+  UndoOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import { getAccess } from "@/helper/api";
 import { useRouter } from "next/navigation";
@@ -82,6 +85,12 @@ interface ListingImage {
   is_cover: boolean;
 }
 
+interface Refund {
+  _id: string;
+  booking_id: string | { _id?: string };
+  status: string;
+}
+
 export default function TripsPage() {
   const router = useRouter();
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -89,6 +98,8 @@ export default function TripsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upcoming");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [sortMode, setSortMode] = useState<"bookingTime" | "tripDate">("bookingTime");
+  const [refunds, setRefunds] = useState<Refund[]>([]);
 
   const [reviewMap, setReviewMap] = useState<Record<string, Review | null>>({});
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
@@ -100,24 +111,33 @@ export default function TripsPage() {
 
   useEffect(() => {
     fetchBookings();
-  }, [activeTab]);
+  }, []);
+
+  useEffect(() => {
+    const fetchRefunds = async () => {
+      try {
+        const data = await getAccess("refunds/my-refunds");
+        if (data && Array.isArray(data)) {
+          setRefunds(data);
+        } else {
+          setRefunds([]);
+        }
+      } catch (error) {
+        console.error("[TripsPage] fetchRefunds - Error:", error);
+        setRefunds([]);
+      }
+    };
+
+    fetchRefunds();
+  }, []);
 
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      let status: string | undefined;
-      if (activeTab === "upcoming") {
-        status = undefined; // Get all upcoming (pending + confirmed)
-      } else if (activeTab === "completed") {
-        status = "completed";
-      } else if (activeTab === "cancelled") {
-        status = "cancelled";
-      }
-
-      console.log("[TripsPage] fetchBookings - activeTab:", activeTab, "status:", status);
-      console.log("[TripsPage] fetchBookings - calling API: bookings/my-bookings");
+      console.log("[TripsPage] fetchBookings - calling API: bookings/my-bookings (all statuses)");
       
-      const data = await getAccess("bookings/my-bookings", status ? { status } : {});
+      // Luôn lấy tất cả bookings, lọc theo tab ở frontend
+      const data = await getAccess("bookings/my-bookings");
       
       console.log("[TripsPage] fetchBookings - API response:", data);
       console.log("[TripsPage] fetchBookings - response type:", typeof data, "isArray:", Array.isArray(data));
@@ -231,13 +251,66 @@ export default function TripsPage() {
   };
 
   const filteredBookings = useMemo(() => {
+    const hasPendingRefund = (bookingId: string) => {
+      return refunds.some((r) => {
+        const refundBookingId =
+          typeof r.booking_id === "string"
+            ? r.booking_id
+            : r.booking_id?._id || "";
+        return (
+          refundBookingId === bookingId &&
+          (r.status === "pending" || r.status === "pending_host_confirmation")
+        );
+      });
+    };
+
+    const isRecentPending = (b: Booking) =>
+      b.status === "pending" &&
+      dayjs().diff(dayjs(b.createdAt), "minute") <= 5;
+
+    const isFutureOrOngoing = (b: Booking) => {
+      const now = dayjs();
+      const checkOut = dayjs(b.check_out);
+      // Ẩn các chuyến đã checkout xong; giữ lại nếu checkout hôm nay hoặc trong tương lai
+      return checkOut.isSame(now, "day") || checkOut.isAfter(now, "day");
+    };
+
+    let result: Booking[];
+
     if (activeTab === "upcoming") {
-      return bookings.filter(
-        (b) => b.status === "pending" || b.status === "confirmed"
+      result = bookings.filter(
+        (b) =>
+          !hasPendingRefund(b._id) &&
+          isFutureOrOngoing(b) &&
+          (b.status === "confirmed" || isRecentPending(b))
       );
+    } else if (activeTab === "pending") {
+      result = bookings.filter(
+        (b) => isRecentPending(b) || hasPendingRefund(b._id)
+      );
+    } else if (activeTab === "completed") {
+      result = bookings.filter((b) => b.status === "completed");
+    } else if (activeTab === "cancelled") {
+      result = bookings.filter((b) => b.status === "cancelled");
+    } else {
+      result = bookings;
     }
-    return bookings;
-  }, [bookings, activeTab]);
+
+    // Sort theo lựa chọn
+    const sorted = [...result].sort((a, b) => {
+      if (sortMode === "bookingTime") {
+        // Đặt phòng muộn hơn sẽ lên đầu
+        return dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf();
+      } else {
+        // Sắp xếp theo ngày check-in (gần nhất trước)
+        return (
+          dayjs(a.check_in).valueOf() - dayjs(b.check_in).valueOf()
+        );
+      }
+    });
+
+    return sorted;
+  }, [bookings, activeTab, sortMode]);
 
   const getStatusBadge = (status: string, paymentStatus?: string) => {
     if (paymentStatus === "paid") {
@@ -366,8 +439,8 @@ export default function TripsPage() {
     router.push(`/bookings/${bookingId}`);
   };
 
-  const handleContactHost = (hostId: string) => {
-    router.push(`/messages?host=${hostId}`);
+  const handleContactHost = (bookingId: string) => {
+    router.push(`/messages?booking=${bookingId}`);
   };
 
   const canReviewBooking = (booking: Booking) => {
@@ -375,6 +448,13 @@ export default function TripsPage() {
     const statusOk = booking.status === "confirmed" || booking.status === "completed";
     const afterCheckout = dayjs().isAfter(dayjs(booking.check_out));
     return paid && statusOk && afterCheckout;
+  };
+
+  const canRequestRefund = (booking: Booking) => {
+    const paid = booking.payment_id?.status === "paid";
+    const statusOk = booking.status === "confirmed";
+    const beforeCheckIn = dayjs().isBefore(dayjs(booking.check_in));
+    return paid && statusOk && beforeCheckIn;
   };
 
   const openReviewModal = (booking: Booking) => {
@@ -463,25 +543,61 @@ export default function TripsPage() {
 
       <div className={styles.content}>
         <div className={styles.bookingsSection}>
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            className={styles.tabs}
-            items={[
-              {
-                key: "upcoming",
-                label: "Sắp tới",
-              },
-              {
-                key: "completed",
-                label: "Đã hoàn thành",
-              },
-              {
-                key: "cancelled",
-                label: "Đã hủy",
-              },
-            ]}
-          />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 16,
+            }}
+          >
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              className={styles.tabs}
+              items={[
+                {
+                  key: "upcoming",
+                  label: "Sắp tới",
+                },
+                {
+                  key: "pending",
+                  label: "Đang chờ xử lý",
+                },
+                {
+                  key: "completed",
+                  label: "Đã hoàn thành",
+                },
+                {
+                  key: "cancelled",
+                  label: "Đã hủy",
+                },
+              ]}
+            />
+            <div style={{ minWidth: 220, textAlign: "right" }}>
+              <Text type="secondary" style={{ marginRight: 8 }}>
+                Sắp xếp theo:
+              </Text>
+              <Select
+                size="small"
+                value={sortMode}
+                onChange={(value) =>
+                  setSortMode(value as "bookingTime" | "tripDate")
+                }
+                style={{ width: 160 }}
+                options={[
+                  {
+                    value: "bookingTime",
+                    label: "Thời gian đặt (mới nhất)",
+                  },
+                  {
+                    value: "tripDate",
+                    label: "Ngày check-in",
+                  },
+                ]}
+              />
+            </div>
+          </div>
 
           <div className={styles.bookingsList}>
             {filteredBookings.length === 0 ? (
@@ -563,10 +679,33 @@ export default function TripsPage() {
                         </Button>
                         <Button
                           icon={<MessageOutlined />}
-                          onClick={() => handleContactHost(booking.host_id._id)}
+                          onClick={() => handleContactHost(booking._id)}
                         >
                           Liên hệ chủ nhà
                         </Button>
+                        {booking.status === "pending" &&
+                          dayjs().diff(dayjs(booking.createdAt), "minute") <=
+                            5 && (
+                            <Button
+                              icon={<DollarOutlined />}
+                              onClick={() =>
+                                router.push(
+                                  `/payment?bookingId=${booking._id}`
+                                )
+                              }
+                            >
+                              Thanh toán
+                            </Button>
+                          )}
+                        {canRequestRefund(booking) && (
+                          <Button
+                            icon={<UndoOutlined />}
+                            danger
+                            onClick={() => router.push(`/trips/refund-request?bookingId=${booking._id}`)}
+                          >
+                            Yêu cầu hoàn tiền
+                          </Button>
+                        )}
                         {canReviewBooking(booking) && (
                           <>
                             <Button

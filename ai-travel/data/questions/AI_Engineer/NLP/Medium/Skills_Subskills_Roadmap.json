@@ -1,0 +1,40 @@
+[
+  {
+    "Roadmap for NLP Medium": {
+      "Representation Learning": [
+        "Contextual Word Embeddings (ELMo, BERT)",
+        "Subword Tokenization (BPE, WordPiece)",
+        "Transformer Encoder-Decoder Models",
+        "Self-Attention Mechanism",
+        "Pretraining vs Fine-tuning"
+      ],
+      "Intermediate Tasks": [
+        "Question Answering Systems",
+        "Dialogue Systems (Rule-based vs Neural)",
+        "Abstractive Text Summarization",
+        "Machine Translation with Seq2Seq + Attention",
+        "Information Retrieval and Ranking Models"
+      ],
+      "Model Training and Optimization": [
+        "Transfer Learning in NLP",
+        "Fine-tuning Pretrained Transformers",
+        "Regularization and Dropout",
+        "Handling Class Imbalance in Text Data",
+        "Optimization Strategies (Adam, AdamW, Scheduler)"
+      ],
+      "Libraries and Frameworks": [
+        "spaCy Advanced Features",
+        "TensorFlow/Keras for NLP",
+        "PyTorch for NLP",
+        "Hugging Face Transformers (Trainer API)"
+      ],
+      "Applications": [
+        "Intent Classification in Chatbots",
+        "Entity Linking and Knowledge Extraction",
+        "Document Classification",
+        "Semantic Similarity and Paraphrase Detection",
+        "Search and Recommendation with NLP"
+      ]
+    }
+  }
+]

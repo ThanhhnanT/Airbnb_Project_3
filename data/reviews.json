@@ -1,0 +1,257 @@
+[
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701700" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167e" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702700" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703700" },
+    "rating": 5,
+    "comment": "Căn hộ sạch và đúng mô tả, ban công nhìn xuống phố rất đẹp, check-in tự động nhanh.",
+    "createdAt": { "$date": "2025-11-20T08:10:00.000Z" },
+    "updatedAt": { "$date": "2025-11-20T08:10:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701701" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167e" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702701" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703701" },
+    "rating": 4,
+    "comment": "Vị trí trung tâm, đi bộ được nhiều nơi. Phòng hơi nhỏ nhưng đầy đủ tiện nghi.",
+    "createdAt": { "$date": "2025-11-22T11:30:00.000Z" },
+    "updatedAt": { "$date": "2025-11-22T11:30:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701702" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167e" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702702" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703702" },
+    "rating": 5,
+    "comment": "Chủ nhà hỗ trợ nhiệt tình, internet nhanh, bàn làm việc ổn cho remote.",
+    "createdAt": { "$date": "2025-11-23T07:45:00.000Z" },
+    "updatedAt": { "$date": "2025-11-23T07:45:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701703" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167e" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702703" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703703" },
+    "rating": 4,
+    "comment": "Ban công có chút ồn giờ cao điểm nhưng đêm rất yên tĩnh, giường êm.",
+    "createdAt": { "$date": "2025-11-24T14:20:00.000Z" },
+    "updatedAt": { "$date": "2025-11-24T14:20:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701704" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167e" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702704" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703704" },
+    "rating": 5,
+    "comment": "Check-in tự động, có hướng dẫn chi tiết. Bếp đủ đồ, thích hợp ở dài ngày.",
+    "createdAt": { "$date": "2025-11-25T09:05:00.000Z" },
+    "updatedAt": { "$date": "2025-11-25T09:05:00.000Z" }
+  },
+
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701705" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167f" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702705" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703705" },
+    "rating": 5,
+    "comment": "View biển tuyệt đẹp, hồ bơi sạch, khu BBQ đủ đồ. Gia đình 10 người vẫn rộng rãi.",
+    "createdAt": { "$date": "2025-11-20T10:00:00.000Z" },
+    "updatedAt": { "$date": "2025-11-20T10:00:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701706" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167f" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702706" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703706" },
+    "rating": 4,
+    "comment": "Nhà đẹp, nhiều phòng ngủ. Đường vào hơi đông cuối tuần nhưng bãi đỗ xe đủ.",
+    "createdAt": { "$date": "2025-11-21T12:15:00.000Z" },
+    "updatedAt": { "$date": "2025-11-21T12:15:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701707" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167f" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702707" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703707" },
+    "rating": 5,
+    "comment": "Nhân viên hỗ trợ nhiệt tình, dọn dẹp mỗi ngày. Phòng khách nhìn thẳng ra biển.",
+    "createdAt": { "$date": "2025-11-22T08:40:00.000Z" },
+    "updatedAt": { "$date": "2025-11-22T08:40:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701708" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167f" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702708" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703708" },
+    "rating": 5,
+    "comment": "BBQ ngoài trời rất vui, bếp lớn dễ nấu cho nhóm đông. Hồ bơi nước ấm buổi tối.",
+    "createdAt": { "$date": "2025-11-23T18:00:00.000Z" },
+    "updatedAt": { "$date": "2025-11-23T18:00:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701709" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d70167f" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702709" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703709" },
+    "rating": 4,
+    "comment": "Nhà có nhiều cây xanh, sân vườn rộng. Check-in hơi trễ do khách trước trả phòng muộn.",
+    "createdAt": { "$date": "2025-11-24T15:25:00.000Z" },
+    "updatedAt": { "$date": "2025-11-24T15:25:00.000Z" }
+  },
+
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d70170a" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701680" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d70270a" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d70370a" },
+    "rating": 5,
+    "comment": "Nhà phố cổ, trang trí đẹp, đi bộ 5 phút ra hồ Hoàn Kiếm. Chủ nhà gợi ý quán ăn rất chuẩn.",
+    "createdAt": { "$date": "2025-11-19T09:15:00.000Z" },
+    "updatedAt": { "$date": "2025-11-19T09:15:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d70170b" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701680" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d70270b" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d70370b" },
+    "rating": 4,
+    "comment": "Phòng sạch, có giếng trời thoáng. Buổi tối khu vực hơi đông khách du lịch nhưng trong nhà yên tĩnh.",
+    "createdAt": { "$date": "2025-11-21T10:50:00.000Z" },
+    "updatedAt": { "$date": "2025-11-21T10:50:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d70170c" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701680" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d70270c" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d70370c" },
+    "rating": 5,
+    "comment": "Giường êm, điều hòa mát, wifi ổn định. Gần nhiều quán cà phê đẹp.",
+    "createdAt": { "$date": "2025-11-22T07:30:00.000Z" },
+    "updatedAt": { "$date": "2025-11-22T07:30:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d70170d" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701680" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d70270d" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d70370d" },
+    "rating": 4,
+    "comment": "Cầu thang hơi hẹp nhưng nhà được dọn sạch, đủ tiện nghi cho 2-3 người.",
+    "createdAt": { "$date": "2025-11-23T13:40:00.000Z" },
+    "updatedAt": { "$date": "2025-11-23T13:40:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d70170e" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701680" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d70270e" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d70370e" },
+    "rating": 5,
+    "comment": "Không gian ấm cúng, ánh sáng đẹp để chụp ảnh. Chủ nhà phản hồi nhanh.",
+    "createdAt": { "$date": "2025-11-24T08:55:00.000Z" },
+    "updatedAt": { "$date": "2025-11-24T08:55:00.000Z" }
+  },
+
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d70170f" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701681" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d70270f" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d70370f" },
+    "rating": 5,
+    "comment": "Studio nhỏ nhưng đủ tiện nghi, view đồi thông rất chill. Chủ nhà chuẩn bị sẵn trà và bánh.",
+    "createdAt": { "$date": "2025-11-20T06:40:00.000Z" },
+    "updatedAt": { "$date": "2025-11-20T06:40:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701710" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701681" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702710" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703710" },
+    "rating": 4,
+    "comment": "Không gian yên tĩnh, có bàn làm việc nhỏ. Buổi tối hơi lạnh, nên mang thêm áo ấm.",
+    "createdAt": { "$date": "2025-11-21T09:10:00.000Z" },
+    "updatedAt": { "$date": "2025-11-21T09:10:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701711" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701681" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702711" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703711" },
+    "rating": 5,
+    "comment": "Giường ấm, chăn dày. Bếp nhỏ đủ nấu ăn nhẹ, gần nhiều quán café đẹp.",
+    "createdAt": { "$date": "2025-11-22T15:25:00.000Z" },
+    "updatedAt": { "$date": "2025-11-22T15:25:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701712" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701681" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702712" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703712" },
+    "rating": 4,
+    "comment": "Có máy sưởi hoạt động tốt, nước nóng ổn định. Đường vào hơi dốc nhưng dễ tìm.",
+    "createdAt": { "$date": "2025-11-23T17:45:00.000Z" },
+    "updatedAt": { "$date": "2025-11-23T17:45:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701713" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701681" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702713" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703713" },
+    "rating": 5,
+    "comment": "View rừng thông buổi sáng rất đẹp, chủ nhà hướng dẫn check-in chi tiết.",
+    "createdAt": { "$date": "2025-11-24T07:35:00.000Z" },
+    "updatedAt": { "$date": "2025-11-24T07:35:00.000Z" }
+  },
+
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701714" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701682" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702714" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703714" },
+    "rating": 5,
+    "comment": "Căn hộ cao cấp, view thành phố ban đêm rất đẹp. Thang máy và bảo vệ 24/7 tạo cảm giác an toàn.",
+    "createdAt": { "$date": "2025-11-20T08:55:00.000Z" },
+    "updatedAt": { "$date": "2025-11-20T08:55:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701715" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701682" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702715" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703715" },
+    "rating": 4,
+    "comment": "Phòng khách kính toàn cảnh, bàn làm việc rộng. Buổi trưa có thể hơi nắng, rèm chống nắng tốt.",
+    "createdAt": { "$date": "2025-11-21T14:15:00.000Z" },
+    "updatedAt": { "$date": "2025-11-21T14:15:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701716" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701682" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702716" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703716" },
+    "rating": 5,
+    "comment": "Gym trong tòa nhà sạch, máy mới. Bếp có đủ đồ để nấu ăn, siêu thị ngay dưới tầng trệt.",
+    "createdAt": { "$date": "2025-11-22T16:35:00.000Z" },
+    "updatedAt": { "$date": "2025-11-22T16:35:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701717" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701682" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702717" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703717" },
+    "rating": 4,
+    "comment": "Check-in nhanh, có hầm gửi xe. Nệm hơi cứng với mình nhưng bạn mình thấy ổn.",
+    "createdAt": { "$date": "2025-11-23T09:20:00.000Z" },
+    "updatedAt": { "$date": "2025-11-23T09:20:00.000Z" }
+  },
+  {
+    "_id": { "$oid": "691aa00183e1d30f0d701718" },
+    "listing_id": { "$oid": "691a9f6183e1d30f0d701682" },
+    "booking_id": { "$oid": "691aa00183e1d30f0d702718" },
+    "reviewer_id": { "$oid": "691aa00183e1d30f0d703718" },
+    "rating": 5,
+    "comment": "Cảnh đêm nhìn xuống trung tâm rất thích. Chủ nhà cho phép check-out muộn thêm 1 giờ.",
+    "createdAt": { "$date": "2025-11-24T18:10:00.000Z" },
+    "updatedAt": { "$date": "2025-11-24T18:10:00.000Z" }
+  }
+]
+

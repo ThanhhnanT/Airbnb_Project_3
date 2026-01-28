@@ -16,7 +16,10 @@ const GoogleMapsProvider: React.FC<GoogleMapsProviderProps> = ({ children }) => 
   }
 
   return (
-    <LoadScript googleMapsApiKey={apiKey}>
+    <LoadScript 
+      googleMapsApiKey={apiKey}
+      libraries={["places"]}
+    >
       {children}
     </LoadScript>
   );

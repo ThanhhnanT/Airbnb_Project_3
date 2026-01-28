@@ -1,0 +1,26 @@
+[
+  {
+    "subskill": "Data Augmentation Techniques",
+    "theory": "Data Augmentation là một kỹ thuật quan trọng trong huấn luyện mô hình, đặc biệt khi dữ liệu gốc còn hạn chế. Nó giúp tăng độ đa dạng và khối lượng dữ liệu bằng cách biến đổi các mẫu hiện có thành dữ liệu mới nhưng vẫn giữ nguyên nhãn. Trong Computer Vision, các phương pháp phổ biến gồm xoay ảnh, lật, cắt, thay đổi độ sáng, và thêm nhiễu. Với NLP, augmentation có thể là hoán đổi từ, dịch ngược (back translation) hoặc thay thế từ bằng từ đồng nghĩa. Kỹ thuật này giúp mô hình chống overfitting, cải thiện khả năng khái quát hóa và đạt hiệu suất cao hơn trên dữ liệu thực tế."
+  },
+  {
+    "subskill": "Hyperparameter Optimization",
+    "theory": "Hyperparameters là những tham số điều chỉnh quá trình huấn luyện, ví dụ như learning rate, batch size, số lớp ẩn, hoặc hệ số regularization. Tối ưu hyperparameter là quá trình tìm ra bộ giá trị phù hợp để mô hình đạt hiệu suất tốt nhất. Các phương pháp cơ bản gồm Grid Search (tìm toàn bộ kết hợp có thể), Random Search (chọn ngẫu nhiên), và các phương pháp tiên tiến hơn như Bayesian Optimization, Hyperband, hoặc sử dụng các thư viện như Optuna, Ray Tune. Việc chọn đúng hyperparameter giúp tăng tốc độ hội tụ và cải thiện độ chính xác của mô hình."
+  },
+  {
+    "subskill": "Fine-tuning Pretrained Models",
+    "theory": "Fine-tuning là quá trình điều chỉnh một mô hình đã được huấn luyện trước (pretrained model) trên một tập dữ liệu lớn, sau đó tinh chỉnh lại trên tập dữ liệu mục tiêu nhỏ hơn và đặc thù hơn. Cách tiếp cận này đặc biệt hữu ích trong Computer Vision (ResNet, EfficientNet, ViT) và NLP (BERT, GPT, LLaMA). Thay vì huấn luyện từ đầu, fine-tuning giúp tiết kiệm tài nguyên, tận dụng kiến thức đã học và đạt hiệu quả cao ngay cả với dữ liệu hạn chế. Có nhiều chiến lược fine-tuning: huấn luyện toàn bộ mô hình, chỉ huấn luyện các lớp cuối cùng, hoặc sử dụng kỹ thuật LoRA (Low-Rank Adaptation) để tinh chỉnh hiệu quả hơn."
+  },
+  {
+    "subskill": "Regularization Methods (Dropout, BatchNorm)",
+    "theory": "Regularization là các kỹ thuật nhằm giảm overfitting, giúp mô hình học được các đặc trưng tổng quát thay vì chỉ ghi nhớ dữ liệu huấn luyện. Dropout hoạt động bằng cách ngẫu nhiên 'tắt' một số neuron trong quá trình huấn luyện, buộc mô hình phải học các đặc trưng mạnh mẽ hơn. Batch Normalization chuẩn hóa dữ liệu đầu vào ở mỗi lớp, giúp giảm hiện tượng internal covariate shift, tăng tốc độ hội tụ và cải thiện ổn định trong huấn luyện. Ngoài ra còn có L1/L2 Regularization (thêm penalty vào hàm loss), Early Stopping (dừng khi loss trên validation không cải thiện) để ngăn mô hình bị quá khớp."
+  },
+  {
+    "subskill": "Transfer Learning in Practice",
+    "theory": "Transfer Learning là quá trình tận dụng kiến thức từ một bài toán hoặc miền dữ liệu khác để giải quyết bài toán mới. Trong thực tế, thay vì huấn luyện mô hình từ đầu, ta có thể sử dụng một mô hình pretrained (như ResNet, BERT, GPT) rồi điều chỉnh cho phù hợp với dữ liệu mục tiêu. Ứng dụng phổ biến trong NLP (dịch máy, phân loại văn bản, chatbot) và Computer Vision (nhận diện ảnh, phân loại y khoa). Transfer Learning đặc biệt hữu ích khi dữ liệu mục tiêu nhỏ nhưng vẫn yêu cầu độ chính xác cao, giúp tiết kiệm thời gian, chi phí và tài nguyên tính toán."
+  },
+  {
+    "subskill": "Efficient Training with GPUs/TPUs",
+    "theory": "GPU và TPU là phần cứng chuyên dụng giúp tăng tốc huấn luyện mô hình học sâu nhờ khả năng tính toán song song khối lượng lớn phép nhân ma trận. Huấn luyện hiệu quả với GPU/TPU đòi hỏi tối ưu việc quản lý batch size, mixed precision training (huấn luyện với số thực 16-bit thay vì 32-bit để tiết kiệm bộ nhớ và tăng tốc), và phân phối dữ liệu hợp lý khi huấn luyện đa GPU. Trên TPU, người ta thường sử dụng TensorFlow/XLA để tối ưu. Việc khai thác tốt phần cứng giúp rút ngắn thời gian huấn luyện từ vài ngày xuống chỉ còn vài giờ, đồng thời cho phép huấn luyện mô hình lớn với chi phí hợp lý hơn."
+  }
+]

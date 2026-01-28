@@ -4,11 +4,56 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from dotenv import dotenv_values
 from langchain.docstore.document import Document
 import os
+import json
 
 config = dotenv_values(".env")
 
-def load_document(file_path: str, level: str, domain: str) -> List[Document]:
+def load_json_faq(file_path: str) -> List[Document]:
+    """Load FAQ from JSON file and create documents for each Q&A pair"""
     try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        documents = []
+        category = data.get('category', 'general')
+        
+        if 'faqs' in data:
+            for faq in data['faqs']:
+                question = faq.get('question', '')
+                answer = faq.get('answer', '')
+                faq_id = faq.get('id', '')
+                
+                # Tạo document từ cặp Q&A
+                content = f"Q: {question}\nA: {answer}"
+                doc = Document(
+                    page_content=content,
+                    metadata={
+                        "source": file_path,
+                        "file_type": "FAQ",
+                        "category": category,
+                        "subcategory": data.get('subcategory', ''),
+                        "question": question,
+                        "answer": answer,
+                        "faq_id": faq_id,
+                        "domain": "airbnb",
+                        # Mặc định level=general để chatbot retrieval hoạt động đúng filter
+                        "level": "general",
+                    }
+                )
+                documents.append(doc)
+        
+        return documents
+    
+    except Exception as e:
+        print(f"Error loading JSON FAQ {file_path}: {e}")
+        return []
+
+def load_document(file_path: str, level: str = "general", domain: str = "airbnb") -> List[Document]:
+    try:
+        # Kiểm tra xem file là JSON FAQ
+        if file_path.lower().endswith(".json"):
+            return load_json_faq(file_path)
+        
         # Chọn loader phù hợp
         if file_path.startswith("http://") or file_path.startswith("https://"):
             loader = YoutubeLoader.from_url(file_path) if "youtube.com" in file_path else WebBaseLoader(file_path)

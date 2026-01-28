@@ -1,0 +1,18 @@
+[
+  {
+    "subskill": "Introduction to NLP and Applications",
+    "theory": "Natural Language Processing (NLP) là lĩnh vực trí tuệ nhân tạo giúp máy tính hiểu, phân tích và sinh ngôn ngữ tự nhiên giống con người. NLP kết hợp giữa ngôn ngữ học, học máy và deep learning. Các ứng dụng phổ biến gồm: phân tích cảm xúc (sentiment analysis), chatbot, dịch máy (machine translation), hệ thống gợi ý, tóm tắt văn bản và tìm kiếm thông tin. NLP là nền tảng của nhiều sản phẩm AI hiện nay như Google Translate, Siri, ChatGPT."
+  },
+  {
+    "subskill": "Text Cleaning (Lowercasing, Stopwords Removal, Punctuation Handling)",
+    "theory": "Text Cleaning là bước tiền xử lý quan trọng giúp chuẩn hóa dữ liệu văn bản trước khi đưa vào mô hình NLP. Các kỹ thuật cơ bản gồm: Lowercasing (chuyển tất cả chữ về dạng thường để tránh phân biệt không cần thiết), Stopwords Removal (loại bỏ các từ phổ biến như 'is', 'the', 'and' không mang nhiều thông tin ngữ nghĩa), và Punctuation Handling (xử lý dấu câu như .,!?). Việc làm sạch văn bản giúp mô hình giảm nhiễu, tăng chất lượng biểu diễn từ và cải thiện độ chính xác của bài toán NLP."
+  },
+  {
+    "subskill": "Tokenization (Word, Subword, Sentence)",
+    "theory": "Tokenization là quá trình chia văn bản thành các đơn vị nhỏ hơn gọi là token để mô hình dễ xử lý. Có 3 mức phổ biến: Word Tokenization (chia theo từ, ví dụ 'I love NLP' → ['I','love','NLP']), Subword Tokenization (chia thành các mảnh nhỏ hơn từ, giúp xử lý từ hiếm, ví dụ 'unhappiness' → ['un', 'happiness']), và Sentence Tokenization (chia văn bản thành câu, ví dụ dựa vào dấu chấm). Tokenization là bước cơ bản để xây dựng biểu diễn từ và đưa dữ liệu vào mạng neural."
+  },
+  {
+    "subskill": "Stemming and Lemmatization",
+    "theory": "Stemming và Lemmatization là hai kỹ thuật chuẩn hóa từ về dạng gốc. Stemming cắt bỏ hậu tố để đưa từ về dạng cơ bản, nhưng có thể tạo ra từ không chuẩn (ví dụ 'studies' → 'studi'). Lemmatization dựa trên từ điển ngữ pháp để đưa về dạng gốc đúng nghĩa (ví dụ 'studies' → 'study', 'better' → 'good'). Lemmatization chính xác hơn nhưng tốn tài nguyên tính toán hơn. Cả hai giúp giảm số lượng từ vựng duy nhất, cải thiện hiệu quả huấn luyện mô hình NLP."
+  }
+]

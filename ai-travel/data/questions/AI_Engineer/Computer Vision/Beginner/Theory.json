@@ -1,0 +1,22 @@
+[
+    {
+        "subskill": "Linear Algebra",
+        "theory": "Linear Algebra là nền tảng của hầu hết các thuật toán trong học máy và học sâu. Nó cung cấp các công cụ để biểu diễn và thao tác với dữ liệu nhiều chiều thông qua vector, ma trận và tensor. Một trong những ứng dụng phổ biến nhất là trong việc biểu diễn dữ liệu đầu vào và trọng số trong các mạng neuron. \n\nCác phép toán cơ bản bao gồm cộng, nhân ma trận, và nhân vector-ma trận. Những khái niệm như trị riêng (eigenvalue), vector riêng (eigenvector) và phân rã ma trận (matrix decomposition) như SVD (Singular Value Decomposition) đóng vai trò quan trọng trong các kỹ thuật giảm chiều dữ liệu như PCA (Principal Component Analysis). \n\nHiểu rõ điều kiện ma trận (condition number) và tính khả nghịch của ma trận cũng rất quan trọng trong tối ưu hóa mô hình. Nhiều thuật toán học sâu dựa vào nhân ma trận để tính toán lan truyền thuận và lan truyền ngược."
+    },
+    {
+        "subskill": "Probability and Statistics",
+        "theory": "Xác suất và thống kê là công cụ thiết yếu trong việc mô hình hóa sự không chắc chắn của dữ liệu. Xác suất được sử dụng để ước lượng phân bố của dữ liệu và đánh giá khả năng xảy ra của các sự kiện. Trong học máy, xác suất giúp định nghĩa các mô hình như hồi quy logistic, Naive Bayes, và các mô hình xác suất đồ thị. \n\nCác khái niệm như phân phối chuẩn (Gaussian distribution), luật Bayes, kỳ vọng (expectation), phương sai (variance) là những nền tảng không thể thiếu. Thống kê mô tả được dùng để tóm tắt dữ liệu, trong khi thống kê suy diễn giúp kiểm định giả thuyết và đưa ra kết luận từ dữ liệu mẫu. \n\nTrong học sâu, xác suất xuất hiện trong việc tính toán hàm mất mát như cross-entropy và các kỹ thuật regularization như dropout."
+    },
+    {
+        "subskill": "Optimization",
+        "theory": "Tối ưu hóa là trung tâm của việc huấn luyện mô hình học máy và học sâu. Nó liên quan đến việc tìm cực tiểu hoặc cực đại của một hàm mục tiêu, thường là hàm mất mát. Các thuật toán tối ưu hóa phổ biến bao gồm Gradient Descent và các biến thể như SGD, Adam, RMSprop. \n\nGradient Descent hoạt động dựa trên việc tính đạo hàm của hàm mất mát theo các tham số mô hình và cập nhật chúng theo hướng giảm giá trị hàm mất mát. Một khía cạnh quan trọng khác là việc lựa chọn tốc độ học (learning rate) phù hợp để đảm bảo hội tụ nhanh mà không bị vượt quá cực tiểu. \n\nCác vấn đề như local minima, saddle point và overfitting là những thách thức phổ biến trong tối ưu hóa. Việc hiểu và áp dụng các kỹ thuật regularization như L1, L2 hay dropout cũng đóng vai trò quan trọng để cải thiện khả năng tổng quát của mô hình."
+    },
+    {
+        "subskill": "Machine Learning Basics",
+        "theory": "Cơ bản về Học máy bao gồm việc hiểu các khái niệm nền tảng như supervised learning, unsupervised learning và reinforcement learning. Supervised learning dựa vào dữ liệu nhãn để huấn luyện mô hình dự đoán, ví dụ như hồi quy tuyến tính và cây quyết định. \n\nUnsupervised learning thì tập trung vào tìm kiếm cấu trúc ẩn trong dữ liệu mà không có nhãn, ví dụ như clustering với K-Means hoặc phân tích thành phần chính (PCA). Ngoài ra, reinforcement learning sử dụng cơ chế phần thưởng để học chính sách hành động tối ưu trong môi trường động. \n\nCác thành phần quan trọng khác bao gồm chia tập dữ liệu thành train/test/validation, đánh giá mô hình bằng các chỉ số như accuracy, precision, recall, và F1-score, cũng như hiểu rõ hiện tượng overfitting và underfitting."
+    },
+    {
+        "subskill": "Deep Learning Fundamentals",
+        "theory": "Học sâu là một nhánh của học máy sử dụng mạng neuron nhiều lớp để mô hình hóa các quan hệ phi tuyến phức tạp. Một mạng neuron cơ bản bao gồm các lớp đầu vào, ẩn và đầu ra, mỗi lớp chứa các neuron thực hiện phép nhân tuyến tính và hàm kích hoạt phi tuyến. \n\nCác kiến trúc phổ biến bao gồm mạng fully-connected (Dense), CNN (Convolutional Neural Networks) cho xử lý ảnh và RNN (Recurrent Neural Networks) cho dữ liệu chuỗi. Quá trình huấn luyện mạng sâu dựa vào thuật toán lan truyền ngược (backpropagation) kết hợp với các kỹ thuật tối ưu hóa như SGD hoặc Adam. \n\nHọc sâu yêu cầu nhiều tài nguyên tính toán và dữ liệu lớn, do đó hiểu các kỹ thuật regularization (dropout, batch normalization) và cải tiến kiến trúc (ResNet, Transformer) là chìa khóa để xây dựng mô hình mạnh mẽ."
+    }
+]

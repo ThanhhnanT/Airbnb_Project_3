@@ -43,8 +43,37 @@ export class PaymentsService {
   async findAll(bookingId?: string, userId?: string): Promise<Payment[]> {
     try {
       const filter: any = {};
-      if (bookingId) filter.booking_id = bookingId;
-      if (userId) filter.user_id = userId;
+      
+      // Handle booking_id - support both string and ObjectId
+      if (bookingId) {
+        if (Types.ObjectId.isValid(bookingId)) {
+          // Use $in to match both string and ObjectId formats
+          filter.booking_id = {
+            $in: [
+              new Types.ObjectId(bookingId),
+              bookingId,
+            ],
+          };
+        } else {
+          filter.booking_id = bookingId;
+        }
+      }
+      
+      // Handle user_id - support both string and ObjectId
+      if (userId) {
+        if (Types.ObjectId.isValid(userId)) {
+          // Use $in to match both string and ObjectId formats
+          filter.user_id = {
+            $in: [
+              new Types.ObjectId(userId),
+              userId,
+            ],
+          };
+        } else {
+          filter.user_id = userId;
+        }
+      }
+      
       return await this.paymentModel.find(filter).populate('booking_id user_id').exec();
     } catch (error) {
       throw new InternalServerErrorException(`Error finding payments: ${error.message}`);

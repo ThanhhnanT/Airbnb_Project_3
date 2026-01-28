@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Refund Request Submitted - AirBnB</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body
+    style="margin: 0; padding: 0; min-width: 100%; font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; background-color: #FAFAFA; color: #222222;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #FF5A5F; padding: 24px; color: #ffffff;">
+            <h1
+                style="font-size: 24px; font-weight: 700; line-height: 1.25; margin-top: 0; margin-bottom: 15px; text-align: center;">
+                Refund Request Submitted</h1>
+        </div>
+        <div style="padding: 24px; background-color: #ffffff;">
+            <p style="margin-top: 0; margin-bottom: 24px;">Hello {{guestName}},</p>
+            <p style="margin-top: 0; margin-bottom: 24px;">Your refund request for the booking has been submitted successfully and is now under review by our admin team.</p>
+            
+            <div style="background-color: #f6f6f6; padding: 16px; margin: 24px 0; border-left: 4px solid #FF5A5F;">
+                <h3 style="margin-top: 0; margin-bottom: 12px; color: #222;">Booking Details:</h3>
+                <p style="margin: 8px 0;"><strong>Listing:</strong> {{listingTitle}}</p>
+                <p style="margin: 8px 0;"><strong>Check-in Date:</strong> {{checkInDate}}</p>
+                <p style="margin: 8px 0;"><strong>Check-out Date:</strong> {{checkOutDate}}</p>
+                <p style="margin: 8px 0;"><strong>Refund Amount:</strong> {{amount}} {{currency}}</p>
+                <p style="margin: 8px 0;"><strong>Reason:</strong> {{reason}}</p>
+            </div>
+
+            <p style="margin-top: 0; margin-bottom: 24px;">Your description: {{description}}</p>
+            
+            <p style="margin-top: 0; margin-bottom: 24px;"><strong>What happens next?</strong></p>
+            <ul style="margin: 12px 0 24px 24px; padding: 0;">
+                <li style="margin-bottom: 8px;">Our admin team will review your refund request</li>
+                <li style="margin-bottom: 8px;">You will receive an email notification once a decision is made</li>
+                <li style="margin-bottom: 8px;">If approved, the refund will be processed to your original payment method</li>
+                <li style="margin-bottom: 8px;">Refunds typically take 5-10 business days to appear in your account</li>
+            </ul>
+
+            <p style="margin-top: 0; margin-bottom: 24px;">You can track your refund request status in your account dashboard at any time.</p>
+        </div>
+        <div style="background-color: #f6f6f6; padding: 24px;">
+            <p style="margin-top: 0; margin-bottom: 24px;">
+                If you have any questions, please contact our support team.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

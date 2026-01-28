@@ -1,50 +1,46 @@
-# EUP - AI Tutor
+# AI Travel & Consultation API
 
 ## Getting Started with Docker
 
-This project is a FastAPI-based AI Tutor backend. The recommended way to run the application is using Docker.
+This project is a FastAPI-based backend for an Airbnb consultation chatbot. The recommended way to run the application is using Docker.
 
 ### Prerequisites
 - [Docker](https://docs.docker.com/get-docker/) installed on your system.
 
-### 1. Clone the Repository
+### 1. Build the Docker Image
+From the `ai-travel` directory:
 ```bash
-git clone https://gitlab.com/thanhhnant-group/eup-ai-tutor.git
+docker build -t ai-travel .
 ```
 
-### 2. Build the Docker Image
+### 2. Run the Docker Container
 ```bash
-docker build -t ai-schedule .
-```
-
-### 3. Run the Docker Container
-```bash
-docker run -d -p 8000:8000 --name ai-schedule-container ai-schedule
+docker run -d -p 8000:8000 --name ai-travel-container ai-travel
 ```
 
 - The API will be available at: [http://localhost:8000](http://localhost:8000)
-- The root endpoint (`/`) should return `{"Hello": "World"}`.
+- The root endpoint (`/`) returns a welcome message and service list.
 
-### 4. Stopping and Removing the Container
+### 3. Stopping and Removing the Container
 To stop the container:
 ```bash
-docker stop ai-schedule-container
+docker stop ai-travel-container
 ```
 To remove the container:
 ```bash
-docker rm ai-schedule-container
+docker rm ai-travel-container
 ```
 
-### 5. Updating the Container
+### 4. Updating the Container
 If you make changes to the code:
 1. Stop and remove the running container (see above).
 2. Rebuild the image:
    ```bash
-   docker build -t ai-schedule .
+   docker build -t ai-travel .
    ```
 3. Run the container again (see above).
 
-### 6. Environment Variables
+### 5. Environment Variables
 - The application uses a `.env` file for configuration. Make sure your `.env` file is present in the project root before building the Docker image.
 
 ---
@@ -59,14 +55,12 @@ If you make changes to the code:
 ```
 
 ## API Endpoints
-- `GET /` — Health check, returns a welcome message.
-- `POST /query` — Main endpoint for schedule queries (see code for request format).
+- `GET /` — Health check, returns a welcome message and available services.
+- `POST /chatbot/ask_question` — Ask questions about Airbnb usage.
+- `GET /chatbot/health` — Health check for chatbot service.
 
 ## Support
 For help, please open an issue in this repository.
 
 ## License
 Specify your license here.
-
-
-

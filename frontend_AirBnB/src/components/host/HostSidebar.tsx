@@ -14,6 +14,7 @@ import {
   CreditCardOutlined,
   DollarOutlined,
   BankOutlined,
+  UndoOutlined,
 } from "@ant-design/icons";
 import styles from "@/app/host/(dashboard)/manage/host-manage.module.css";
 
@@ -39,11 +40,12 @@ interface HostSidebarProps {
 }
 
 const items: MenuItem[] = [
-  getItem("Bảng điều khiển", "/host", <DashboardOutlined />),
+  getItem("Bảng điều khiển", "/host/dashboard", <DashboardOutlined />),
   getItem("Chỗ ở của tôi", "/host/manage", <HomeOutlined />),
   getItem("Đơn đặt phòng", "/host/bookings", <BookOutlined />),
   getItem("Tin nhắn", "/host/messages", <MessageOutlined />),
   getItem("Lịch", "/host/calendar", <CalendarOutlined />),
+  getItem("Hoàn tiền", "/host/refunds", <UndoOutlined />),
   getItem("Thanh toán", "/host/payouts", <DollarOutlined />),
   getItem("Thông tin ngân hàng", "/host/bank-account", <BankOutlined />),
 ];
@@ -55,8 +57,8 @@ export default function HostSidebar({ collapsed, userInfo }: HostSidebarProps) {
 
   useEffect(() => {
     if (!pathname) return;
-    if (pathname === "/host" || pathname === "/host/") {
-      setSelectedKeys(["/host"]);
+    if (pathname === "/host" || pathname === "/host/" || pathname.startsWith("/host/dashboard")) {
+      setSelectedKeys(["/host/dashboard"]);
     } else if (pathname.startsWith("/host/manage")) {
       setSelectedKeys(["/host/manage"]);
     } else if (pathname.startsWith("/host/bookings")) {
@@ -65,6 +67,8 @@ export default function HostSidebar({ collapsed, userInfo }: HostSidebarProps) {
       setSelectedKeys(["/host/messages"]);
     } else if (pathname.startsWith("/host/calendar")) {
       setSelectedKeys(["/host/calendar"]);
+    } else if (pathname.startsWith("/host/refunds")) {
+      setSelectedKeys(["/host/refunds"]);
     } else if (pathname.startsWith("/host/payouts")) {
       setSelectedKeys(["/host/payouts"]);
     } else if (pathname.startsWith("/host/bank-account")) {

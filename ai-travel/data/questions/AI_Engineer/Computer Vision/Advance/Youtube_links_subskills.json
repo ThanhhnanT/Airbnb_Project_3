@@ -1,0 +1,26 @@
+[
+  {
+    "subskill": "Mixed Precision Training",
+    "youtube_link": "https://www.youtube.com/watch?v=i1fIBtdhjIg"
+  },
+  {
+    "subskill": "Distributed Training with PyTorch/TF",
+    "youtube_link": "https://www.youtube.com/watch?v=i1fIBtdhjIg"
+  },
+  {
+    "subskill": "Gradient Accumulation and Checkpointing",
+    "youtube_link": "https://www.youtube.com/watch?v=pKZs4hllCvI"
+  },
+    {
+    "subskill": "Model Compression and Pruning",
+    "youtube_link": "https://www.youtube.com/watch?v=pKZs4hllCvI"
+  },
+  {
+    "subskill": "Neural Architecture Search",
+    "youtube_link": "https://www.youtube.com/watch?v=i1fIBtdhjIg"
+  },
+  {
+    "subskill": "Model Parallelism and Data Parallelism",
+    "youtube_link": "https://www.youtube.com/watch?v=A9FqqZWAM3g"
+  }
+]
